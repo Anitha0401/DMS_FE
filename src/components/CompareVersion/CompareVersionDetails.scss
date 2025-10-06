@@ -1,0 +1,46 @@
+.compare-version-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    width: '1150px';
+    height: 100%;
+    border: 1.5px solid #b0b0b0;
+    overflow-y: hidden; 
+    overflow-x: hidden;  
+}
+
+.diffDiv{
+    height: '620px';
+    border: 1.5px solid #251414;
+    overflow-y: auto;
+    overflow-x: hidden;  
+}
+
+label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333;
+    display: inline-block;
+    width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    flex-shrink: 0
+}
+
+.selectedText{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-weight: normal;
+    font-style: italic;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    width: auto;
+    display: inline-block;
+}

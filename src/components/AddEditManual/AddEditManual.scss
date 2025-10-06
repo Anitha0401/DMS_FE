@@ -1,0 +1,289 @@
+.add-edit-manual-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    width: '1150px';
+    height: 100%;
+    border: 1.5px solid #b0b0b0; 
+    overflow-y: hidden;  
+    overflow-x: hidden;  
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+
+        label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #333;
+            display: inline-block;
+            width: 110px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            flex-shrink: 0
+        }
+
+        input,
+        select{
+            min-height: 37px !important;
+            height: 37px !important;
+            font-size: 0.95rem;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+
+            &:focus {
+                border-color: #0078d4;
+                outline: none;
+            }
+        }
+
+        textarea {
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+
+            &:focus {
+                border-color: #0078d4;
+                outline: none;
+            }
+        }
+
+        .p-editor-toolbar {
+            background: #679ff3 !important;
+            border-radius: 6px 6px 0 0 !important;
+            border-bottom: 1.5px solid #b0b0b0 !important;
+        }
+
+        .p-editor-container {
+            width: 100% !important;
+            margin: 0 !important;
+            box-sizing: border-box;
+        }
+
+        .p-editor-toolbar {
+            width: 100% !important;
+            margin: 0 !important;
+            border-radius: 6px 6px 0 0 !important;
+        }
+
+        .p-editor-toolbar button[aria-label="Image"],
+        .p-editor-toolbar button[aria-label="Code"] {
+            display: none !important;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+
+    }
+
+    .p-datatable .p-datatable-thead>tr>th {
+        padding: 0.5rem 1rem !important;
+    }
+
+    .textbox-compact {
+        min-height: 37px !important;
+        height: 37px !important;
+        font-size: 0.95rem;
+    }
+
+    .dropdown-compact .p-dropdown {
+        min-height: 37px !important;
+        height: 37px !important;
+        font-size: 0.95rem;
+    }
+
+    .dropdown-compact .p-dropdown-label {
+        line-height: 35px !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .dropdown-compact .p-dropdown-item {
+        min-height: 37px !important;
+        font-size: 0.95rem;
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+    }
+
+.manual-form-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 2rem 2.5rem;
+    max-width: 900px;
+    margin: 2rem auto;
+}
+
+.manual-form-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #1976d2;
+    text-align: center;
+}
+
+.manual-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.manual-form-group {
+    display: flex;
+    flex-direction: row;
+    gap: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.manual-form-group2 {
+    display: block;
+    flex-direction: row;
+    margin-bottom: 0.3rem;
+}
+
+.manual-form-group label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.2rem;
+}
+
+.manual-form-group1 {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    margin-bottom: 0.1rem;
+}
+.manual-form-section {
+    margin-bottom: 1.5rem;
+}
+
+.manual-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn {
+    padding: 0.5rem 2rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary {
+    background: #1976d2;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #125ea2;
+}
+
+.btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #bdbdbd;
+}
+
+
+.button_holder {
+    height: auto;
+    width: 100%;
+    margin: 0px auto 10px auto;
+    text-align: center;
+    display: block;
+}
+.button {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 17px;
+    color: #fff;
+    font-weight: bold;
+    border: 1px solid #0072bc;
+    width: auto;
+    border-radius:3px;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    margin: 0px;
+    padding: 5px 10px;
+    cursor: pointer;
+    background: rgb(30,87,153); /* Old browsers */
+    /* IE9 SVG, needs conditional override of 'filter' to 'none' */
+    background: -moz-linear-gradient(top, rgba(30,87,153,1) 0%, rgba(41,137,216,1) 50%, rgba(32,124,202,1) 51%, rgba(125,185,232,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(30,87,153,1)), color-stop(50%, rgba(41,137,216,1)), color-stop(51%, rgba(32,124,202,1)), color-stop(100%, rgba(125,185,232,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgba(30,87,153,1) 0%, rgba(41,137,216,1) 50%, rgba(32,124,202,1) 51%, rgba(125,185,232,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(30,87,153,1) 0%, rgba(41,137,216,1) 50%, rgba(32,124,202,1) 51%, rgba(125,185,232,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(30,87,153,1) 0%, rgba(41,137,216,1) 50%, rgba(32,124,202,1) 51%, rgba(125,185,232,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgba(30,87,153,1) 0%, rgba(41,137,216,1) 50%, rgba(32,124,202,1) 51%, rgba(125,185,232,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#7db9e8', GradientType=0 ); /* IE6-8 */
+}
+.button:hover, .button:active {
+    border: 1px solid #5cacde;
+    background: #5cacde; /* Old browsers */
+    background: -moz-linear-gradient(top, #99cbea 0%, #5cacde 50%, #5cacde 51%, #99cbea 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, 86c9f3#99cbea), color-stop(50%, #8eb92a), color-stop(51%, #99cbea), color-stop(100%, #99cbea)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #99cbea 0%, #5cacde 50%, #5cacde 51%, #99cbea 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #99cbea 0%, #5cacde 50%, #5cacde 51%, #99cbea 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #99cbea 0%, #5cacde 50%, #5cacde 51%, #99cbea 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #99cbea 0%, #5cacde 50%, #5cacde 51%, #99cbea 100%); /* W3C */
+}
+.tox .tox-promotion {
+    visibility: hidden !important;
+}
+.tox.tox-tinymce {
+    border: 2px solid gray !important; /* Change color/width as needed */
+    border-radius: 8px !important;        /* Optional: rounded corners */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07); /* Optional: subtle shadow */
+}
+.tox .tox-toolbar,
+.tox .tox-toolbar__primary {
+    box-shadow: 0 0px 0px rgba(0,0,0,0.07); /* Optional: subtle shadow */
+    border-bottom: 1px solid gray !important; /* Change color/width as needed */
+}
+.tox .tox-edit-area__iframe:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+.tox .tox-edit-area__iframe {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+}
+
+.tox .tox-pop {
+    display: none !important;
+}
+
+.tox .tox-pop.tox-pop--left::before {
+    display: none !important;
+}

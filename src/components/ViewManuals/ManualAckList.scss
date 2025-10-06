@@ -1,0 +1,92 @@
+.manual-details {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 3px 4px 2px 4px;
+  margin: 3px auto;
+  max-width: 1800px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.manual-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.manual-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.manual-title-label {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.manual-details{
+    flex: 1 1 auto;
+    height: 85vh;
+    min-height: 100%;
+    border: 2px solid #b0b0b0 !important;
+    border-radius: 6px;
+    overflow-y: hidden;
+    background: #fff;
+}
+
+.manual-list{
+    flex: 1 1 auto;
+    min-height: 70%;
+    border: 2px solid #b0b0b0 !important; 
+    border-radius: 6px;
+    overflow-y: scroll;
+    background: #fff;
+}
+
+.datatable-scrollable {
+    max-height: 100px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.p-sortable-column-icon {
+    margin-left: auto;
+    margin-right: 0;
+    color: rgb(182, 182, 182) !important; 
+}
+
+.manual-details, .p-datatable-scrollable-body {
+    overflow-y: hidden;
+    height: 80vh;
+    min-height: 400px;
+}
+
+.manual-details .p-datatable-tbody > tr > td,
+.manual-details .p-datatable-thead > tr > th {
+    border: 1px solid #d4d4d4 !important;
+}
+
+.manual-details .p-datatable-tbody > tr > td,
+.manual-details .p-datatable-thead > tr > th {
+    border-left: 1px solid #d4d4d4 !important;
+    border-right: 1px solid #d4d4d4 !important;
+}
+
+.manual-details .p-datatable-tbody > tr > td:first-child,
+.manual-details .p-datatable-thead > tr > th:first-child {
+    border: 1px solid #ebcbcb !important;
+}
+.manual-details .p-datatable-emptymessage {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.p-datatable-emptymessage > td {
+    text-align: center !important;
+    width: 100% !important;
+}

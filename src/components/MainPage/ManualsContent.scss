@@ -1,0 +1,178 @@
+.sectionDiv{
+    height: 89vh; 
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding: 0px; 
+}
+
+.sectiontext{
+    margin: 5px;
+    padding: 5px;
+    background-color: rgb(243, 245, 247);
+    height: 79.4vh;
+    border-radius: 3px;
+    border: 1px solid gray;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.selectedTextDiv{
+    margin: 0px;
+    padding: 0px;
+    background-color: rgb(243, 245, 247);
+    height: 40px;
+}
+
+.selectedText{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    font-style: italic;
+    vertical-align: middle;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.selectedTextHighlight{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    font-style: italic;
+    color: blue;
+    display: inline-block;
+    width: 350px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.section-spn {
+    color: red;
+    padding-left: 10px;
+    font-size: 14px
+}
+
+.section-spn1 {
+    width: 80%;
+    height: 95%
+}
+
+.section-spn2 {
+    color: Red;
+    font-size: 16px;
+    font-weight: bold
+}
+
+.section-spn3 {
+    color: blue;
+    font-size: 16px;
+    font-weight: bold
+}
+
+.section-spn4 {
+    color: #2E86C1 !important;
+    padding-left: 10px;
+    font-size: 15px
+}
+
+.section-div {
+    overflow: auto;
+    padding: 5px 5px
+}
+
+.section-div1 {
+    float: right;
+    cursor: pointer
+}
+
+.section-div2 {
+    color: blue;
+    cursor: pointer
+}
+
+.large-checkbox {
+    transform: scale(1.5);
+    accent-color: #1976d2;
+}
+
+.big-favourite-btn {
+    font-size: 1rem !important;
+    padding: 1rem 1rem !important;
+    min-width: 70px;
+    border-radius: 1.5rem !important;
+    box-shadow: 0 2px 2px rgba(255, 193, 7, 0.15);
+}
+
+.download-icon-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 10px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.download-icon {
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+}
+
+.manual-action-btn {
+    margin-left: 10px;
+    vertical-align: middle;
+    height: 40px;
+    padding: 0 8px;
+    background-color: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+
+    &:hover,
+    &:focus {
+        background-color: #125ea2;
+    }
+}
+
+.info-icon-btn {
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.info-icon-btn img {
+  width: 40px;
+  height: 35px;
+}
+
+.no-header-dialog .p-dialog-header {
+  display: none !important;
+}
+
+/* For PrimeReact Button */
+.p-button:disabled,
+.p-button.p-disabled {
+  background: #e0e0e0 !important;
+  color: #a0a0a0 !important;
+  border-color: #cccccc !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
+
+/* For your custom .manual-action-btn class */
+.manual-action-btn:disabled {
+  background: #e0e0e0 !important;
+  color: #a0a0a0 !important;
+  border: 1px solid #cccccc !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
