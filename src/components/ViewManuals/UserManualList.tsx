@@ -5,6 +5,7 @@ import dmsLifecycleService from '../../services/DMSLifecycleService';
 import './UserManualList.scss';
 import { Dialog } from 'primereact/dialog';
 import ManualDetails from './ManualDetails';
+import { setError } from '../../store/slices/appSlice';
 
 export interface UserManualProps {
     userId: string;
@@ -35,17 +36,23 @@ export interface userDetails {
 const UserManualList: React.FC<UserManualProps> = ({callMode, userId}) => {
     const [visibleManualDetailsDialog, setVisibleManualDetailsDialog] = useState<boolean>(false);
     const [dm_ManualVersionID, setDm_ManualVersionID] = useState<number>(-1);
+    const [isLoading, setIsLoading] = useState(true);
   
     const [usersManualData, setUsersManualData] = useState<userDetails[]>([]);
     
     useEffect(() => {
-        dmsLifecycleService.apiCall(`DMS/GetUserManualListForCalledMode?userID=${userId}&calledMode=${callMode}`, 'get')
+        try {
+            dmsLifecycleService.apiCall(`DMS/GetUserManualListForCalledMode?userID=${userId}&calledMode=${callMode}`, 'get')
                 .then((data: any) => {
-                    setUsersManualData(data);
-                })
+                   setUsersManualData(data);
+                   setIsLoading(false);
+              })
                 .catch(() => {
                     setUsersManualData([]);
                 });
+            } catch (err: any) {
+                setError(err.message || 'Error fetching data');
+            } 
     }, []);
     
     const callManualDetails = (dm_ManualVersionID: number) => {
@@ -58,7 +65,12 @@ const UserManualList: React.FC<UserManualProps> = ({callMode, userId}) => {
                 value={usersManualData} 
                 paginator
                 rows={10}  
-                emptyMessage={'No data found.'}
+                scrollable
+                emptyMessage={
+                    <span style={{ display: 'block', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                        {isLoading ? 'Loading...' : 'No data found.'}
+                    </span>
+                }
                 className="manual-list p-datatable-gridlines"
                 style={{ width: '100%' }}>
                 <Column field="viewManualLink" header="View Manual" body={(rowData) => (

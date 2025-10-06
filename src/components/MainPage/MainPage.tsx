@@ -25,7 +25,7 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     const [favouriteCnt, setFavouriteCnt] = useState(0);
     const treeViewRef = useRef<any>(null);
 
-    useEffect(() => {   
+    const setUserActionCounts = () => {
         dmsLifecycleService.apiCall(`DMS/GetUserManualCounts?userId=${userId}`, 'get')
             .then((data: any) => {
                 if (data) {
@@ -44,8 +44,12 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
                 setFavouriteCnt(0);
             }
         );
+    };
 
-         dmsLifecycleService.apiCall(`Login/dbinfo`, 'get')
+    useEffect(() => {   
+        setUserActionCounts();
+
+        dmsLifecycleService.apiCall(`Login/dbinfo`, 'get')
             .then((data: any) => {
                 if (data) {
                    let serverShort = data.server ? data.server.substring(0, 7) : '';
@@ -69,12 +73,14 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
 
     const usersManualAction = (e: React.MouseEvent<HTMLAnchorElement>, callMode: string, headerText: string) => {
         e.preventDefault(); 
-        setShowUserManualDialog(true);
         setUsersAction(callMode);
         setUsersActionHeader(headerText);
+        setShowUserManualDialog(true);
     }
 
     const LoadTreeNodeData = () => {
+        setUserActionCounts();
+        
         if (treeViewRef.current && typeof treeViewRef.current.refreshTree === 'function') {
             treeViewRef.current.refreshTree();
         }

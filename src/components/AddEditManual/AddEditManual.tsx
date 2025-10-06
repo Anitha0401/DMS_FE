@@ -257,7 +257,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
             <div style={{ marginBottom: '1px', width: '100%', flexDirection: 'row', display: 'flex', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <label style={{ fontWeight: 'bold', width: '75px' }}>Status : </label>
-                    <label className='selectedTextHighlight'> {form.StatusString}</label>
+                    <label className='selectedTextHighlight' style={{width: '350px'}}> {form.StatusString}</label>
                 </div>
                 <div className="d-flex justify-content-end" style={{ textAlign: 'right', width: '100%' }}>
                     <button type="button" className="button" onClick={handlePublish}>Publish</button> &nbsp;&nbsp;

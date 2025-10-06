@@ -162,6 +162,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
     const refreshTree = () => {
         setSelectedAction('Refresh')
         const fetchData = async () => {
+            setNewNodeKey(appInfo.selectedManualNodeObj ? appInfo.selectedManualNodeObj.key : '');
             await LoadTreeNodeData();
         };
 
@@ -340,7 +341,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
         try {
             var url = 'DMS/UpdateManualRights';
            
-            const response = await dmsLifecycleService.apiCall(url, 'post', data, {
+            await dmsLifecycleService.apiCall(url, 'post', data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -422,21 +423,6 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
         }
     };
 
-    const CustomDialogHeader = ({ title, onClose }: { title: string, onClose: () => void }) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <span style={{ fontWeight: 600, fontSize: '1.2rem', color: '#0072bc' }}>{title}</span>
-            <button
-                type="button"
-                className="p-dialog-header-icon p-dialog-header-close p-link"
-                onClick={onClose}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#333' }}
-                aria-label="Close"
-            >
-                <span className="pi pi-times" />
-            </button>
-        </div>
-    );
-
     if (loading) return <div>Loading Tree.....</div>
 
     return (
@@ -449,8 +435,8 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                     style={{ height: '38px' }}
                 />
                 <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
-                    <Button label="" icon="pi pi-plus" className="treeButton" onClick={expandAll} /> &nbsp;&nbsp;
-                    <Button label="" icon="pi pi-minus" className="treeButton" onClick={collapseAll} />&nbsp;&nbsp;
+                    <Button label="" icon="pi pi-plus" className="treeButton" tooltip="Expand All" onClick={expandAll} /> &nbsp;&nbsp;
+                    <Button label="" icon="pi pi-minus" className="treeButton" tooltip="Collapse All" onClick={collapseAll} />&nbsp;&nbsp;
                 </div>
             </div>
             <div className="tree-container">

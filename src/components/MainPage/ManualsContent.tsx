@@ -15,6 +15,8 @@ import { Button } from 'primereact/button';
 import ApproveManual from './ApproveManual';
 import AddEditManual from '../AddEditManual/AddEditManual';
 import jsPDF from 'jspdf';
+import { downloadAsWord } from '../utils/DownloadWord';
+import { downloadAsPDF } from '../utils/DownloadPDF';
 
 export interface ManualDetailsProps {
     userId: string;
@@ -64,9 +66,22 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                 });
         };
        
+    const downloadAsWordHandler = () => {
+        downloadAsWord(headerText, manualText);
+    };
+    
+    const downloadAsPDFHandler = () => {
+        downloadAsPDF(headerText, manualText);
+    };
+ 
+    const contextMenuItems = [
+        { label: 'PDF', icon: 'pi pi-file-pdf', command: downloadAsPDFHandler },
+        { label: 'Word', icon: 'pi pi-file-word', command: downloadAsWordHandler }
+    ];
+
     const updateManuals = async (data: any) => {
         try {
-            const response = await dmsLifecycleService.apiCall('DMS/EditManual', 'post', data, {
+            await dmsLifecycleService.apiCall('DMS/EditManual', 'post', data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -74,7 +89,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
            setVisibleAddEditDialog(false);
            fetchData();
-           if (typeof onRefreshTree === 'function') onRefreshTree(); 
+           if (onRefreshTree) onRefreshTree(); 
         } catch (err: any) {
             dispatch(setError(err.message || 'Error adding manual'));
         }
@@ -82,7 +97,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
     const ApproveManuals = async (data: any) => {
         try {
-            const response = await dmsLifecycleService.apiCall('DMS/ApproveManual', 'post', data, {
+            await dmsLifecycleService.apiCall('DMS/ApproveManual', 'post', data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -90,7 +105,8 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
            setVisibleApproveManualDialog(false);
            fetchData();
-           if (typeof onRefreshTree === 'function') onRefreshTree(); 
+           if (onRefreshTree) onRefreshTree(); 
+           //if (typeof onRefreshTree === 'function') onRefreshTree(); 
         } catch (err: any) {
             dispatch(setError(err.message || 'Error approving manual'));
         }
@@ -98,7 +114,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
     const SendBackManuals = async (data: any) => {
         try {
-            const response = await dmsLifecycleService.apiCall('DMS/SendBackManual', 'post', data, {
+            await dmsLifecycleService.apiCall('DMS/SendBackManual', 'post', data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -106,111 +122,11 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
            setVisibleApproveManualDialog(false);
            fetchData();
-           if (typeof onRefreshTree === 'function') onRefreshTree(); 
+           if (onRefreshTree) onRefreshTree(); 
         } catch (err: any) {
             dispatch(setError(err.message || 'Error approving manual'));
         }
     }
-
-    const downloadAsPDF = () => {
-        const doc = new jsPDF();
-        doc.text(manualText.replace(/<[^>]+>/g, ''), 10, 10);
-        doc.save(`${headerText || 'manual'}.pdf`);
-    };
-
-    const downloadAsWord = () => {
-        const htmlContent = `
-      <html>
-        <head>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              line-height: 1.6;
-            }
-            h1 {
-              color: #4CAF50;
-              align: center;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-            }
-            th, td {
-              padding: 8px;
-              text-align: left;
-              border: 1px solid #000;
-            }
-            .header-table td {
-              vertical-align: middle;
-            }
-            .header-table {
-              margin-bottom: 20px;
-            }
-          </style>
-        </head>
-        <body>
-          <table class="header-table" style="width:100%;height:140px;border-collapse: collapse;">
-            <tr>
-              <td style="width:10%; text-align:center;">
-                <img src="logo.png" alt="Company Logo" width="100">
-              </td>
-              <td style="width:50%; text-align:center;">
-                <div style="border-bottom:1px solid #000;"><h2>Fleet Maintenance Manual</h2></div>
-                <div><h3>2.1 - Shipboard Maintenance</h3></div>
-              </td>
-              <td style="width:40%; text-align:left;">
-                <table style="width:100%;">
-                  <tr style="border-bottom: 1px solid #000;">
-                    <td style="border: none;"><strong>DOCUMENT ID</strong></td>
-                    <td style="border: none;">FMM</td>
-                  </tr>
-                  <tr style="border-bottom: 1px solid #000;">
-                    <td style="border: none;"><strong>ISSUED BY</strong></td>
-                    <td style="border: none;">DPA</td>
-                  </tr>
-                  <tr style="border-bottom: 1px solid #000;">
-                    <td style="border: none;"><strong>SECTION</strong></td>
-                    <td style="border: none;">2.1</td>
-                  </tr>
-                  <tr>
-                    <td style="border: none;"><strong>REV. NO.</strong></td>
-                    <td style="border: none;">1.0</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-          <h1>${headerText}</h1>
-          <div></div>
-          <div>${manualText}</div>
-        </body>
-      </html>
-    `;
-
-        // Create a Blob object with the HTML content
-        const blob = new Blob(["\ufeff", htmlContent], {
-            type: "application/msword",
-        });
-
-        // Create a download link
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `${headerText}.doc`; // File name for the Word document
-
-        // Trigger the download
-        document.body.appendChild(link);
-        link.click();
-
-        // Clean up
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    };
- 
-    const contextMenuItems = [
-        { label: 'PDF', icon: 'pi pi-file-pdf', command: downloadAsPDF },
-        { label: 'Word', icon: 'pi pi-file-word', command: downloadAsWord }
-    ];
 
     const showCompareVersion = async (data: any) => {
         try {
@@ -263,7 +179,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                     </span>  &nbsp;
                 </div>
                 <div style={{width: '1000px', flexDirection: 'row', display: 'inline-flex', alignItems: 'left', verticalAlign: 'middle'}}>
-                    <label className='selectedTextHighlight'
+                    <label className='selectedTextHighlight' style={{width: '700px'}}
                     title={
                         manualInfo.selectedManualNodeObj
                         ? manualInfo.selectedManualNodeObj.label
@@ -296,7 +212,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             height: '2.2rem', // adjust as needed
                             lineHeight: '1.2rem'
                         }}
-                        tooltip={isFavourite ? "Already in Favourites" : "Add to Favourite"}
+                        //tooltip={isFavourite ? "Already in Favourites" : "Add to Favourite"}
                         onClick={handleAddToFavourite}
                         disabled={isFavourite}
                     />
