@@ -36,7 +36,6 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
     useEffect(() => {
         dmsLifecycleService.apiCall(`DMS/GetManualDetailsByVersionId/${dmManualVersionID}`, 'get')
                 .then((data: any) => {
-                    console.log(data);
                     setManualData(data);
                 })
                 .catch(() => {

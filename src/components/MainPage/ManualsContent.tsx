@@ -14,9 +14,8 @@ import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import ApproveManual from './ApproveManual';
 import AddEditManual from '../AddEditManual/AddEditManual';
-import jsPDF from 'jspdf';
-import { downloadAsWord } from '../utils/DownloadWord';
-import { downloadAsPDF } from '../utils/DownloadPDF';
+import { downloadAsWord } from '../utils/DownloadManuals';
+import { downloadAsPDF } from '../utils/DownloadManuals';
 
 export interface ManualDetailsProps {
     userId: string;
@@ -67,11 +66,11 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         };
        
     const downloadAsWordHandler = () => {
-        downloadAsWord(headerText, manualText);
+        downloadAsWord(manualText, manualInfo.selectedManualNodeObj?.data?.dM_ManualVersionID);
     };
     
     const downloadAsPDFHandler = () => {
-        downloadAsPDF(headerText, manualText);
+        downloadAsPDF(manualText, manualInfo.selectedManualNodeObj?.data?.dM_ManualVersionID);
     };
  
     const contextMenuItems = [
