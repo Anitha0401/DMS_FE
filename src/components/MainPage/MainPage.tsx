@@ -80,7 +80,7 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
 
     const LoadTreeNodeData = () => {
         setUserActionCounts();
-        
+
         if (treeViewRef.current && typeof treeViewRef.current.refreshTree === 'function') {
             treeViewRef.current.refreshTree();
         }
@@ -96,7 +96,7 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
             <div className="row body">
                 <div
                     id="treeComponent"
-                    className={toggleTree ? "col-3 tree" : "col-1 tree"}
+                    className= "col-3 tree"
                     style={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -112,7 +112,6 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            flexShrink: 0
                         }}
                     >
                         <a href="#" className="hyperlink" onClick={(e) => usersManualAction(e, "PendingMyApproval", "Approval Pending")}>

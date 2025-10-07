@@ -16,6 +16,8 @@ import ApproveManual from './ApproveManual';
 import AddEditManual from '../AddEditManual/AddEditManual';
 import { downloadAsWord } from '../utils/DownloadManuals';
 import { downloadAsPDF } from '../utils/DownloadManuals';
+import JoditEditor from 'jodit-react';
+import { defaultMargins } from 'html-docx-js-typescript/dist/templates';
 
 export interface ManualDetailsProps {
     userId: string;
@@ -50,11 +52,15 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
             if(manualInfo.selectedManualNodeObj?.data?.dM_StatusID === 150) {
                 setIsManualReleased(manualInfo.selectedManualNodeObj.data.isActive);
             }
-            
-            fetchData();
         }        
     }, [manualInfo.selectedManualNodeObj]);
     
+    useEffect(() => {
+        if (manualInfo.selectedManualNodeObj) {
+            fetchData();
+        }
+    }, [isChecked, manualInfo.selectedManualNodeObj]);
+
     const fetchData = async() => {
           dmsLifecycleService.apiCall(`DMS/GetManualContent?dm_ManualID=${manualInfo.selectedManualNodeObj.key}&IncludeSubManuals=${isChecked}`, 'get')
                 .then((manualResponse) => {
@@ -157,6 +163,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
             .catch(() => {
                 toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected to add favourite!', life: 3000 });
             });
+           if (onRefreshTree) onRefreshTree(); 
     }
 
     const reject = () => {
@@ -293,12 +300,18 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                     </div>
             </div>
             <div className='sectiontext'>
-                { manualInfo.selectedManualNodeObj ? (
-                      <p style={{whiteSpace:'pre-wrap'}} dangerouslySetInnerHTML={{ __html: manualText }}>
-                      </p>
-                    ) : 
-                    ( <p></p> )
-                }
+                 {manualInfo.selectedManualNodeObj ? (
+                    <JoditEditor
+                        value={manualText}
+                        config={{
+                            readonly: true,
+                            toolbar: false,
+                            height: 690,
+                        }}
+                    />
+                ) : (
+                    <p></p>
+                )}
             </div>
         </div>
         <Dialog header={'Compare Version'}

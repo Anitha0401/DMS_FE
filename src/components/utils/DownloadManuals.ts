@@ -111,7 +111,7 @@ export async function generateHTMLContent(manualText: string, dmManualVersionID:
 export async function downloadAsWord(manualText: string, dmManualVersionID: number) {
     
     const { htmlContent, manualName } = await generateHTMLContent(manualText, dmManualVersionID);
-
+console.log(htmlContent);
     // Create a Blob object with the HTML content
     const blob = new Blob(["\ufeff", htmlContent], {
         type: "application/msword",
@@ -127,12 +127,9 @@ export async function downloadAsWord(manualText: string, dmManualVersionID: numb
     document.body.appendChild(link);
     link.click();
 
-    // Open the Word document in a new tab (if supported)
-    window.open(url, '_blank');
-
     // Clean up
     document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(url), 1000); // Delay cleanup to allow opening
+    URL.revokeObjectURL(url);
 }
 
 export async function downloadAsPDF(manualText: string, dmManualVersionID: number) {

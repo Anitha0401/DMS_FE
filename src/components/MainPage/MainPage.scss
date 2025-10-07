@@ -1,13 +1,15 @@
-//Main content section
-.mainPanel{
-    background-color: aliceblue;
-    width: 100%;
+body, html, .wrapper {
     height: 100vh;
-    padding: 5px 2px 5px 5px;
-    box-sizing: border-box;
+    overflow: hidden;
 }
 
-/*-----------------------------content part-----------------------*/
+
+/* Ensure the main row fills the viewport and does not scroll */
+.row.body {
+    height: calc(100vh - 80px);
+    overflow: hidden;
+    display: flex;
+}
 
 .row {
     margin-left: 0px !important;
@@ -24,14 +26,35 @@ body .p-contextmenu {
     width: 200px;
 }
 
-body .p-tree {
-    padding: 2px;
+.menu-bar {
+    background-color: aliceblue;
+    justify-content: space-between;
+    align-items: left;
+    border-radius: 6px;
+    padding: 0 1px;
+    box-sizing: border-box;
+    gap: 8px;
+  }
+
+ .tree-bar {
+    background-color: aliceblue;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px;
+    padding: 0 2px;
+    box-sizing: border-box;
+    height: 100%;
+  }
+
+.p-tree.p-component.p-tree-selectable {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; 
+    overflow-x: hidden;
+    margin: 0px;
+    padding: 0px;
 }
 
-body .p-button.p-button-text-only .p-button-text {
-    padding: 0px !important;
-    font-size: 13px;
-}
 
 //left side container
 .tree-maincontainer {
@@ -53,42 +76,7 @@ body .p-button.p-button-text-only .p-button-text {
   border-radius: 2px;
 }
 
-.menu-bar {
-    background-color: aliceblue;
-    justify-content: space-between;
-    align-items: left;
-    border-radius: 6px;
-    padding: 0 1px;
-    box-sizing: border-box;
-    gap: 8px;
-  }
-
-  .tree-bar {
-    background-color: aliceblue;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 6px;
-    padding: 0 2px;
-    box-sizing: border-box;
-    height: 100%;
-  }
-
-.p-tree.p-component.p-tree-selectable {
-    width: 100%;
-    height: 100%;
-    overflow-y: auto; 
-    overflow-x: hidden;
-    margin: 0px;
-    padding: 0px;
-}
-
-
 .col-3.tree {
-    padding: 0px;
-    border-right: 1px solid #d4d4d4;
-}
-
-.col-1.tree {
     padding: 0px;
     border-right: 1px solid #d4d4d4;
 }
