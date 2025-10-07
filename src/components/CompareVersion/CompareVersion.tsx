@@ -71,8 +71,8 @@ const CompareVersion: React.FC<ManualFormProps> = ({ onSubmit, closeForm, select
                 </div>
                 <div className="d-flex justify-content-end" style={{ textAlign: 'right', marginRight: '60px', width: '100%' }}>
                     <button type="submit" className="button" style={{height: '67px'}}>Compare</button>
-                    <button type="button" className="btn-gray btn-secondary ms-2" style={{height: '67px', width: '80px'}} onClick={closeForm}>Cancel
-                    </button> &nbsp;&nbsp;&nbsp;
+                    <button type="button" className="btn-gray btn-secondary ms-2" style={{height: '67px', width: '85px'}} onClick={closeForm}>Cancel
+                    </button> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 </div>
             </div>
             <div style={{ display: 'flex', gap: '5px', marginTop: '10px' }}>

@@ -89,7 +89,9 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                 setVisibleAddEditDialog(true); 
                 setHeaderText('Edit Manual : ' + selectedNodeLabel); 
                 setSelectedAction('Edit'); },
-            disabled: !(appInfo.selectedManualNodeObj && String(appInfo.selectedManualNodeObj.data.statusString).toUpperCase() === 'DRAFT')
+            disabled: !(appInfo.selectedManualNodeObj &&
+                        (String(appInfo.selectedManualNodeObj.data.statusString).toUpperCase() === 'DRAFT' ||
+                         String(appInfo.selectedManualNodeObj.data.statusString).toUpperCase() === 'RELEASED'))
         },
         {
             label: 'Delete ',

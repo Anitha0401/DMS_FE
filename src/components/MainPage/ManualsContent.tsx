@@ -275,7 +275,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             onClick={() => { setVisibleAddEditDialog(true); }}
                             type="button"
                             style={{ width: '100px', marginRight: '8px' }}
-                            disabled = {isManualReleased || manualInfo.selectedManualNodeObj?.data?.dM_StatusID !== 100}
+                            disabled = {!isManualReleased && manualInfo.selectedManualNodeObj?.data?.dM_StatusID !== 100}
                         >
                             Edit
                         </button>
@@ -316,9 +316,9 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         </div>
         <Dialog header={'Compare Version'}
             visible={visibleCompareVersionDialog}
-            style={{ width: '450px', height: '35vh', minWidth: '90vh' }}
+            style={{ width: '450px', height: '32vh', minWidth: '90vh' }}
             contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
-            headerStyle={{ backgroundColor: '#d2e3f9ff', borderBottom: '3px solid blue' }}
+            headerStyle={{ height: '60px', backgroundColor: '#d2e3f9ff', borderBottom: '2px solid blue' }}
             onHide={() => { if (!visibleCompareVersionDialog) return; setVisibleCompareVersionDialog(false); }}>
             <CompareVersion
                 onSubmit={showCompareVersion}
