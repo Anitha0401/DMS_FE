@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './ManualDetails.scss';
 import dmsLifecycleService from '../../services/DMSLifecycleService';
+import JoditEditor from 'jodit-react';
 
 export interface ManualDetailsProps {
     dmManualVersionID: number;
@@ -32,22 +33,26 @@ export type ManualDetails = {
 
 const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeForm }) => {
    const [manualData, setManualData] = useState<ManualDetails>();
+   const [loading, setLoading] = useState(true);
     
     useEffect(() => {
         dmsLifecycleService.apiCall(`DMS/GetManualDetailsByVersionId/${dmManualVersionID}`, 'get')
                 .then((data: any) => {
                     setManualData(data);
+                    setLoading(false);
                 })
                 .catch(() => {
                     setManualData(undefined);
+                    setLoading(false);
                 });
     }, []);
+
+    if (loading) return <div>Loading manual detailss.....</div>
 
     return (
          <div className="manual-details-container">
             <div className="manual-details-header">
                 <h3>{manualData?.manualName || 'Manual Details'}</h3>
-                {/* Optionally add a close button here */}
             </div>
             <div className="manual-details-grid">
                 <div className="manual-details-item">
@@ -117,9 +122,18 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
             </div>
             <div className="manual-details-section">
                 <span className="label">Contents</span>
-                <div className="manual-details-contents">
-                     <p style={{whiteSpace:'pre-wrap'}} dangerouslySetInnerHTML={{ __html: manualData?.textContents ?? "" }}>
-                      </p>
+                <div className="manual-details-contents" style={{ margin:'0px', padding: '2px', overflowY: 'hidden'}}>
+                      <JoditEditor
+                        value={manualData?.textContents ?? ""}
+                        config={{
+                            readonly: true,
+                            toolbar: false,
+                            height: 390,
+                            showXPathInStatusbar: false,
+                            showCharsCounter: false,
+                            showWordsCounter: false
+                        }}
+                    />
                 </div>
             </div>
         </div>

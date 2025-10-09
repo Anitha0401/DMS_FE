@@ -59,6 +59,13 @@ const UserManualList: React.FC<UserManualProps> = ({callMode, userId}) => {
       setDm_ManualVersionID(dm_ManualVersionID) 
       setVisibleManualDetailsDialog(true)
     };
+
+    const formatDate = (dateStr: string) => {
+        if (!dateStr) return '';
+        // Assumes dateStr is ISO format or contains date and time
+        return dateStr.split('T')[0]; // Returns only the date part
+    };
+
     return (
         <div className="manual-details">
             <DataTable 
@@ -72,32 +79,38 @@ const UserManualList: React.FC<UserManualProps> = ({callMode, userId}) => {
                     </span>
                 }
                 className="manual-list p-datatable-gridlines"
-                style={{ width: '100%' }}>
-                <Column field="viewManualLink" header="View Manual" body={(rowData) => (
-                    <a href={rowData.viewManualLink} target="_blank" rel="noopener noreferrer"
-                     onClick={(e) => {
+                style={{ width: '100%' }}
+                tableStyle={{ tableLayout: 'fixed' }}
+                >
+                <Column field="viewManualLink" header="#" style={{ width: '60px' }} body={(rowData) => (
+                    <a href={rowData.viewManualLink} 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       onClick={(e) => {
                             e.preventDefault();
                             callManualDetails(rowData.dM_ManualVersionID);
-                        }}>View</a>
+                        }}>View
+                    </a>
                 )} />
                 <Column field="categoryName" header="Category" style={{width: '150px'}} />
-                <Column field="manualCode" header="Manual Code" style={{width: '150px'}} />
+                <Column field="manualCode" header="Manual Code" style={{width: '80px'}} />
                 <Column field="manualName" header="Manual Name" style={{width: '500px'}} />
-                <Column field="version" header="Version" style={{width: '150px'}} />
+                <Column field="version" header="Version" style={{width: '80px'}} />
                 <Column field="statusString" header="Status" style={{width: '150px'}} />
-                <Column field="isApprovalRequired" header="Is Approval Required" style={{width: '150px'}} />
-                <Column field="canExport" header="Can Export" style={{width: '150px'}} />
-                <Column field="createdBy" header="Created By" style={{width: '150px'}} />
-                <Column field="createdDate" header="Created Date" style={{width: '150px'}} />
-                <Column field="releasedBy" header="Released By" style={{width: '150px'}} />
-                <Column field="releasedDate" header="Released Date" style={{width: '150px'}} />
-                <Column field="publishedBy" header="Published By" style={{width: '150px'}} />
-                <Column field="publishedDate" header="Published Date" style={{width: '150px'}} />
-                <Column field="lastModifiedBy" header="Last Modified By" style={{width: '150px'}} />
-                <Column field="lastModifiedDate" header="Last Modified Date" style={{width: '150px'}} />
-                <Column field="comments" header="Comments" style={{width: '150px'}} />
-                <Column field="dM_ManualID" header="DM_ManualID" style={{width: '150px'}} />
-                <Column field="dM_ManualVersionID" header="DM_ManualVersionID" style={{width: '150px'}} />
+                <Column field="isApprovalRequired" header="Approval Required" style={{width: '90px'}} />
+                <Column field="canExport" header="Can Export" style={{width: '80px'}} />
+                <Column field="isAcknowledgementRequired" header="Ack Required" style={{width: '90px'}} />
+                <Column field="createdBy" header="Created By" style={{width: '120px'}} />
+                <Column field="createdDate" header="Created Date" style={{width: '100px'}} body={rowData => formatDate(rowData.createdDate)} />
+                <Column field="releasedBy" header="Released By" style={{width: '120px'}} />
+                <Column field="releasedDate" header="Released Date" style={{width: '100px'}} body={rowData => formatDate(rowData.releasedDate)} />
+                <Column field="publishedBy" header="Published By" style={{width: '120px'}} />
+                <Column field="publishedDate" header="Published Date" style={{width: '110px'}} body={rowData => formatDate(rowData.publishedDate)} />
+                <Column field="lastModifiedBy" header="Last Modified By" style={{width: '120px'}} />
+                <Column field="lastModifiedDate" header="Last Modified Date" style={{width: '110px'}} body={rowData => formatDate(rowData.lastModifiedDate)} />
+                <Column field="comments" header="Comments" style={{width: '250px'}} />
+                {/* <Column field="dM_ManualID" header="ID" style={{width: '1px'}} />
+                <Column field="dM_ManualVersionID" header="ID" style={{width: '0px'}} /> */}
             </DataTable>
 
             {visibleManualDetailsDialog && (
@@ -106,7 +119,14 @@ const UserManualList: React.FC<UserManualProps> = ({callMode, userId}) => {
                     visible={visibleManualDetailsDialog}
                     style={{ width: '1550px', minWidth: '90vh' }}
                     contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
-                    headerStyle={{ backgroundColor: '#d2e3f9ff', borderBottom: '3px solid blue', height: '60px' }}
+                    headerStyle={{
+                        backgroundColor: '#d2e3f9ff',
+                        borderBottom: '3px solid blue',
+                        height: '50px',
+                        display: 'flex',
+                        alignItems: 'center', // Vertically center header content and close button
+                        justifyContent: 'space-between'
+                    }}
                     onHide={() => { if (!visibleManualDetailsDialog) return; setVisibleManualDetailsDialog(false); }}>
                     <ManualDetails 
                         closeForm={() => setVisibleManualDetailsDialog(false)}

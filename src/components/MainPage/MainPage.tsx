@@ -52,21 +52,17 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
         dmsLifecycleService.apiCall(`Login/dbinfo`, 'get')
             .then((data: any) => {
                 if (data) {
-                   let serverShort = data.server ? data.server.substring(0, 7) : '';
+                   let dbShort = data.database ? data.database.substring(0, 7).toLowerCase() : '';
                    let dbInfo = "Prod Env";
-                   if (serverShort === "testdms") dbInfo = "Dev Env";
-                   else if (serverShort === "testdms") dbInfo = "QA Env";
-                   else if (serverShort === "testdms") dbInfo = "Dev Env";
-                   else if (serverShort === "testdms") dbInfo = "UAT Env";
+                   if (dbShort === "testdms") dbInfo = "Dev Env";
+                   else if (dbShort === "testdms") dbInfo = "QA Env";
+                   else if (dbShort === "testdms") dbInfo = "Dev Env";
+                   else if (dbShort === "testdms") dbInfo = "UAT Env";
                    setDbInfoAction(dbInfo);
                 }
             })
             .catch(() => {
-                setApprovalCnt(0);
-                setReviewCnt(0);
-                setAckCnt(0);
-                setNewCnt(0);
-                setFavouriteCnt(0);
+               
             }
         );
     }, [userId]);

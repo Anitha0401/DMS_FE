@@ -67,21 +67,28 @@
     min-height: 200px;
 }
 
-.vessel-rank-list .p-datatable-tbody > tr > td,
+.vessel-rank-list .p-datatable-tbody > tr > td{
+    border: 1px solid #d4d4d4 !important;
+}
+
 .vessel-rank-list .p-datatable-thead > tr > th {
     border: 1px solid #d4d4d4 !important;
+    height: 30px !important;
+    max-height: 30px !important;
+    line-height: 30px !important;
+    padding: 4px 8px !important; /* Adjust as needed, or use 0 for no padding */
+    background-color: aliceblue !important;
 }
 
 .vessel-rank-list .p-datatable-tbody > tr > td,
 .vessel-rank-list .p-datatable-thead > tr > th {
     border-left: 1px solid #d4d4d4 !important;
     border-right: 1px solid #d4d4d4 !important;
+    overflow-y: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.vessel-rank-list .p-datatable-tbody > tr > td:first-child,
-.vessel-rank-list .p-datatable-thead > tr > th:first-child {
-    border: 1px solid #ebcbcb !important;
-}
 .vessel-rank-list .p-datatable-emptymessage {
     height: 100%;
     display: flex;

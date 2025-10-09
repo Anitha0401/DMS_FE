@@ -70,13 +70,16 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
 
     const config = {
         readonly: false,
-        height: 380,
+        height: 420,
         toolbar: true,
         placeholder: '',
         toolbarAdaptive: false,
         toolbarSticky: false,
         toolbarStickyOffset: 0,
-        removeButtons: ['source', 'about', 'print', 'superscript', 'subscript', 'indent', 'outdent', 'symbol', 'speechRecognition']
+        removeButtons: ['source', 'about', 'print', 'superscript', 'subscript', 'speechRecognize'],
+        showXPathInStatusbar: false,
+        showCharsCounter: false,
+        showWordsCounter: false
     };
 
     const contextMenuItems = [

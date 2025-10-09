@@ -242,7 +242,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             onChange={e => { setIsChecked(e.target.checked); }}
                             className="large-checkbox"
                             style={{ marginLeft: '6px', marginRight: '4px', verticalAlign: 'middle' }}
-                         />
+                         />{' '}&nbsp;
                         Include Sub Manual
                     </label>
                     </div>
@@ -307,6 +307,9 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             readonly: true,
                             toolbar: false,
                             height: 690,
+                            showCharsCounter: false,
+                            showWordsCounter: false,
+                            showXPathInStatusbar: false,
                         }}
                     />
                 ) : (
@@ -342,6 +345,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         </Dialog>
         {visibleManualDetailsDialog && (
             <Dialog
+                className="manual-details-dialog"
                 header={'Manual Details '}
                 visible={visibleManualDetailsDialog}
                 style={{ width: '1550px', minWidth: '90vh' }}

@@ -64,21 +64,31 @@
     min-height: 400px;
 }
 
-.manual-details .p-datatable-tbody > tr > td,
+.manual-details .p-datatable-thead > tr,
 .manual-details .p-datatable-thead > tr > th {
-    border: 1px solid #d4d4d4 !important;
-}
-
-.manual-details .p-datatable-tbody > tr > td,
-.manual-details .p-datatable-thead > tr > th {
+    height: 20px !important;
+    max-height: 20px !important;
+    line-height: 20px !important;
     border-left: 1px solid #d4d4d4 !important;
     border-right: 1px solid #d4d4d4 !important;
+    background-color: aliceblue !important;
+    padding: 4px 8px !important; /* Adjust as needed, or use 0 for no padding */
 }
 
-.manual-details .p-datatable-tbody > tr > td:first-child,
-.manual-details .p-datatable-thead > tr > th:first-child {
-    border: 1px solid #ebcbcb !important;
+.manual-details .p-datatable-tbody > tr {
+    height: 51px; /* Set your desired row height */
+    max-height: 51px;
 }
+
+.manual-details .p-datatable-tbody > tr > td {
+    border-left: 1px solid #d4d4d4 !important;
+    border-right: 1px solid #d4d4d4 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 1px; /* Forces ellipsis based on column width */
+}
+
 .manual-details .p-datatable-emptymessage {
     height: 100%;
     display: flex;

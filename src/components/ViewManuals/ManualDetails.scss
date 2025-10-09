@@ -81,7 +81,27 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.03);
   overflow-y: auto;
 }
+/* Fix PrimeReact Dialog header and close icon alignment */
+.p-dialog .p-dialog-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 50px !important;
+  padding-right: 1.5rem;
+  vertical-align: middle !important;
+}
 
+.p-dialog .p-dialog-header-icon {
+  align-self: center !important;
+  vertical-align: middle !important;
+  margin-top: 0 !important;
+}
+
+.p-dialog .p-dialog-title {
+  margin: 0 !important;
+  padding: 0 !important;
+  align-self: center !important;
+}
 @media (max-width: 700px) {
   .manual-details-container {
     padding: 1rem;
