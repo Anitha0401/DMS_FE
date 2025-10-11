@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import * as Diff from 'diff';
+import DOMPurify from 'dompurify';
 import dmsLifecycleService from '../../services/DMSLifecycleService';
 import './CompareVersionDetails.scss';
 
-// import ReactDiffViewer from 'react-diff-viewer';
-// import Prism from 'prismjs';
-// import 'prismjs/components/prism-javascript';
-// import 'prismjs/themes/prism.css';
-
 type ManualFormProps = {
     closeForm: () => void;
-    manualID: number
+    manualID: number;
     DM_ManualVersionID_ToCompare: number;
 };
 
@@ -18,6 +15,89 @@ const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID,
     const [currentText, setCurrentText] = useState<string>('');
     const [compareVersion, setCompareVersion] = useState<string>('');
     const [compareText, setCompareText] = useState<string>('');
+    const [diffResult, setDiffResult] = useState<Diff.Change[]>([]);
+
+    const formatHTMLForDisplay = (htmlContent: string) => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        return tempDiv.innerText;
+    };
+
+    const renderDiff = (changes: Diff.Change[]) => {
+        const diffStyles = {
+            removed: {
+                backgroundColor: '#ffd7d5',
+                textDecoration: 'line-through',
+                color: '#b31d28',
+                display: 'inline',
+            },
+            added: {
+                backgroundColor: '#cdffd8',
+                color: '#22863a',
+                display: 'inline',
+            },
+            unchanged: {
+                color: '#24292e',
+                display: 'inline'
+            },
+            diffLine: {
+                display: 'flex',
+                width: '100%',
+                marginBottom: '8px'
+            },
+            diffPanel: {
+                flex: 1,
+                padding: '10px 20px',
+                backgroundColor: '#f6f8fa',
+                overflowX: 'auto' as React.CSSProperties['overflowX'],
+                whiteSpace: 'nowrap' as const
+            }
+        };
+
+        // Group changes by lines for side-by-side comparison
+        const leftContent = changes.map((part, index) => {
+            if (part.removed || !part.added) {
+                return (
+                    <span key={index} style={part.removed ? diffStyles.removed : diffStyles.unchanged}>
+                        {formatHTMLForDisplay(part.value)}
+                    </span>
+                );
+            }
+            return null;
+        });
+
+        const rightContent = changes.map((part, index) => {
+            if (part.added || !part.removed) {
+                return (
+                    <span key={index} style={part.added ? diffStyles.added : diffStyles.unchanged}>
+                        {formatHTMLForDisplay(part.value)}
+                    </span>
+                );
+            }
+            return null;
+        });
+
+        return (
+            <div style={{ display: 'flex', width: '100%' }}>
+                <div style={{ ...diffStyles.diffPanel, borderRight: '1px solid #e1e4e8' }}>
+                    <h3 style={{ fontSize: '1.25rem', color: '#24292e', borderBottom: '1px solid #e1e4e8', paddingBottom: '8px' }}>
+                        Compare Version : {compareVersion}
+                    </h3>
+                    <div className="diff-content">
+                        {leftContent}
+                    </div>
+                </div>
+                <div style={diffStyles.diffPanel}>
+                    <h3 style={{ fontSize: '1.25rem', color: '#24292e', borderBottom: '1px solid #e1e4e8', paddingBottom: '8px' }}>
+                        Current Version : {currentVersion}
+                    </h3>
+                    <div className="diff-content">
+                        {rightContent}
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     useEffect(() => {
       const fetchData = async() => {
@@ -27,6 +107,13 @@ const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID,
                 setCurrentText(data.current_ManualContent);
                 setCompareVersion(data.compare_Version);
                 setCompareText(data.compare_ManualContent);
+                
+                // Calculate diff on the HTML content
+                const diff = Diff.diffWords(
+                    data.compare_ManualContent,
+                    data.current_ManualContent
+                );
+                setDiffResult(diff);
             })
             .catch(() => {
                 setCurrentVersion('');
@@ -37,44 +124,19 @@ const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID,
         }
 
         fetchData();
-    }, [DM_ManualVersionID_ToCompare]);
+    }, [DM_ManualVersionID_ToCompare, manualID]);
 
-    const syntaxHighlight = (str :any) => {
-      if (!str) return;
-      // const language = Prism.highlight(str, Prism.languages.javascript,  'js');
-      // return <span dangerouslySetInnerHTML={{ __html: language }} />;
+    const sanitizeAndRenderHTML = (content: string) => {
+        // Sanitize HTML content for security
+        const sanitizedContent = DOMPurify.sanitize(content);
+        return <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
     };
 
     return (
         <div className="compare-version-details">
-            <div style={{ marginBottom: '1px', width: '100%',  flexDirection: 'column', display: 'flex', justifyContent: 'space-between' }}>
-               <div style={{flexDirection : 'row', display:'flex', width:'100%'}}>
-                  <div style={{flexDirection:'row'}}>
-                     <label className='selectedText'>
-                    Compare Version :
-                    </label>
-                    <span style={{ width:'450px', fontWeight: 'bold', fontSize: 18, fontStyle:'bold', marginLeft: 8, display:'inline-block' }}> 
-                      {compareVersion}
-                    </span>
-
-                    <label className='selectedText' style={{ textAlign:'right'}}>
-                    Current Version :
-                    </label>
-                    <span style={{width: '350px', fontWeight: 'bold', fontSize: 18, fontStyle:'bold', marginLeft: 8, display:'inline-block' }}> 
-                    {currentVersion}
-                    </span>
-                 
-                 
-                    <button style={{alignItems:'right'}} onClick={closeForm}>Close</button>
-                  </div>
-               </div>
-                <div style={{ height: '620px', overflowY: 'auto', border:'1.5px solid #251414' }} >
-                    {/* <ReactDiffViewer
-                      oldValue={compareText} 
-                      newValue={currentText} 
-                      renderContent={syntaxHighlight}
-                      splitView={true} 
-                    /> */}
+            <div style={{ marginBottom: '1px', width: '100%', flexDirection: 'column', display: 'flex' }}>
+                <div style={{ height: '100%', overflowY: 'auto', border: '1.5px solid #251414' }}>
+                    {renderDiff(diffResult)}
                 </div>
             </div>
         </div>

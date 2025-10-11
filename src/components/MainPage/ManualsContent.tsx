@@ -39,6 +39,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     const [visibleApproveManualDialog, setVisibleApproveManualDialog] = useState<boolean>(false);
     const [DM_ManualVersionID_ToCompare, setDM_ManualVersionID_ToCompare] = useState<number>(-1);
     const [headerText, setHeaderText] = useState<string>('Manual Details');
+    const [showConfirmPopup, setShowConfirmPopup] = useState(false);
     const menu = useRef<any>(null);
     const toast = useRef<any>(null);
    
@@ -144,48 +145,93 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         }
     }
 
-    const handleAddToFavourite = () => {
-        confirmDialog({
-            message: 'Are you sure you want to add this manual as favourite?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            defaultFocus: 'accept',
-            accept,
-            reject
-        });
+    const checkConfirmation = () => {
+        setShowConfirmPopup(true);
     };
-    
+
+    const CustomConfirmDialog = () => {
+        if (!showConfirmPopup) return null;
+        return (
+            <div className="confirm-overlay">
+                <div className="confirm-popup">
+                    <div className="confirm-header">
+                        <i className="pi pi-exclamation-triangle" /> Confirmation
+                    </div>
+                    <div className="confirm-content">
+                        Are you sure you want to add this manual as favourite?
+                    </div>
+                    <div className="confirm-actions">
+                        <button 
+                            className="confirm-button confirm-yes" 
+                            onClick={() => {
+                                setShowConfirmPopup(false);
+                                accept();
+                            }}
+                        >
+                            Yes
+                        </button>
+                        <button 
+                            className="confirm-button confirm-no" 
+                            onClick={() => {
+                                setShowConfirmPopup(false);
+                                reject();
+                            }}
+                        >
+                            No
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     const accept = () => {
-        dmsLifecycleService.apiCall(`DMS/AddToFavourite?dm_ManualID=${manualID}&userID=${userId}`, 'post')
-            .then(data => {
-                toast.current.show({ severity: 'info', summary: 'Confirmed', detail: 'Manual added to favourites.', life: 3000 });
+        dmsLifecycleService.apiCall(`DMS/AddToFavourite?dm_ManualID=${manualID}&userId=${userId}`, 'get')
+            .then(() => {
+                toast.current.show({
+                    severity: 'info',
+                    summary: 'Confirmed',
+                    detail: 'Manual added to favourites.',
+                    life: 3000,
+                    closable: true
+                });
             })
             .catch(() => {
-                toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected to add favourite!', life: 3000 });
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to add manual to favourites.',
+                    life: 3000,
+                    closable: true
+                });
             });
-           if (onRefreshTree) onRefreshTree(); 
     }
 
     const reject = () => {
-        toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected add favourite', life: 3000 });
+        toast.current.show({
+            severity: 'warn',
+            summary: 'Rejected',
+            detail: 'You have rejected add favourite',
+            life: 3000,
+            closable: true
+        });
     }
 
     return (
        <>
         <Toast ref={toast} />
-        <ConfirmDialog />
         <div className='sectionDiv'>
             <div className='selectedTextDiv'>
-                <div style={{width: '190px', flexDirection: 'row', display: 'inline-flex', alignItems: 'left', verticalAlign: 'middle'}}>
+                <div style={{width: '215px', flexDirection: 'row', display: 'inline-flex', alignItems: 'left', verticalAlign: 'middle'}}>
                     <span className='selectedText' style={{verticalAlign: 'middle'}}>Selected Manual :&nbsp;</span>
-                    <span className='selectedText' style={{display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle'}}>
+                    <span  style={{display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle', fontSize: '18px'}}>
                     {manualInfo.selectedManualNodeObj
                         ? ` (v${manualInfo.selectedManualNodeObj.data.manualVersion})`
                         : ''}
                     </span>  &nbsp;
                 </div>
                 <div style={{width: '1000px', flexDirection: 'row', display: 'inline-flex', alignItems: 'left', verticalAlign: 'middle'}}>
-                    <label className='selectedTextHighlight' style={{width: '700px'}}
+                    <label className='selectedTextHighlight'
                     title={
                         manualInfo.selectedManualNodeObj
                         ? manualInfo.selectedManualNodeObj.label
@@ -219,17 +265,15 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             lineHeight: '1.2rem'
                         }}
                         //tooltip={isFavourite ? "Already in Favourites" : "Add to Favourite"}
-                        onClick={handleAddToFavourite}
+                        onClick={checkConfirmation}
                         disabled={isFavourite}
                     />
                 </div>
             </div>
             <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{flexDirection: 'row'}}>
-                    <label className='selectedText' style={{ width:'135px', textAlign:'right'}}>
-                    Status :
-                    </label>
-                    <span style={{ fontWeight: 'bold', fontSize: 18, fontStyle:'bold', marginLeft: 8, width:'300px', display:'inline-block' }}>
+                    <span className='selectedText' style={{verticalAlign: 'middle', display: 'inline-flex'}}>Status :&nbsp;</span>
+                    <span style={{ fontWeight: 'bold', fontSize: 18, fontStyle:'bold', marginLeft: 8, width:'300px', display:'inline-flex' }}>
                     {manualInfo.selectedManualNodeObj
                         ? manualInfo.selectedManualNodeObj.data.statusString
                         : ''}
