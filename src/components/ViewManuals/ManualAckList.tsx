@@ -42,7 +42,11 @@ const ManualAckList: React.FC<ackProps> = ({dm_ManualID, closeForm}) => {
                 value={ackManualData}
                 paginator
                 rows={10}  
-                emptyMessage={'No data found.'}
+                 emptyMessage={
+                    <span style={{ display: 'block', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                       'No data found.'
+                    </span>
+                }
                 className="manual-list p-datatable-gridlines"
                 style={{ width: '100%' }}>
                 <Column field="vslCode" header="Vessel Code" style={{width: '150px'}} />

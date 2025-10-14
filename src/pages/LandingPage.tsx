@@ -1,17 +1,15 @@
-import React, { use, useEffect } from 'react';
+import React from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import { setLoggedIn, setShowAlert } from '../store/slices/userSlice';
+import Login from './Login';
+import Dashboard from '../components/MainPage/Dashboard';
 import dmsLifecycleService from '../services/DMSLifecycleService';
-import Cookies from 'js-cookie';
-import { setUser, setLoggedIn, setShowAlert } from '../store/slices/userSlice';
-import Login from '../components/Login';
-import MainPage from '../components/MainPage/MainPage';
 
 const LandingPage: React.FC = () => {
     const dispatch = useDispatch();
     const userInfo = useSelector((state: RootState) => state.userInfo);
-    console.log('User Info:', userInfo);
     const [token, setToken] = React.useState<string | null>(null);
 
     // useEffect(() => {
@@ -32,11 +30,16 @@ const LandingPage: React.FC = () => {
     // }, []);
 
     const handleLogin = async (userId: string, password: string) => {
-        console.log('Login attempt:', { userId, password });
         try {
-            // Validate the user credentials
+            dispatch(setShowAlert(false));
+           
             const loginInfo = { userId, password };
-            const isLoginSuccessful = true; //await dmsLifecycleService.validateLoggedInUser(loginInfo);
+
+           const isLoginSuccessful = await dmsLifecycleService.apiCall('Login', 'post', loginInfo, {
+                                                headers: {
+                                                    'Content-Type': 'application/json'
+                                                }
+                                            });
             if (isLoginSuccessful) {
                 dispatch(setLoggedIn(isLoginSuccessful));
                 dispatch(setShowAlert(false));
@@ -45,7 +48,7 @@ const LandingPage: React.FC = () => {
             }
         } catch (error) {
             console.error('Login failed:', error);
-            // Handle login failure
+            dispatch(setShowAlert(true));
         }
     };
 
@@ -57,7 +60,7 @@ const LandingPage: React.FC = () => {
                 </div>
             }
             {userInfo.loggedIn && (
-                <MainPage userId={userInfo.id ?? 'TestUser13'} />
+                <Dashboard userId={userInfo.id ?? 'TestUser13'} />
             )}
         </div>
     );

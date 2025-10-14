@@ -4,7 +4,7 @@
   .header-bar {
     width: 100%;
     display: flex;
-    background-color: aliceblue;
+    background-color: var(--bg-primary);
     border-bottom: 5px #0072bc solid;
     justify-content: space-between;
     align-items: center;
@@ -23,7 +23,7 @@
 .header-title {
   font-size: 1.7rem;
   font-weight: 600;
-  color: #0f3051;
+  color: var(--text-primary);
 } 
 
 .logo1 {
@@ -41,13 +41,13 @@
 }
 
 .header-subtitle {
-  color: #666;
+  color: var(--text-primary);
   font-size: 20px;
   font-style: bold;
   text-align: center;
 }
 .header-subtitle1 {
-  color: #666;
+  color: var(--text-primary);
   font-size: 14px;
   font-style: bold;
   text-align: center;
@@ -55,7 +55,22 @@
 
 .href {
     margin: 5px;
-    color: #666;
+    color: var(--text-primary);
     text-align: center;
     font-size: 20px;
   }
+
+  .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .env-info {
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+  }  
+}

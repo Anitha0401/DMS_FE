@@ -34,7 +34,7 @@ const dmsLifecycleService = {
             Object.entries(loginInfo).forEach(([key, value]) => {
                 formData.append(key, value as string);
             });
-            const response = await axiosInstance.post(`${API_URL}/validateLoggedInUser`, formData, {
+            const response = await axiosInstance.post(`${API_URL}/Login`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -49,7 +49,7 @@ const dmsLifecycleService = {
     apiCall: async (endpoint: string, method: 'get' | 'post' | 'delete' = 'get', data?: any, config?: any) => {
         try {
             const url = `${API_URL}/${endpoint}`;
-            console.log(`API Call - Endpoint: ${url}, Method: ${method}, Data:`, data);
+            
             // If the method is 'get', we don't send data in the body, but as query parameters
             if (method === 'get' && data) {
                 config = { ...config, params: data };

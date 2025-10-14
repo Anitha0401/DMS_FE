@@ -190,7 +190,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
             const data: TreeNodeData[] = await dmsLifecycleService.apiCall(`DMS/GetTreeViewManualList?userId=${userId}`, 'get');
             setAllNodes(data);
             setNodes(data);
-
+            
             if (selectedAction === 'AddSubLevel' || selectedAction === 'AddSameLevel' || selectedAction === 'Edit' || selectedAction === 'Refresh') {
                 return;
             }
@@ -367,13 +367,14 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
 
     const callManualDeleteAPI = async (nodeKey: string) => {
         try {
+            setSelectedAction('');
             const response = await dmsLifecycleService.apiCall(
                     `DMS/DeleteManual/${nodeKey}`,
                     'delete'
             );
 
             if (!response.ok) {
-                throw new Error('Failed to delete');
+               // throw new Error('Failed to delete');
             }
 
             await LoadTreeNodeData();
@@ -402,13 +403,14 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
 
     const callLatestVersionDeleteAPI = async (nodeKey: string) => {
         try {
+            setSelectedAction('');
             const response = await dmsLifecycleService.apiCall(
                     `DMS/DeleteManual/${nodeKey}`,
                     'delete'
             );
             
             if (!response.ok) {
-                throw new Error('Failed to delete');
+               // throw new Error('Failed to delete');
             }
 
             await LoadTreeNodeData();
@@ -429,19 +431,57 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
 
     return (
         <div className="tree-maincontainer">
-            <div className="p-inputgroup mb-2" style={{ gap: '15px' }}>
+            <div className="p-inputgroup mb-2" style={{ gap: '15px', padding: '2px' }}>
                 <InputText
                     placeholder="Search..."
                     value={searchValue}
                     onChange={onSearchChange}
-                    style={{ height: '38px' }}
+                    style={{ 
+                        height: '38px', 
+                        paddingLeft: '10px', 
+                        flex: 1,
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '4px'
+                    }}
                 />
                 <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
-                    <Button label="" icon="pi pi-plus" className="treeButton" tooltip="Expand All" onClick={expandAll} /> &nbsp;&nbsp;
-                    <Button label="" icon="pi pi-minus" className="treeButton" tooltip="Collapse All" onClick={collapseAll} />&nbsp;&nbsp;
+                    <Button 
+                    label="" 
+                    icon="pi pi-plus" 
+                    className="treeButton compact-btn" 
+                    tooltip="Expand All" 
+                    onClick={expandAll}
+                    style={{
+                        background: 'var(--primary-color)',
+                        border: '1px solid var(--primary-color)',
+                        color: 'white',
+                        width: '38px',        // Reduced width
+                        height: '38px',       // Reduced height
+                        minWidth: '38px',     // Prevent stretching
+                        padding: '0',         // Remove padding
+                        fontSize: '0.75rem'   // Smaller icon
+                    }}
+                />&nbsp;&nbsp;
+                <Button 
+                    label="" 
+                    icon="pi pi-minus" 
+                    className="treeButton compact-btn" 
+                    tooltip="Collapse All" 
+                    onClick={collapseAll}
+                    style={{
+                        background: 'var(--primary-color)',
+                        border: '1px solid var(--primary-color)',
+                        color: 'white',
+                        width: '38px',        // Reduced width
+                        height: '38px',       // Reduced height
+                        minWidth: '38px',     // Prevent stretching
+                        padding: '0',         // Remove padding
+                        fontSize: '0.75rem'   // Smaller icon
+                    }}
+                />&nbsp;&nbsp;
                 </div>
             </div>
-            <div className="tree-container">
+            <div className="tree-view-container" style={{ padding: 0, margin: 0 }}>
                 <ConfirmDialog />
                 <ContextMenu model={contextMenuItems} ref={cm} />
                 <Tree
@@ -454,6 +494,14 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                     onToggle={(e) => setExpandedKeys(e.value)}
                     contextMenuSelectionKey={contextMenuSelectionKey ?? undefined}
                     onContextMenu={onContextMenu}
+                    className="custom-tree"
+                    style={{ 
+                    border: 'none', 
+                    padding: 0, 
+                    paddingTop: '2px',
+                    margin: 0,
+                    background: 'var(--bg-secondary)'
+                }}
                 />
             </div>
             <Dialog 

@@ -6,6 +6,8 @@ import { Dialog } from 'primereact/dialog';
 import UserManualList from '../ViewManuals/UserManualList';
 import dmsLifecycleService from '../../services/DMSLifecycleService';
 import './MainPage.scss';
+import { useTheme } from '../../contexts/ThemeContext';
+import { Dropdown } from 'primereact/dropdown';
 
 export interface ManualDetailsProps {
     userId: string;
@@ -25,6 +27,8 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     const [favouriteCnt, setFavouriteCnt] = useState(0);
     const treeViewRef = useRef<any>(null);
 
+    const { theme, setTheme, themeOptions } = useTheme();
+
     const setUserActionCounts = () => {
         dmsLifecycleService.apiCall(`DMS/GetUserManualCounts?userId=${userId}`, 'get')
             .then((data: any) => {
@@ -42,8 +46,7 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
                 setAckCnt(0);
                 setNewCnt(0);
                 setFavouriteCnt(0);
-            }
-        );
+            });
     };
 
     useEffect(() => {   
@@ -61,10 +64,7 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
                    setDbInfoAction(dbInfo);
                 }
             })
-            .catch(() => {
-               
-            }
-        );
+            .catch(() => {});
     }, [userId]);
 
     const usersManualAction = (e: React.MouseEvent<HTMLAnchorElement>, callMode: string, headerText: string) => {
@@ -83,65 +83,85 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     };
 
     return (
-        <div className='wrapper'>
+        <div className='main-page-wrapper'>
             <PageHeader
                 title="COMPANY - Document Management System"
                 subtitle="Test User Name"
+                subContent={
+                    <div className="header-actions">
+                        <Dropdown 
+                            value={theme} 
+                            options={themeOptions} 
+                            onChange={(e) => setTheme(e.value)}
+                            optionLabel="label"
+                            optionValue="value"
+                            className="theme-selector"
+                            placeholder="Select Theme"
+                            style={{ 
+                                height: '43px',
+                                minHeight: '32px',
+                                fontSize: '0.85rem'
+                            }}
+                            panelStyle={{
+                                fontSize: '0.85rem'
+                            }}
+                        />
+                    </div>
+                }
                 rightContent={dbInfoAction}
             />
-            <div className="row body">
-                <div
-                    id="treeComponent"
-                    className= "col-3 tree"
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        backgroundColor: 'aliceblue',
-                        borderRight: '5px #0072bc solid',
-                    }}
-                >
-                    <div className="tree-bar" style={{ flex: 1, overflow: 'auto' }}>
+            <div className="main-page-content">
+                <div className="tree-section">
+                    <div className="tree-container">
                         <ManualsTreeView ref={treeViewRef} userId={userId} />
                     </div>
-                    <div
-                        className="menu-bar"
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                        }}
-                    >
-                        <a href="#" className="hyperlink" onClick={(e) => usersManualAction(e, "PendingMyApproval", "Approval Pending")}>
-                            Pending My Approval ({approvalCnt})
+                    <div className="menu-section">
+                        <a href="#" className="menu-link" onClick={(e) => usersManualAction(e, "PendingMyApproval", "Approval Pending")}>
+                            <i className="pi pi-clock"></i>
+                            <span>Pending My Approval ({approvalCnt})</span>
                         </a>
-                        <a href="#" className="hyperlink" onClick={(e) => usersManualAction(e, "PendingMyReview", "Review Pending")}>
-                            Pending My Review ({reviewCnt})
+                        <a href="#" className="menu-link" onClick={(e) => usersManualAction(e, "PendingMyReview", "Review Pending")}>
+                            <i className="pi pi-eye"></i>
+                            <span>Pending My Review ({reviewCnt})</span>
                         </a>
-                        <a href="#" className="hyperlink" onClick={(e) => usersManualAction(e, "PendingMyAcknowledgement", "Acknowledgement Pending")}>
-                            Pending My Acknowledgement ({ackCnt})
+                        <a href="#" className="menu-link" onClick={(e) => usersManualAction(e, "PendingMyAcknowledgement", "Acknowledgement Pending")}>
+                            <i className="pi pi-thumbs-up"></i>
+                            <span>Pending My Acknowledgement ({ackCnt})</span>
                         </a>
-                        <a href="#" className="hyperlink" onClick={(e) => usersManualAction(e, "NewDocuments", "New Documents")}>
-                            New Documents ({newCnt})
+                        <a href="#" className="menu-link" onClick={(e) => usersManualAction(e, "NewDocuments", "New Documents")}>
+                            <i className="pi pi-plus-circle"></i>
+                            <span>New Documents ({newCnt})</span>
                         </a>
-                        <a href="#" className="hyperlink" onClick={(e) => usersManualAction(e, "Favourites", "My Favourites")}>
-                            My Favourites ({favouriteCnt})
+                        <a href="#" className="menu-link" onClick={(e) => usersManualAction(e, "Favourites", "My Favourites")}>
+                            <i className="pi pi-star-fill"></i>
+                            <span>My Favourites ({favouriteCnt})</span>
                         </a>
                     </div>
                 </div>
-                <div
-                    id="sectionContainer"
-                    className={toggleTree ? "col-9 section" : "col-11 section"}
-                >
+                <div className={`content-section ${toggleTree ? 'with-tree' : 'full-width'}`}>
                     <div ref={scrollRef} />
-                        <ManualsContent userId={userId} onRefreshTree={LoadTreeNodeData}  />
+                    <ManualsContent userId={userId} onRefreshTree={LoadTreeNodeData} />
                 </div>
             </div>
             {showUserManualDialog && (
-                <Dialog header={usersActionHeader + " - Manual List "}
+                <Dialog 
+                    header={usersActionHeader + " - Manual List "}
                     visible={showUserManualDialog}
                     style={{ width: '90%', maxWidth: '1800px' }}
-                    contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff', height: '80vh', overflowY: 'hidden' }}
-                    headerStyle={{ backgroundColor: '#d2e3f9ff', borderBottom: '3px solid blue' }}
-                    onHide={() => { if (!showUserManualDialog) return; setShowUserManualDialog(false); }}>
+                    contentStyle={{ 
+                        padding: '0.5rem', 
+                        backgroundColor: 'var(--bg-secondary)', 
+                        height: '80vh', 
+                        overflowY: 'hidden' 
+                    }}
+                    headerStyle={{ 
+                        backgroundColor: 'var(--bg-primary)', 
+                        borderBottom: '3px solid var(--primary-color)', 
+                        height: '80px',
+                        color: 'var(--text-primary)'
+                    }}
+                    onHide={() => { if (!showUserManualDialog) return; setShowUserManualDialog(false); }}
+                >
                      <UserManualList userId={userId} callMode={usersAction} />
                 </Dialog>
             )}

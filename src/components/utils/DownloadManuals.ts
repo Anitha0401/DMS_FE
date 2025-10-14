@@ -111,7 +111,7 @@ export async function generateHTMLContent(manualText: string, dmManualVersionID:
 export async function downloadAsWord(manualText: string, dmManualVersionID: number) {
     
     const { htmlContent, manualName } = await generateHTMLContent(manualText, dmManualVersionID);
-console.log(htmlContent);
+
     // Create a Blob object with the HTML content
     const blob = new Blob(["\ufeff", htmlContent], {
         type: "application/msword",

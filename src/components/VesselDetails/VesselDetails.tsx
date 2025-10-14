@@ -116,8 +116,12 @@ const VesselDetails: React.FC<VesselFormProps> = ({ initialData, onSubmit, close
         <form onSubmit={handleSubmit} className="vessel-details-form">
             <div style={{ marginBottom: '1px', width: '100%', flexDirection: 'row', display: 'flex', justifyContent: 'space-between' }}>
                 <div className="d-flex justify-content-end" style={{ textAlign: 'right', width: '100%' }}>
-                    <button type="submit" className="button" style={{width: '100px', height: '40px'}} disabled={selectedAction === 'View'}>Save</button>
-                    <button type="button" className="button btn-secondary ms-2" onClick={closeForm}>
+                  {selectedAction !== 'View' && (
+                        <button type="submit" className="button" style={{width: '100px', height: '40px'}}>
+                            Save
+                        </button>
+                    )} 
+                 <button type="button" className="button btn-secondary ms-2" onClick={closeForm}>
                         Cancel
                     </button>
                 </div>

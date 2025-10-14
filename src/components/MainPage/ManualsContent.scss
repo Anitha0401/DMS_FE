@@ -1,291 +1,260 @@
-.sectionDiv{
-    height: 89vh; 
-    overflow-x: hidden;
-    overflow-y: hidden;
-    padding: 0px; 
-}
+.manuals-content {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0.25rem; // Reduced from 1rem
+  border-radius: 4px; // Smaller radius
+  transition: all 0.3s ease;
+  margin: 0; // Remove any margin
+  height: 100%;
 
-.sectiontext{
-    margin: 5px;
-    padding: 5px;
-    background-color: rgb(243, 245, 247);
-    height: 80vh;
-    border-radius: 3px;
-    border: 1px solid gray;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
+  .sectionDiv {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 0; // Remove padding
+    margin: 0; // Remove margin
+    height: 100%;
+  }
 
-.selectedTextDiv{
-    margin: 0px;
-    padding: 0px;
-    background-color: rgb(243, 245, 247);
-    height: 40px;
-}
-
-.selectedText{
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 20px;
-    font-weight: bold;
-    font-style: italic;
-    vertical-align: middle;
-    white-space: nowrap;
-    display: inline-block;
-}
-
-.selectedTextHighlight{
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 22px;
-    font-weight: bold;
-    font-style: italic;
-    color: blue;
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-    white-space: nowrap;
-}
-
-.section-spn {
-    color: red;
-    padding-left: 10px;
-    font-size: 14px
-}
-
-.section-spn1 {
-    width: 80%;
-    height: 95%
-}
-
-.section-spn2 {
-    color: Red;
-    font-size: 16px;
-    font-weight: bold
-}
-
-.section-spn3 {
-    color: blue;
-    font-size: 16px;
-    font-weight: bold
-}
-
-.section-spn4 {
-    color: #2E86C1 !important;
-    padding-left: 10px;
-    font-size: 15px
-}
-
-.section-div {
-    overflow: auto;
-    padding: 5px 5px
-}
-
-.section-div1 {
-    float: right;
-    cursor: pointer
-}
-
-.section-div2 {
-    color: blue;
-    cursor: pointer
-}
-
-.large-checkbox {
-    transform: scale(1.5);
-    accent-color: #1976d2;
-}
-
-.big-favourite-btn {
-    font-size: 1rem !important;
-    padding: 1rem 1rem !important;
-    min-width: 70px;
-    border-radius: 1.5rem !important;
-    box-shadow: 0 2px 2px rgba(255, 193, 7, 0.15);
-}
-
-.download-icon-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    margin-left: 10px;
-    cursor: pointer;
-    vertical-align: middle;
-}
-
-.download-icon {
-    width: 40px;
-    height: 40px;
-    display: inline-block;
-}
-
-.manual-action-btn {
-    margin-left: 10px;
-    vertical-align: middle;
-    height: 40px;
-    padding: 0 8px;
-    background-color: #1976d2;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-family: inherit;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-
-    &:hover,
-    &:focus {
-        background-color: #125ea2;
-    }
-}
-
-.info-icon-btn {
-  padding: 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-left: 8px;
-  vertical-align: middle;
-}
-.info-icon-btn img {
-  width: 40px;
-  height: 35px;
-}
-
-.no-header-dialog .p-dialog-header {
-  display: none !important;
-}
-
-/* For PrimeReact Button */
-.p-button:disabled,
-.p-button.p-disabled {
-  background: #e0e0e0 !important;
-  color: #a0a0a0 !important;
-  border-color: #cccccc !important;
-  opacity: 1 !important;
-  cursor: not-allowed !important;
-}
-
-/* For your custom .manual-action-btn class */
-.manual-action-btn:disabled {
-  background: #e0e0e0 !important;
-  color: #a0a0a0 !important;
-  border: 1px solid #cccccc !important;
-  opacity: 1 !important;
-  cursor: not-allowed !important;
-}
-
-/* Ensure dialog header uses flex and aligns items center */
-.manual-details-dialog .p-dialog-header {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    height: 60px !important; /* Match your headerStyle */
-    padding-right: 1.5rem;
-}
-
-/* Align the close button vertically */
-.manual-details-dialog.p-dialog-header-icon {
-    align-self: center !important;
-    margin-top: 0 !important;
-}
-
-/* Optional: Remove extra margin/padding from header title */
-.manual-details-dialog .p-dialog-title {
-    margin: 0 !important;
-    padding: 0 !important;
-    align-self: center !important;
-}
-.confirm-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+  .selectedTextDiv {
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 1000;
-    animation: fadeIn 0.2s ease-in;
-}
+    margin-bottom: 0.25rem; // Reduced from 1rem
+    padding: 0.5rem; // Reduced from 1rem
+    background: var(--bg-primary);
+    border-radius: 4px; // Smaller radius
+    border: 1px solid var(--border-color);
+    gap: 0.5rem; // Reduced gap
 
-.confirm-popup {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-    width: 400px;
-    animation: slideIn 0.2s ease-out;
-}
-
-.confirm-header {
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-    border-radius: 8px 8px 0 0;
-    font-weight: 600;
-    font-size: 1.25rem;
-
-    i {
-        margin-right: 0.5rem;
-        color: #f59e0b;
+    .selectedText {
+       color: var(--text-primary) !important;
+      font-size: 1.2rem !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      vertical-align: middle !important;
+      line-height: 1.8 !important;
     }
-}
 
-.confirm-content {
-    padding: 1.5rem;
-    font-size: 1rem;
-    color: #495057;
-}
+    .selectedTextHighlight {
+      color: var(--primary-color);
+      font-weight: bold;
+      font-size: 1.5rem; // Reduced from 1.1rem
+      margin: 0;
+      padding: 0;
+    }
 
-.confirm-actions {
-    padding: 1rem;
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    border-top: 1px solid #dee2e6;
-}
+    .info-icon-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.5rem; // Reduced padding
+      cursor: pointer;
+      margin-right: 0.25rem; // Reduced margin
+      transition: all 0.2s ease;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-.confirm-button {
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
+      &:hover {
+        background: var(--primary-color);
+        transform: translateY(-1px);
+      }
+
+      img {
+        width: 32px; // Reduced from 20px
+        height: 32px;
+      }
+    }
+
+    .p-button {
+      background: var(--warning-color) !important;
+      border-color: var(--warning-color) !important;
+      color: white !important;
+      padding: 0.25rem 0.5rem !important; // Reduced padding
+      font-size: 0.8rem !important; // Smaller font
+      margin: 0 0.25rem; // Increased margin
+      height: 40px !important; // Set explicit height
+      min-height: 40px !important;
+
+      &:hover {
+        background: var(--warning-color) !important;
+        opacity: 0.9;
+      }
+
+      &:disabled {
+        background: var(--text-muted) !important;
+        border-color: var(--text-muted) !important;
+      }
+    }
+  }
+
+  .manual-action-btn {
+    background: var(--primary-color);
+    color: white;
     border: none;
-    font-weight: 600;
+    border-radius: 6px; // Slightly larger radius
+    padding: 0.75rem 1rem; // Increased padding
+    margin: 0 0.25rem;
     cursor: pointer;
-    transition: background-color 0.2s;
+    font-size: 0.9rem; // Larger font size
+    font-weight: 500;
+    transition: all 0.2s ease;
+    height: 44px; // Increased height
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    &.confirm-yes {
-        background-color: #3b82f6;
-        color: white;
+    &:hover:not(:disabled) {
+      background: var(--primary-color);
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      background: var(--text-muted);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+
+  .download-icon-btn {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 0.125rem; // Reduced padding
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        margin: 0 0.125rem; // Reduced margin
+        height: 45px;
+        align-items: center;
+        justify-content: center;
 
         &:hover {
-            background-color: #2563eb;
+            background: var(--bg-primary);
+            transform: translateY(-1px);
         }
+
+        img {
+            width: 50px; // Reduced size
+            height: 40px;
+         }
     }
 
-    &.confirm-no {
-        background-color: #f3f4f6;
-        color: #374151;
-
-        &:hover {
-            background-color: #e5e7eb;
-        }
+    .left-section {
+        flex: 1; // Take up remaining space
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
     }
-}
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+    .right-section {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem; // Space between buttons
+        flex-shrink: 0; // Don't shrink
+    }
 
-@keyframes slideIn {
-    from {
-        transform: translateY(-20px);
-        opacity: 0;
+  .large-checkbox {
+    width: 24px !important; // Larger width
+    height: 24px !important; // Larger height
+    accent-color: var(--primary-color);
+    margin: 0 0.5rem;
+    cursor: pointer;
+    
+    // For better visual alignment
+    vertical-align: middle;
+  }
+
+  // Jodit Editor with minimal spacing
+  .sectiontext {
+    margin-top: 0.25rem; // Reduced from 1rem
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border-color); // Thinner border
+    height: calc(100vh - 200px); // Take more vertical space
+
+    .jodit-react-container {
+        height: 100% !important;
+
+        .jodit-container {
+            background: var(--bg-secondary) !important;
+            border: 1px solid var(--border-color) !important;
+            height: calc(100% - 5px)!important;
+            display: flex !important;
+            flex-direction: column !important;
+
+            .jodit-workplace {
+                background: var(--bg-secondary) !important;
+                height: 100% !important; // Account for smaller toolbar
+
+                .jodit-wysiwyg {
+                    background: var(--bg-secondary) !important;
+                    color: var(--text-primary) !important;
+                    font-family: 'Segoe UI', Arial, sans-serif !important;
+                    font-size: 16px !important;
+                    line-height: 1.6 !important;
+                    padding: 0.5rem !important; // Reduced padding inside editor
+                    margin-left: 5px !important;
+
+                    // Override all text elements in the editor
+                    * {
+                        color: var(--text-primary) !important;
+                    }
+
+                    p, div, span, h1, h2, h3, h4, h5, h6, 
+                    td, th, li, ul, ol, blockquote {
+                        color: var(--text-primary) !important;
+                        margin: 0.25rem 0 !important; // Reduced margins
+                    }
+
+                    // Tables with tighter spacing
+                    table {
+                        border-color: var(--border-color) !important;
+                        margin: 0.25rem 0 !important;
+                        
+                        td, th {
+                            border-color: var(--border-color) !important;
+                            background: var(--bg-secondary) !important;
+                            color: var(--text-primary) !important;
+                            padding: 0.25rem !important; // Reduced cell padding
+                        }
+                    }
+
+                    // Links
+                    a {
+                        color: var(--primary-color) !important;
+                    }
+
+                    // Code blocks with minimal spacing
+                    code, pre {
+                        background: var(--bg-primary) !important;
+                        color: var(--text-primary) !important;
+                        border: 1px solid var(--border-color) !important;
+                        padding: 0.25rem !important; // Reduced padding
+                        margin: 0.25rem 0 !important;
+                    }
+
+                    // Images with minimal margin
+                    img {
+                        border: 1px solid var(--border-color);
+                        border-radius: 4px;
+                        margin: 0.25rem 0 !important;
+                    }
+                }
+            }
+      }
+
+      .jodit-status-bar {
+        background: var(--bg-primary) !important;
+        border-top: 1px solid var(--border-color) !important;
+        color: var(--text-secondary) !important;
+        padding: 0.125rem 0.5rem !important; // Minimal status bar padding
+        font-size: 0.75rem !important; // Smaller font
+        min-height: 20px !important; // Smaller status bar
+      }
     }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  }
 }

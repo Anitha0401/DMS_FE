@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './Login.scss';
 
 interface LoginProps {
     onLogin: (userId: string, password: string) => void;

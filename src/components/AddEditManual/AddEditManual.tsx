@@ -70,7 +70,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
 
     const config = {
         readonly: false,
-        height: 420,
+        height: 'calc(100% - 1500px)', 
         toolbar: true,
         placeholder: '',
         toolbarAdaptive: false,
@@ -79,7 +79,14 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
         removeButtons: ['source', 'about', 'print', 'superscript', 'subscript', 'speechRecognize'],
         showXPathInStatusbar: false,
         showCharsCounter: false,
-        showWordsCounter: false
+        showWordsCounter: false,
+        style: {
+            backgroundColor: 'var(--bg-secondary)',
+            color: 'var(--text-primary)',
+            fontFamily: '"Segoe UI", Arial, sans-serif',
+            fontSize: '14px',
+            lineHeight: '1.6'
+        }
     };
 
     const contextMenuItems = [
@@ -113,6 +120,8 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
         if (selectedAction === 'Edit' && selectedManualID > 0) {
             dmsLifecycleService.apiCall(`DMS/GetManualDetailsByVersionId/${selectedManualVersionID}`, 'get')
                 .then((data: any) => {
+                    console.log('Fetched manual data:', data);
+
                     setForm({
                         DM_ManualID: data.dM_ManualID ?? selectedManualID ?? -1,
                         DM_ManualVersionID: data.dM_ManualVersionID ?? -1,

@@ -47,6 +47,12 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
                 });
     }, []);
 
+    const formatDate = (dateStr: string | undefined) => {
+        if (!dateStr) return '';
+        // Assumes dateStr is ISO format or contains date and time
+        return dateStr.split('T')[0]; // Returns only the date part
+    };
+
     if (loading) return <div>Loading manual detailss.....</div>
 
     return (
@@ -89,7 +95,7 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
                 </div>
                 <div className="manual-details-item">
                     <span className="label">Created Date</span>
-                    <span className="value">{manualData?.createdDate}</span>
+                    <span className="value">{formatDate(manualData?.createdDate)}</span>
                 </div>
                 <div className="manual-details-item">
                     <span className="label">Published By</span>
@@ -97,7 +103,7 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
                 </div>
                 <div className="manual-details-item">
                     <span className="label">Published Date</span>
-                    <span className="value">{manualData?.publishedDate}</span>
+                    <span className="value">{formatDate(manualData?.publishedDate)}</span>
                 </div>
                 <div className="manual-details-item">
                     <span className="label">Released By</span>
@@ -105,7 +111,7 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
                 </div>
                 <div className="manual-details-item">
                     <span className="label">Released Date</span>
-                    <span className="value">{manualData?.releasedDate}</span>
+                    <span className="value">{formatDate(manualData?.releasedDate)}</span>
                 </div>
                 <div className="manual-details-item">
                     <span className="label">Last Modified By</span>
@@ -113,15 +119,15 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
                 </div>
                 <div className="manual-details-item">
                     <span className="label">Last Modified Date</span>
-                    <span className="value">{manualData?.lastModifiedDate}</span>
+                    <span className="value">{formatDate(manualData?.lastModifiedDate)}</span>
                 </div>
             </div>
             <div className="manual-details-section">
-                <span className="label">Comments</span>
+                <span className="label">Comment</span>
                 <div className="manual-details-comments">{manualData?.comments}</div>
             </div>
             <div className="manual-details-section">
-                <span className="label">Contents</span>
+                <span className="label">Context</span>
                 <div className="manual-details-contents" style={{ margin:'0px', padding: '2px', overflowY: 'hidden'}}>
                       <JoditEditor
                         value={manualData?.textContents ?? ""}

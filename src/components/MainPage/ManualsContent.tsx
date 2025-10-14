@@ -12,12 +12,13 @@ import ManualDetails from '../ViewManuals/ManualDetails';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import ApproveManual from './ApproveManual';
+import ApproveManual from '../ApproveManual/ApproveManual';
 import AddEditManual from '../AddEditManual/AddEditManual';
 import { downloadAsWord } from '../utils/DownloadManuals';
 import { downloadAsPDF } from '../utils/DownloadManuals';
 import JoditEditor from 'jodit-react';
 import { defaultMargins } from 'html-docx-js-typescript/dist/templates';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export interface ManualDetailsProps {
     userId: string;
@@ -42,7 +43,25 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     const [showConfirmPopup, setShowConfirmPopup] = useState(false);
     const menu = useRef<any>(null);
     const toast = useRef<any>(null);
+    const { theme } = useTheme(); 
    
+     const getJoditConfig = () => ({
+        readonly: true,
+        toolbar: false,
+        height: 'calc(100% - 1200px)',
+        showCharsCounter: false,
+        showWordsCounter: false,
+        showXPathInStatusbar: false,
+        theme: theme === 'dark' ? 'dark' : 'default',
+        style: {
+            backgroundColor: 'var(--bg-secondary)',
+            color: 'var(--text-primary)',
+            fontFamily: '"Segoe UI", Arial, sans-serif',
+            fontSize: '14px',
+            lineHeight: '1.6'
+        }
+    });
+
     useEffect(() => {
         if(manualInfo.selectedManualNodeObj)
         {
@@ -50,6 +69,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
             setHeaderText(manualInfo.selectedManualNodeObj ? manualInfo.selectedManualNodeObj.label : '');
             setIsFavourite(manualInfo.selectedManualNodeObj.data.isFavourite ? manualInfo.selectedManualNodeObj.data.isFavourite == 1 ? true : false : false);
 
+            setIsManualReleased(false);
             if(manualInfo.selectedManualNodeObj?.data?.dM_StatusID === 150) {
                 setIsManualReleased(manualInfo.selectedManualNodeObj.data.isActive);
             }
@@ -186,7 +206,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     };
 
     const accept = () => {
-        dmsLifecycleService.apiCall(`DMS/AddToFavourite?dm_ManualID=${manualID}&userId=${userId}`, 'get')
+        dmsLifecycleService.apiCall(`DMS/AddToFavourite?dm_ManualID=${manualID}&userId=${userId}`, 'post')
             .then(() => {
                 toast.current.show({
                     severity: 'info',
@@ -195,6 +215,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                     life: 3000,
                     closable: true
                 });
+                if (onRefreshTree) onRefreshTree(); 
             })
             .catch(() => {
                 toast.current.show({
@@ -218,32 +239,34 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     }
 
     return (
-       <>
+       <div className="manuals-content">
         <Toast ref={toast} />
         <div className='sectionDiv'>
             <div className='selectedTextDiv'>
-                <div style={{width: '215px', flexDirection: 'row', display: 'inline-flex', alignItems: 'left', verticalAlign: 'middle'}}>
-                    <span className='selectedText' style={{verticalAlign: 'middle'}}>Selected Manual :&nbsp;</span>
-                    <span  style={{display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle', fontSize: '18px'}}>
-                    {manualInfo.selectedManualNodeObj
-                        ? ` (v${manualInfo.selectedManualNodeObj.data.manualVersion})`
-                        : ''}
-                    </span>  &nbsp;
+                <div className="left-section" style={{flexDirection: 'row' }}>
+                    <div style={{flexDirection: 'row', display: 'inline-flex', alignItems: 'left', verticalAlign: 'middle'}}>
+                        <span className='selectedText' >Selected Manual :&nbsp;</span>
+                        <span  style={{display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle', fontSize: '18px'}}>
+                        {manualInfo.selectedManualNodeObj
+                            ? ` (v${manualInfo.selectedManualNodeObj.data.manualVersion})`
+                            : ''}
+                        </span>  &nbsp;
+                    </div>
+                    <div style={{flexDirection: 'row', display: 'inline-flex', alignItems: 'left', verticalAlign: 'middle'}}>
+                        <label className='selectedTextHighlight'
+                        title={
+                            manualInfo.selectedManualNodeObj
+                            ? manualInfo.selectedManualNodeObj.label
+                            : ''
+                        }
+                        >
+                        {manualInfo.selectedManualNodeObj
+                            ? manualInfo.selectedManualNodeObj.label
+                            : ''}
+                        </label>
+                    </div>
                 </div>
-                <div style={{width: '1000px', flexDirection: 'row', display: 'inline-flex', alignItems: 'left', verticalAlign: 'middle'}}>
-                    <label className='selectedTextHighlight'
-                    title={
-                        manualInfo.selectedManualNodeObj
-                        ? manualInfo.selectedManualNodeObj.label
-                        : ''
-                    }
-                    >
-                    {manualInfo.selectedManualNodeObj
-                        ? manualInfo.selectedManualNodeObj.label
-                        : ''}
-                    </label>
-                </div>
-                <div style={{width: '190px',  display: 'inline-flex', alignItems: 'center', verticalAlign: 'top' }}>
+                <div className="right-section">
                     <button
                         type="button"
                         className="info-icon-btn"
@@ -272,8 +295,8 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
             </div>
             <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{flexDirection: 'row'}}>
-                    <span className='selectedText' style={{verticalAlign: 'middle', display: 'inline-flex'}}>Status :&nbsp;</span>
-                    <span style={{ fontWeight: 'bold', fontSize: 18, fontStyle:'bold', marginLeft: 8, width:'300px', display:'inline-flex' }}>
+                    <span style={{ fontWeight: '600', fontSize: '16px', display:'inline-flex' }}>Status :&nbsp;</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '18px', fontStyle:'bold', width:'300px', display:'inline-flex' }}>
                     {manualInfo.selectedManualNodeObj
                         ? manualInfo.selectedManualNodeObj.data.statusString
                         : ''}
@@ -286,7 +309,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             onChange={e => { setIsChecked(e.target.checked); }}
                             className="large-checkbox"
                             style={{ marginLeft: '6px', marginRight: '4px', verticalAlign: 'middle' }}
-                         />{' '}&nbsp;
+                         />
                         Include Sub Manual
                     </label>
                     </div>
@@ -296,16 +319,9 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             type="button"
                             className="download-icon-btn"
                             title="Download Manual"
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                marginLeft: '5px',
-                                cursor: 'pointer',
-                                verticalAlign: 'middle'
-                            }}
                             onClick={e => menu.current.show(e)}
                         >
-                            <img src="/download1.png" alt="Download" className="download-icon" style={{ width: '50px', height: '40px' }} />
+                            <img src="/download1.png" alt="Download" className="download-icon" />
                         </button>
                         <button
                             className="manual-action-btn"
@@ -347,17 +363,13 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                  {manualInfo.selectedManualNodeObj ? (
                     <JoditEditor
                         value={manualText}
-                        config={{
-                            readonly: true,
-                            toolbar: false,
-                            height: 690,
-                            showCharsCounter: false,
-                            showWordsCounter: false,
-                            showXPathInStatusbar: false,
-                        }}
+                        config={getJoditConfig()}
+                        key={theme}
                     />
                 ) : (
-                    <p></p>
+                   <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '2rem' }}>
+                        Select a manual to view its content
+                    </p>
                 )}
             </div>
         </div>
@@ -424,7 +436,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
             visible={visibleAddEditDialog}
             style={{ width: '60%', height: '160vh' }}
             contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
-            headerStyle={{ backgroundColor: '#d2e3f9ff', borderBottom: '3px solid blue' , height: '30px'}}
+            headerStyle={{ backgroundColor: '#d2e3f9ff', borderBottom: '3px solid blue' , height: '40px'}}
             onHide={() => { if (!visibleAddEditDialog) return; setVisibleAddEditDialog(false); }}>
                 <AddEditManual
                     onSubmit={updateManuals}
@@ -435,7 +447,8 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                 />
             </Dialog>
         )}
-        </> 
+        {showConfirmPopup && <CustomConfirmDialog />}
+        </div>
     );
 };
 
