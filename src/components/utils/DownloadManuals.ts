@@ -1,7 +1,5 @@
-// import { dmsLifecycleService } from '../../services/dmsLifecycleService';
 import { jsPDF } from "jspdf";
 import dmsLifecycleService from '../../services/DMSLifecycleService';
-import { useState } from 'react';
 
 export type ManualDetails = {
     categoryName: string;
@@ -19,7 +17,7 @@ export async function generateHTMLContent(manualText: string, dmManualVersionID:
     // Fetch manual details synchronously
     let manualData: ManualDetails;
     try {
-        manualData = await dmsLifecycleService.apiCall(`DMS/GetManualDetailsByVersionId/${dmManualVersionID}`, 'get');
+        manualData = await dmsLifecycleService.getApiCall(`DMS/GetManualDetailsByVersionId/${dmManualVersionID}`);
     } catch {
         manualData = {
             categoryName: '',

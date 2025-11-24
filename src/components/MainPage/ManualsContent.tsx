@@ -2,23 +2,21 @@ import React, {useState, useEffect, useRef} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { ContextMenu } from 'primereact/contextmenu';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
-import './ManualsContent.scss';
 import { setError } from '../../store/slices/appSlice';
 import { Dialog } from 'primereact/dialog';
+import { Toast } from 'primereact/toast';
+import { Button } from 'primereact/button';
+import { downloadAsWord } from '../utils/DownloadManuals';
+import { downloadAsPDF } from '../utils/DownloadManuals';
+import { useTheme } from '../../contexts/ThemeContext';
+import JoditEditor from 'jodit-react';
 import CompareVersion from '../CompareVersion/CompareVersion';
 import CompareVersionDetails from '../CompareVersion/CompareVersionDetails';
 import ManualDetails from '../ViewManuals/ManualDetails';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { Toast } from 'primereact/toast';
-import { Button } from 'primereact/button';
 import ApproveManual from '../ApproveManual/ApproveManual';
 import AddEditManual from '../AddEditManual/AddEditManual';
-import { downloadAsWord } from '../utils/DownloadManuals';
-import { downloadAsPDF } from '../utils/DownloadManuals';
-import JoditEditor from 'jodit-react';
-import { defaultMargins } from 'html-docx-js-typescript/dist/templates';
-import { useTheme } from '../../contexts/ThemeContext';
+import dmsLifecycleService from '../../services/DMSLifecycleService';
+import './ManualsContent.scss';
 
 export interface ManualDetailsProps {
     userId: string;
@@ -67,7 +65,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         {
             setManualID(manualInfo.selectedManualNodeObj.key ? Number(manualInfo.selectedManualNodeObj.key) : -1);
             setHeaderText(manualInfo.selectedManualNodeObj ? manualInfo.selectedManualNodeObj.label : '');
-            setIsFavourite(manualInfo.selectedManualNodeObj.data.isFavourite ? manualInfo.selectedManualNodeObj.data.isFavourite == 1 ? true : false : false);
+            setIsFavourite(manualInfo.selectedManualNodeObj.data.isFavourite ? manualInfo.selectedManualNodeObj.data.isFavourite === 1 ? true : false : false);
 
             setIsManualReleased(false);
             if(manualInfo.selectedManualNodeObj?.data?.dM_StatusID === 150) {
@@ -83,7 +81,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     }, [isChecked, manualInfo.selectedManualNodeObj]);
 
     const fetchData = async() => {
-          dmsLifecycleService.apiCall(`DMS/GetManualContent?dm_ManualID=${manualInfo.selectedManualNodeObj.key}&IncludeSubManuals=${isChecked}`, 'get')
+          dmsLifecycleService.getApiCall(`DMS/GetManualContent?dm_ManualID=${manualInfo.selectedManualNodeObj.key}&IncludeSubManuals=${isChecked}`)
                 .then((manualResponse) => {
                     setManualText(manualResponse);
                 })
@@ -107,11 +105,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
     const updateManuals = async (data: any) => {
         try {
-            await dmsLifecycleService.apiCall('DMS/EditManual', 'post', data, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            await dmsLifecycleService.postApiCall('DMS/EditManual', data);
 
            setVisibleAddEditDialog(false);
            fetchData();
@@ -123,11 +117,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
     const ApproveManuals = async (data: any) => {
         try {
-            await dmsLifecycleService.apiCall('DMS/ApproveManual', 'post', data, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            await dmsLifecycleService.postApiCall('DMS/ApproveManual', data);
 
            setVisibleApproveManualDialog(false);
            fetchData();
@@ -140,11 +130,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
     const SendBackManuals = async (data: any) => {
         try {
-            await dmsLifecycleService.apiCall('DMS/SendBackManual', 'post', data, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            await dmsLifecycleService.postApiCall('DMS/SendBackManual', data);
 
            setVisibleApproveManualDialog(false);
            fetchData();
@@ -206,7 +192,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     };
 
     const accept = () => {
-        dmsLifecycleService.apiCall(`DMS/AddToFavourite?dm_ManualID=${manualID}&userId=${userId}`, 'post')
+        dmsLifecycleService.postApiCall(`DMS/AddToFavourite?dm_ManualID=${manualID}&userId=${userId}`)
             .then(() => {
                 toast.current.show({
                     severity: 'info',
@@ -404,9 +390,8 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                 className="manual-details-dialog"
                 header={'Manual Details '}
                 visible={visibleManualDetailsDialog}
-                style={{ width: '1550px', minWidth: '90vh' }}
+                style={{ width: '1250px', minWidth: '90vh', height: '100vh', maxHeight: '95vh' }}
                 contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
-                headerStyle={{ backgroundColor: '#d2e3f9ff', borderBottom: '3px solid blue', height: '60px' }}
                 onHide={() => { if (!visibleManualDetailsDialog) return; setVisibleManualDetailsDialog(false); }}>
                 <ManualDetails 
                     closeForm={() => setVisibleManualDetailsDialog(false)}

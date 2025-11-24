@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import './ManualDetails.scss';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
 import JoditEditor from 'jodit-react';
+import dmsLifecycleService from '../../services/DMSLifecycleService';
+import './ManualDetails.scss';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export interface ManualDetailsProps {
     dmManualVersionID: number;
@@ -34,9 +35,10 @@ export type ManualDetails = {
 const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeForm }) => {
    const [manualData, setManualData] = useState<ManualDetails>();
    const [loading, setLoading] = useState(true);
+   const { theme } = useTheme(); 
     
     useEffect(() => {
-        dmsLifecycleService.apiCall(`DMS/GetManualDetailsByVersionId/${dmManualVersionID}`, 'get')
+        dmsLifecycleService.getApiCall(`DMS/GetManualDetailsByVersionId/${dmManualVersionID}`)
                 .then((data: any) => {
                     setManualData(data);
                     setLoading(false);
@@ -128,16 +130,24 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
             </div>
             <div className="manual-details-section">
                 <span className="label">Context</span>
-                <div className="manual-details-contents" style={{ margin:'0px', padding: '2px', overflowY: 'hidden'}}>
+                <div className="manual-details-contents" style={{ height: 'calc(100% - 500px)', margin:'0px', padding: '2px', overflowY: 'hidden'}}>
                       <JoditEditor
                         value={manualData?.textContents ?? ""}
                         config={{
                             readonly: true,
                             toolbar: false,
-                            height: 390,
+                            height: '550px',
                             showXPathInStatusbar: false,
                             showCharsCounter: false,
-                            showWordsCounter: false
+                            showWordsCounter: false,
+                            theme: theme === 'dark' ? 'dark' : 'default',
+                            style: {
+                                backgroundColor: 'var(--bg-secondary)',
+                                color: 'var(--text-primary)',
+                                fontFamily: '"Segoe UI", Arial, sans-serif',
+                                fontSize: '14px',
+                                lineHeight: '1.6'
+                            }
                         }}
                     />
                 </div>

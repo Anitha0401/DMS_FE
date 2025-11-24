@@ -1,20 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
+import { Dropdown } from 'primereact/dropdown';
+import { Dialog } from 'primereact/dialog';
 import ManualsTreeView from './ManualsTreeView';
 import ManualsContent from './ManualsContent';
 import PageHeader from '../PageHeader';
-import { Dialog } from 'primereact/dialog';
 import UserManualList from '../ViewManuals/UserManualList';
 import dmsLifecycleService from '../../services/DMSLifecycleService';
 import './MainPage.scss';
-import { useTheme } from '../../contexts/ThemeContext';
-import { Dropdown } from 'primereact/dropdown';
 
 export interface ManualDetailsProps {
     userId: string;
 }
 
 const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
-    const [toggleTree, setToggleTree] = useState(true);
     const scrollRef = useRef<HTMLDivElement>(null);
     const [showUserManualDialog, setShowUserManualDialog] = useState(false); 
     const [dbInfoAction, setDbInfoAction] = useState('');
@@ -30,7 +29,7 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     const { theme, setTheme, themeOptions } = useTheme();
 
     const setUserActionCounts = () => {
-        dmsLifecycleService.apiCall(`DMS/GetUserManualCounts?userId=${userId}`, 'get')
+        dmsLifecycleService.getApiCall(`DMS/GetUserManualCounts?userId=${userId}`)
             .then((data: any) => {
                 if (data) {
                     setApprovalCnt(data.approvalCnt || 0);
@@ -52,7 +51,7 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     useEffect(() => {   
         setUserActionCounts();
 
-        dmsLifecycleService.apiCall(`Login/dbinfo`, 'get')
+        dmsLifecycleService.getApiCall(`Login/dbinfo`)
             .then((data: any) => {
                 if (data) {
                    let dbShort = data.database ? data.database.substring(0, 7).toLowerCase() : '';
@@ -138,7 +137,7 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
                         </a>
                     </div>
                 </div>
-                <div className={`content-section ${toggleTree ? 'with-tree' : 'full-width'}`}>
+                <div className={`content-section with-tree`}>
                     <div ref={scrollRef} />
                     <ManualsContent userId={userId} onRefreshTree={LoadTreeNodeData} />
                 </div>

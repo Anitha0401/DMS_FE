@@ -28,24 +28,20 @@ const dmsLifecycleService = {
             throw error; // Re-throw the error for further handling
         }
     },
-    validateLoggedInUser: async (loginInfo: any) => {
-        try {
-            const formData = new FormData();
-            Object.entries(loginInfo).forEach(([key, value]) => {
-                formData.append(key, value as string);
-            });
-            const response = await axiosInstance.post(`${API_URL}/Login`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error validating logged in status:', error);
-            throw error; // Re-throw the error for further handling
-        }
+    getApiCall: async (endpoint: string) => {
+         return await dmsLifecycleService.apiCall(endpoint, 'get');
     },
-    // Generic API call method
+    deleteApiCall: async (endpoint: string, data?: any) => {
+         return await dmsLifecycleService.apiCall(endpoint, 'delete', data);
+    },
+    postApiCall: async (endpoint: string, data?: any) => {
+        return await dmsLifecycleService.apiCall(endpoint, 'post', data, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+     
+    },
     apiCall: async (endpoint: string, method: 'get' | 'post' | 'delete' = 'get', data?: any, config?: any) => {
         try {
             const url = `${API_URL}/${endpoint}`;

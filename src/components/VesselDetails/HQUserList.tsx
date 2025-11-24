@@ -25,9 +25,11 @@ const HQUserList: React.FC<HQUserListProps> = ({ hqUser, selectedHQUserList, onS
     const [selectedDept, setSelectedDept] = useState<string | null>(null);
     const [hqDeptOptions, setHqDeptOptions] = useState<{ label: string; value: string }[]>([]);
     const [hqRoleOptions, setHqRoleOptions] = useState<{ label: string; value: string }[]>([]);
+    const [searchValue, setSearchValue] = useState('');
+    const [allData, setAllData] = useState<HQUser[]>([]);
 
     useEffect(() => {
-        dmsLifecycleService.apiCall('HQUser/GetHQDept')
+        dmsLifecycleService.getApiCall('HQUser/GetHQDept')
             .then(data => {
                 const options = data.map((cat: any) => ({
                     label: cat,
@@ -37,7 +39,7 @@ const HQUserList: React.FC<HQUserListProps> = ({ hqUser, selectedHQUserList, onS
             })
             .catch(() => setHqDeptOptions([]));
 
-        dmsLifecycleService.apiCall('HQUser/GetHQRoles')
+        dmsLifecycleService.getApiCall('HQUser/GetHQRoles')
             .then(data => {
                 const options = data.map((cat: any) => ({
                     label: cat,
@@ -50,6 +52,7 @@ const HQUserList: React.FC<HQUserListProps> = ({ hqUser, selectedHQUserList, onS
     }, []);
 
     useEffect(() => {
+        setAllData(hqUser);
         const selectHQUserIds = hqUser.filter(user =>
             selectedHQUserList?.includes(user.hQ_UsersID)
         );
@@ -57,7 +60,7 @@ const HQUserList: React.FC<HQUserListProps> = ({ hqUser, selectedHQUserList, onS
         setSelectedHqUsers(selectHQUserIds);
     }, [hqUser, selectedHQUserList]);
 
-    const filteredUsers = hqUser.filter(user => {
+    const filteredUsers = allData.filter(user => {
         const dept = user.hqDept || '';
         const role = user.userRole || '';
         
@@ -77,30 +80,42 @@ const HQUserList: React.FC<HQUserListProps> = ({ hqUser, selectedHQUserList, onS
         onSelectionChange && onSelectionChange(e.value);
     };
 
+    const onSearchChange = (e: any) => {
+        const value = e.target.value;
+        setSearchValue(value);
+        
+        if (value.trim() === '') {
+            // Reset to original data when search is empty
+            setAllData(hqUser);
+        } else {
+            // Filter users based on search term
+            const filtered = hqUser.filter(user => 
+                user.userName.toLowerCase().includes(value.toLowerCase()) ||
+                user.userRole.toLowerCase().includes(value.toLowerCase()) ||
+                user.hqDept.toLowerCase().includes(value.toLowerCase()) ||
+                user.hQ_UsersID.toString().includes(value)
+            );
+            setAllData(filtered);
+        }
+    }
+
     return (
         <div className='vessel-details-container'>
             <div>
                 <label className="headerLabel">HQ User List</label>
             </div>
-            <div className="p-inputgroup mb-2">
-                <InputText
+            <div className="p-inputgroup">
+                  <InputText
                     placeholder="Search..."
-                    style={{ height: '38px' }}
-                />
-                <button
-                    type="button"
-                    className="manual-action-btn"
-                    title="Search"
-                    style={{
-                        marginLeft: '8px',
-                        verticalAlign: 'middle'
+                    value={searchValue}
+                    onChange={onSearchChange}
+                    style={{ 
+                        height: '38px', 
+                        paddingLeft: '10px' 
                     }}
-                    onClick={() => alert('Search clicked!')}
-                >
-                    <i className="pi pi-search" style={{ fontSize: '1.2rem' }}></i>
-                </button>
+                />
             </div>
-            <div className="p-inputgroup mb-2" style={{ alignItems: 'center' }}>
+            <div className="p-inputgroup" style={{ alignItems: 'center' }}>
                 <label style={{ fontWeight: 'bold', width: '50px' }}>Dept: </label>
                 <Dropdown
                     value={selectedDept}

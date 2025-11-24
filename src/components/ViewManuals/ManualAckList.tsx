@@ -27,14 +27,14 @@ const ManualAckList: React.FC<ackProps> = ({dm_ManualID, closeForm}) => {
     const [ackManualData, setAckManualData] = useState<ackDetails[]>([]);
 
     useEffect(() => {
-        dmsLifecycleService.apiCall(`DMS/GetManualUserAckList/${dm_ManualID}`, 'get')
+        dmsLifecycleService.getApiCall(`DMS/GetManualUserAckList/${dm_ManualID}`)
                 .then((data: any) => {
                     setAckManualData(data);
                 })
                 .catch(() => {
                     setAckManualData([]);
                 });
-    }, []);
+    }, [dm_ManualID]);
     
     return (
         <div className="manual-details">

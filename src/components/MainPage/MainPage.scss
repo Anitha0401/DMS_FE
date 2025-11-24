@@ -41,13 +41,17 @@
   transition: all 0.3s ease;
 
   .p-inputgroup {
-    margin-bottom: 1rem !important;
-    
+    gap: 5px;
+    padding: 2px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+
     .p-inputtext {
-      background: var(--bg-secondary) !important;
       border: 1px solid var(--border-color) !important;
       color: var(--text-primary) !important;
-      
+      padding-left: 1rem !important;
+      border-radius: '4px' !important;
+                        
       &:focus {
         border-color: var(--primary-color) !important;
         box-shadow: 0 0 0 0.2rem rgba(0, 114, 188, 0.2) !important;
@@ -177,82 +181,6 @@
       border-radius: 6px !important;
       box-shadow: 0 2px 8px var(--shadow) !important;
     }
-  }
-}
-
-// Confirm Dialog theming
-.p-confirm-dialog {
-  background: var(--bg-secondary) !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: 12px !important;
-  
-  .p-dialog-header {
-    background: var(--bg-primary) !important;
-    color: var(--text-primary) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    border-radius: 12px 12px 0 0 !important;
-    
-    .p-dialog-title {
-      color: var(--text-primary) !important;
-    }
-  }
-  
-  .p-dialog-content {
-    background: var(--bg-secondary) !important;
-    color: var(--text-primary) !important;
-    padding: 1.5rem !important;
-    
-    .p-confirm-dialog-message {
-      color: var(--text-primary) !important;
-    }
-    
-    .p-confirm-dialog-icon {
-      color: var(--warning-color) !important;
-    }
-  }
-  
-  .p-dialog-footer {
-    background: var(--bg-primary) !important;
-    border-top: 1px solid var(--border-color) !important;
-    border-radius: 0 0 12px 12px !important;
-    
-    .p-button {
-      &.p-confirm-dialog-accept {
-        background: var(--primary-color) !important;
-        border-color: var(--primary-color) !important;
-        color: white !important;
-        
-        &:hover {
-          background: var(--primary-color) !important;
-          opacity: 0.9;
-        }
-      }
-      
-      &.p-confirm-dialog-reject {
-        background: var(--bg-secondary) !important;
-        border: 1px solid var(--border-color) !important;
-        color: var(--text-primary) !important;
-        
-        &:hover {
-          background: var(--danger-color) !important;
-          color: white !important;
-        }
-      }
-    }
-  }
-}
-
-// Dialog theming
-.p-dialog {
-  .p-dialog-header {
-    background: var(--bg-primary) !important;
-    color: var(--text-primary) !important;
-    border-bottom: 3px solid var(--primary-color) !important;
-  }
-  
-  .p-dialog-content {
-    background: var(--bg-secondary) !important;
-    color: var(--text-primary) !important;
   }
 }
 
@@ -402,6 +330,10 @@
     background: var(--bg-primary) !important;
     color: var(--text-primary) !important;
     border-bottom: 3px solid var(--primary-color) !important;
+    min-height: 70px !important;
+    padding: 1rem 1.5rem !important; /* top/bottom left/right */
+    display: flex !important;
+    align-items: center !important;
   }
   
   .p-dialog-content {
@@ -409,6 +341,7 @@
     color: var(--text-primary) !important;
   }
 }
+
 
 // Remove any wrapper padding that might be affecting the tree
 .tree-wrapper {
@@ -570,18 +503,66 @@
   }
 }
 
-// Theme-specific overrides for PrimeReact Dialog
-.p-dialog {
-  .p-dialog-header {
-    background: var(--bg-primary) !important;
-    color: var(--text-primary) !important;
-    border-bottom: 3px solid var(--primary-color) !important;
-  }
+/* Make context menu horizontal */
+.horizontal-contextmenu {
+    .p-menu-list {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        padding: 0.5rem !important;
+    }
+    
+    .p-menuitem {
+        flex-shrink: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .p-menuitem-link {
+        padding: 0.5rem 1rem !important;
+        border-radius: 4px !important;
+        white-space: nowrap !important;
+    }
+}
 
-  .p-dialog-content {
-    background: var(--bg-secondary) !important;
-    color: var(--text-primary) !important;
-  }
+.compact-contextmenu {
+    .p-menu-list {
+        padding: 0.05rem !important;
+        min-width: 160px !important;
+    }
+    
+    .p-menuitem-link {
+        padding: 0.05rem 0.05rem !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+        font-size: 1rem !important;
+        color: var(--text-primary) !important;
+        border-radius: 3px !important;
+        margin: 1px 0 !important;
+    }
+    
+    .p-menuitem-icon {
+        font-size: 0.9rem !important;
+        width: 16px !important;
+        text-align: center !important;
+        margin: 0 !important;
+    }
+
+    .p-menuitem-icon,
+    .pi,
+    i[class*="pi-"] {
+        text-decoration: none !important;
+    }
+
+    /* Remove underlines  from icon containers */
+    .p-menuitem-link {
+        text-decoration: none !important;
+    }
+
+    .p-menuitem-link:hover {
+        text-decoration: none !important;
+    }
 }
 
 // Responsive design

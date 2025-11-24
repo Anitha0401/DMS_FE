@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { ContextMenu } from 'primereact/contextmenu';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
-import JoditEditor from 'jodit-react';
-import * as pdfjsLib from "pdfjs-dist";
-import './AddEditManual.scss';
 import { getDocument } from 'pdfjs-dist';
 import { GlobalWorkerOptions } from 'pdfjs-dist';
-import ApprovalFlow from './ApprovalFlow';
 import { Checkbox } from 'primereact/checkbox';
+import JoditEditor from 'jodit-react';
+import dmsLifecycleService from '../../services/DMSLifecycleService';
+import ApprovalFlow from './ApprovalFlow';
+import './AddEditManual.scss';
 
 GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
@@ -95,7 +94,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
     ];
 
     useEffect(() => {
-        dmsLifecycleService.apiCall('DMS/GetManualCategory')
+        dmsLifecycleService.getApiCall('DMS/GetManualCategory')
             .then(data => {
                 const options = data.map((cat: any) => ({
                     label: cat.categoryName,
@@ -105,7 +104,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
             })
             .catch(() => setCategoryOptions([]));
 
-        dmsLifecycleService.apiCall('DMS/GetApprovalFlowList')
+        dmsLifecycleService.getApiCall('DMS/GetApprovalFlowList')
             .then(data => {
                 const options = data.map((flow: any) => ({
                     label: flow.flowDesc,
@@ -118,7 +117,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
 
         // Fetch manual data if editing
         if (selectedAction === 'Edit' && selectedManualID > 0) {
-            dmsLifecycleService.apiCall(`DMS/GetManualDetailsByVersionId/${selectedManualVersionID}`, 'get')
+            dmsLifecycleService.getApiCall(`DMS/GetManualDetailsByVersionId/${selectedManualVersionID}`)
                 .then((data: any) => {
                     console.log('Fetched manual data:', data);
 
@@ -168,7 +167,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                 CalledMode: selectedAction,
             });
         }
-    }, [selectedAction, selectedManualVersionID]);
+    }, [selectedAction, selectedManualID, selectedManualVersionID]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -183,62 +182,6 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
     const handlePublish = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         onSubmit({ ...form, IsToPublish: true });
-    };
-
-    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        const fileType = file.type;
-        if (fileType === "application/pdf") {
-            await importPDF(file);
-        } else if (fileType === "application/msword" || fileType.includes("wordprocessingml")) {
-            await importWord(file);
-        } else {
-            alert("Unsupported file type. Please upload a Word or PDF file.");
-        }
-    };
-
-    const importPDF = async (file: File) => {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const typedArray = new Uint8Array(e.target?.result as ArrayBuffer);
-            const pdf = await pdfjsLib.getDocument(typedArray).promise;
-
-            let textContent = "";
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const text = await page.getTextContent();
-                textContent += text.items.map((item: any) => item.str).join(" ") + "\n";
-            }
-
-            setForm(prev => ({ ...prev, TextContents: textContent ?? '' }))
-        };
-        reader.readAsArrayBuffer(file);
-    };
-
-    const importWord = async (file: File) => {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const arrayBuffer = e.target?.result as ArrayBuffer;
-            const mammoth = await import("mammoth");
-            const result = await mammoth.extractRawText({ arrayBuffer });
-            // Use convertToHtml to preserve formatting and images
-            // const result = await mammoth.convertToHtml({ arrayBuffer });
-        
-            // editorRef.current?.setContent(result.value);
-            setForm(prev => ({ ...prev, TextContents: result.value ?? '' }))
-        };
-        reader.readAsArrayBuffer(file);
-    };
-
-    const handlePdfUpload = (event: any) => {
-        const file = event.target.files[0];
-        if (file) {
-            const fileURL = URL.createObjectURL(file);
-            const iframeHtml = `<iframe src="${fileURL}" width="100%" height="500px"></iframe>`;
-            setForm(prev => ({ ...prev, TextContents: iframeHtml ?? '' }))
-        }
     };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -298,13 +241,13 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                             <div className="manual-form-group2" style={{ display: 'flex', textAlign: 'center'}}>
                                 <Checkbox
                                     className="dropdown-compact"
-                                    checked={form.IsMainTitle == 1}
+                                    checked={form.IsMainTitle === 1}
                                     onChange={e => setForm(prev => ({ ...prev, IsMainTitle: !!e.checked ? 1 : 0 }))}
                                 />
                                 <label style={{ width: '120px', textAlign: 'left', marginLeft: '5px' }}>Main Title</label>
                                 <Checkbox
                                     className="dropdown-compact"
-                                    checked={form.CanExport == 1}
+                                    checked={form.CanExport === 1}
                                     onChange={e => setForm(prev => ({ ...prev, CanExport: !!e.checked ? 1 : 0 }))}
                                 />
                                 <label style={{ width: '150px', textAlign: 'left', marginLeft: '5px' }}>Allow Export</label>
@@ -325,7 +268,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                             <div className="manual-form-group2" style={{ display: 'flex', textAlign: 'center'}}>
                                 <Checkbox
                                     className="dropdown-compact"
-                                    checked={form.IsAcknowledgementRequired == 1}
+                                    checked={form.IsAcknowledgementRequired === 1}
                                     onChange={e => setForm(prev => ({ ...prev, IsAcknowledgementRequired: !!e.checked ? 1 : 0 }))}
                                 />
                                 <label style={{ width: '250px', textAlign: 'left', marginLeft: '5px' }}>Acknowledgement Required</label>
@@ -346,7 +289,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                                 <label style={{ width: '110px', flexShrink: 0 }}>Aprpoval Flow</label>
                                 <Checkbox
                                     className="dropdown-compact"
-                                    checked={form.IsApprovalRequired == 1}
+                                    checked={form.IsApprovalRequired === 1}
                                     onChange={e => {
                                         const checked = !!e.checked;
                                         setForm(prev => ({
@@ -378,7 +321,6 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                                 <label style={{ width: '110px', flexShrink: 0 }}>Context</label>
                                 <ContextMenu model={contextMenuItems} ref={menu} style={{ minWidth: '150px' }} />
                                 <a onClick={e => menu.current.show(e)} style={{ marginLeft: '5px', fontSize: '16px' }}>Import</a>
-                                {/* <input type="file" accept=".pdf,.doc,.docx" onChange={handleFileUpload} /> */}
                                 <input type="file" accept="application/pdf" onChange={handleFileChange} />;
                             </div>
                             <div className="col-sm-9" style={{ width: '100%', height: '395px' }}>

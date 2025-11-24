@@ -17,6 +17,8 @@ const VesselRankList: React.FC<VesselRankListProps> = ({ vslRank, selectedVessel
     const [selectedVslRank, setSelectedVslRank] = useState<VesselRank[]>([]);
     const [selectedVslDept, setSelectedVslDept] = useState<string | null>(null);
     const [vesselDeptOptions, setVesselDeptOptions] = useState<{ label: string; value: string }[]>([]);
+    const [searchValue, setSearchValue] = useState('');
+    const [allData, setAllData] = useState<VesselRank[]>([]);
 
     useEffect(() => {
         setVesselDeptOptions([
@@ -29,6 +31,7 @@ const VesselRankList: React.FC<VesselRankListProps> = ({ vslRank, selectedVessel
 
 
     useEffect(() => {
+        setAllData(vslRank);
         const selectedVslRanks = vslRank.filter(vessel =>
             selectedVesselRankList?.includes(vessel.userRank)
         );
@@ -37,7 +40,7 @@ const VesselRankList: React.FC<VesselRankListProps> = ({ vslRank, selectedVessel
     }, [vslRank, selectedVesselRankList]);
 
 
-    const filteredVessels = vslRank.filter(vsl => {
+    const filteredVessels = allData.filter(vsl => {
         const dept = vsl.userDept || '';
         const deptMatch = selectedVslDept
             ? (dept && dept.toUpperCase() === selectedVslDept.toUpperCase())
@@ -52,30 +55,38 @@ const VesselRankList: React.FC<VesselRankListProps> = ({ vslRank, selectedVessel
         onSelectionChange && onSelectionChange(e.value);
     };
 
+    const onSearchChange = (e: any) => {
+        const value = e.target.value;
+        setSearchValue(value);
+
+        if (value.trim() === '') {
+            setAllData(vslRank);
+        } else {
+            const filtered = vslRank.filter(rank => 
+                rank.userRank.toLowerCase().includes(value.toLowerCase()) ||
+                rank.userDeptDisplay?.toLowerCase().includes(value.toLowerCase())
+            );
+            setAllData(filtered);
+        }
+    };
+
     return (
         <div className='vessel-details-container'>
             <div>
                  <label className="headerLabel">Vessel Staff List</label>
             </div>
-            <div className="p-inputgroup mb-2">
+            <div className="p-inputgroup">
                 <InputText
                     placeholder="Search..."
-                    style={{ height: '38px' }}
-                />
-                <button
-                    type="button"
-                    className="manual-action-btn"
-                    title="Search"
-                    style={{
-                        marginLeft: '8px',
-                        verticalAlign: 'middle'
+                    value={searchValue}
+                    onChange={onSearchChange}
+                    style={{ 
+                        height: '38px', 
+                        paddingLeft: '10px' 
                     }}
-                    onClick={() => alert('Search clicked!')}
-                >
-                    <i className="pi pi-search" style={{ fontSize: '1.2rem' }}></i>
-                </button>
+                />
             </div>
-             <div className="p-inputgroup mb-2" style={{ alignItems: 'center' }}>
+             <div className="p-inputgroup" style={{ alignItems: 'center' }}>
                 <label style={{ fontWeight: 'bold', width: '50px' }}>Dept: </label>
                 <Dropdown
                     value={selectedVslDept}

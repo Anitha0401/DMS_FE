@@ -1,10 +1,9 @@
 import React from 'react';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { setLoggedIn, setShowAlert } from '../store/slices/userSlice';
 import Login from './Login';
-import Dashboard from '../components/MainPage/Dashboard';
+import Dashboard from '../components/Dashboard/Dashboard';
 import dmsLifecycleService from '../services/DMSLifecycleService';
 
 const LandingPage: React.FC = () => {
@@ -33,17 +32,14 @@ const LandingPage: React.FC = () => {
         try {
             dispatch(setShowAlert(false));
            
-            const loginInfo = { userId, password };
+           const loginInfo = { userId, password };
+           const isLoginSuccessful = await dmsLifecycleService.postApiCall('Login', loginInfo);
 
-           const isLoginSuccessful = await dmsLifecycleService.apiCall('Login', 'post', loginInfo, {
-                                                headers: {
-                                                    'Content-Type': 'application/json'
-                                                }
-                                            });
             if (isLoginSuccessful) {
                 dispatch(setLoggedIn(isLoginSuccessful));
                 dispatch(setShowAlert(false));
-            } else {
+            } 
+            else {
                 dispatch(setShowAlert(true));
             }
         } catch (error) {

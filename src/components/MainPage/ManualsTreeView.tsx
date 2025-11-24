@@ -2,20 +2,20 @@ import React, { useImperativeHandle, forwardRef, useState, useRef, useEffect } f
 import { Tree } from "primereact/tree";
 import { TreeNode } from 'primereact/treenode';
 import { Dialog } from 'primereact/dialog';
-import AddEditManual from '../AddEditManual/AddEditManual';
 import { ContextMenu } from 'primereact/contextmenu';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { setError, setSelectedManualNodeObj } from '../../store/slices/appSlice';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
 import type { ContextMenu as ContextMenuType } from 'primereact/contextmenu';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import axios from 'axios';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
-import axios from 'axios';
-import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
 import dmsLifecycleService from '../../services/DMSLifecycleService';
+import AddEditManual from '../AddEditManual/AddEditManual';
 import VesselDetails from '../VesselDetails/VesselDetails';
 import ManualDetails from '../ViewManuals/ManualDetails';
 import ManualAckList from '../ViewManuals/ManualAckList';
@@ -113,20 +113,16 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                 }
             ]
         },
-        {
-            label: '',
-        },
+        { separator: true },
         {
             label: 'Assign Manual Rights (To Ack)',
             icon: 'pi pi-user-plus',
             command: () => { 
                 setVisibleVesselDetailsDialog(true); 
-                setHeaderText('Assign Manual Rights : ' + selectedNodeLabel); 
+                setHeaderText('Assign Manual Rights'); 
                 setSelectedAction('Edit'); }
         },
-        {
-            label: '                     ',
-        },
+        { separator: true },
         {
             label: 'View Manual Details',
             icon: 'pi pi-eye',
@@ -140,7 +136,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
             icon: 'pi pi-check',
             command: () => { 
                 setVisibleVesselDetailsDialog(true); 
-                setHeaderText('View Manual Rights : ' + selectedNodeLabel); 
+                setHeaderText('View Manual Rights'); 
                 setSelectedAction('View'); }
         },
         {
@@ -187,7 +183,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
 
     const LoadTreeNodeData = async () => {
         try {
-            const data: TreeNodeData[] = await dmsLifecycleService.apiCall(`DMS/GetTreeViewManualList?userId=${userId}`, 'get');
+            const data: TreeNodeData[] = await dmsLifecycleService.getApiCall(`DMS/GetTreeViewManualList?userId=${userId}`);
             setAllNodes(data);
             setNodes(data);
             
@@ -318,11 +314,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                 url = 'DMS/EditManual';
             }
 
-            const response = await dmsLifecycleService.apiCall(url, 'post', data, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await dmsLifecycleService.postApiCall(url, data);
 
             setVisibleAddEditDialog(false);
             if (selectedAction === 'AddSubLevel' || selectedAction === 'AddSameLevel') {
@@ -341,13 +333,9 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
 
     const updateVesselDetails = async (data: any) => {
         try {
-            var url = 'DMS/UpdateManualRights';
-           
-            await dmsLifecycleService.apiCall(url, 'post', data, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            var url = 'DMS/UpdateManualRights';           
+            await dmsLifecycleService.postApiCall(url, data);
+
             setVisibleVesselDetailsDialog(false);
             await LoadTreeNodeData();
         } catch (err: any) {
@@ -368,10 +356,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
     const callManualDeleteAPI = async (nodeKey: string) => {
         try {
             setSelectedAction('');
-            const response = await dmsLifecycleService.apiCall(
-                    `DMS/DeleteManual/${nodeKey}`,
-                    'delete'
-            );
+            const response = await dmsLifecycleService.deleteApiCall(`DMS/DeleteManual/${nodeKey}`)
 
             if (!response.ok) {
                // throw new Error('Failed to delete');
@@ -404,10 +389,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
     const callLatestVersionDeleteAPI = async (nodeKey: string) => {
         try {
             setSelectedAction('');
-            const response = await dmsLifecycleService.apiCall(
-                    `DMS/DeleteManual/${nodeKey}`,
-                    'delete'
-            );
+            const response = await dmsLifecycleService.deleteApiCall(`DMS/DeleteManual/${nodeKey}`);
             
             if (!response.ok) {
                // throw new Error('Failed to delete');
@@ -431,17 +413,14 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
 
     return (
         <div className="tree-maincontainer">
-            <div className="p-inputgroup mb-2" style={{ gap: '15px', padding: '2px' }}>
+            <div className="p-inputgroup">
                 <InputText
                     placeholder="Search..."
                     value={searchValue}
                     onChange={onSearchChange}
                     style={{ 
                         height: '38px', 
-                        paddingLeft: '10px', 
-                        flex: 1,
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '4px'
+                        paddingLeft: '10px' 
                     }}
                 />
                 <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
@@ -483,7 +462,27 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
             </div>
             <div className="tree-view-container" style={{ padding: 0, margin: 0 }}>
                 <ConfirmDialog />
-                <ContextMenu model={contextMenuItems} ref={cm} />
+                <ContextMenu 
+                    model={contextMenuItems}
+                    ref={cm} 
+                    className="compact-contextmenu"
+                    appendTo="self"
+                    style={{ minWidth: '300px' }}
+                    pt={{
+                        root: { 
+                            className: 'no-left-padding',
+                            style: { paddingLeft: 0 }
+                        },
+                        menu: {
+                            style: { paddingLeft: 0 }
+                        },
+                        menuitem: {
+                            style: { paddingLeft: 0 }
+                        },
+                        action: {
+                            style: { paddingLeft: '0.25rem' }
+                        }
+                        }} />
                 <Tree
                     value={nodes}
                     selectionMode="single"
@@ -522,11 +521,11 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
 
             <Dialog header={headerText}
                 visible={visibleVesselDetailsDialog}
-                style={{ width: '70%', maxHeight: '90vh', minWidth: '90vh' }}
+                style={{ width: '65%', maxHeight: '90vh', minWidth: '90vh' }}
                 contentStyle={{ height: '100%', padding: '0.5rem', backgroundColor: '#e5eefbff' }}
-                headerStyle={{ backgroundColor: '#d2e3f9ff', borderBottom: '3px solid blue' }}
                 onHide={() => { if (!visibleVesselDetailsDialog) return; setVisibleVesselDetailsDialog(false); }}>
                 <VesselDetails
+                    manualTitle={selectedNodeLabel? selectedNodeLabel : ''}
                     onSubmit={updateVesselDetails}
                     closeForm={() => setVisibleVesselDetailsDialog(false)}
                     selectedAction={selectedAction}

@@ -4,12 +4,12 @@ import "primereact/resources/themes/bootstrap4-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "bootstrap/dist/css/bootstrap.css";
-import "./App.css";
-import LandingPage from './pages/LandingPage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
+import LandingPage from './pages/LandingPage';
 import MainPage from './components/MainPage/MainPage';
-import Dashboard from './components/MainPage/Dashboard';
+import Dashboard from './components/Dashboard/Dashboard';
+import "./App.css";
 
 
 const App: React.FC = () => {

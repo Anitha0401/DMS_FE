@@ -101,7 +101,7 @@ const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID,
 
     useEffect(() => {
       const fetchData = async() => {
-        dmsLifecycleService.apiCall(`DMS/GetCompareVersion_Content?dm_ManualID=${manualID}&compare_ManualVersionID=${DM_ManualVersionID_ToCompare}`, 'get')
+        dmsLifecycleService.getApiCall(`DMS/GetCompareVersion_Content?dm_ManualID=${manualID}&compare_ManualVersionID=${DM_ManualVersionID_ToCompare}`)
             .then(data => {
                 setCurrentVersion(data.current_Version);
                 setCurrentText(data.current_ManualContent);

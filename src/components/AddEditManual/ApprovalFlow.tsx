@@ -12,7 +12,7 @@ const ApprovalFlow: React.FC<ApprovalFlowProps> = ({ currentFlow }) => {
     const [approvalFlowList, setApprovalFlowList] = useState<{ flowDesc: string }[]>([]);
 
     useEffect(() => {
-      dmsLifecycleService.apiCall(`DMS/GetApprovalDetailsForFlowID/${currentFlow}`, 'get')
+      dmsLifecycleService.getApiCall(`DMS/GetApprovalDetailsForFlowID/${currentFlow}`)
         .then((data: any) => {
           let list: any[] = [];
           if (Array.isArray(data)) {

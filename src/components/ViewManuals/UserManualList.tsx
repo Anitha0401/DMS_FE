@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { setError } from '../../store/slices/appSlice';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
-import './UserManualList.scss';
 import { Dialog } from 'primereact/dialog';
 import ManualDetails from './ManualDetails';
-import { setError } from '../../store/slices/appSlice';
+import dmsLifecycleService from '../../services/DMSLifecycleService';
+import './UserManualList.scss';
 
 export interface UserManualProps {
     userId: string;
@@ -42,7 +42,7 @@ const UserManualList: React.FC<UserManualProps> = ({callMode, userId}) => {
     
     useEffect(() => {
         try {
-            dmsLifecycleService.apiCall(`DMS/GetUserManualListForCalledMode?userID=${userId}&calledMode=${callMode}`, 'get')
+            dmsLifecycleService.getApiCall(`DMS/GetUserManualListForCalledMode?userID=${userId}&calledMode=${callMode}`)
                 .then((data: any) => {
                    setUsersManualData(data);
                    setIsLoading(false);
@@ -53,7 +53,7 @@ const UserManualList: React.FC<UserManualProps> = ({callMode, userId}) => {
             } catch (err: any) {
                 setError(err.message || 'Error fetching data');
             } 
-    }, []);
+    }, [userId, callMode]);
     
     const callManualDetails = (dm_ManualVersionID: number) => {
       setDm_ManualVersionID(dm_ManualVersionID) 

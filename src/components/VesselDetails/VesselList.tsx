@@ -3,8 +3,8 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
 import { Vessel } from './VesselDetails';
+import dmsLifecycleService from '../../services/DMSLifecycleService';
 
 interface VesselListProps {
     vessels: Vessel[];
@@ -14,14 +14,15 @@ interface VesselListProps {
     }
 
 const VesselList: React.FC<VesselListProps> = ({ vessels, selectedVesselIdList, onSelectionChange, isViewMode }) => {
-
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [selectedVessels, setSelectedVessels] = useState<Vessel[]>([]);
     const [selectedVesselType, setSelectedVesselType] = useState<string | null>(null);
     const [vesselTypeOptions, setVesselTypeOptions] = useState<{ label: string; value: string }[]>([]);
+    const [searchValue, setSearchValue] = useState('');
+    const [allData, setAllData] = useState<Vessel[]>([]);
 
     useEffect(() => {
-        dmsLifecycleService.apiCall('Vessel/GetVslType')
+        dmsLifecycleService.getApiCall('Vessel/GetVslType')
             .then(data => {
                 const options = data.map((cat: any) => ({
                     label: cat,
@@ -34,6 +35,7 @@ const VesselList: React.FC<VesselListProps> = ({ vessels, selectedVesselIdList, 
     }, []);
     
     useEffect(() => {
+        setAllData(vessels);
         const selectedVesselsFromIds = vessels.filter(vessel =>
             selectedVesselIdList?.includes(vessel.vesselID)
         );
@@ -42,7 +44,7 @@ const VesselList: React.FC<VesselListProps> = ({ vessels, selectedVesselIdList, 
 	    setIsLoading(false);
     }, [vessels, selectedVesselIdList]);
 
-    const filteredVessels = vessels.filter(vessel => {
+    const filteredVessels = allData.filter(vessel => {
         const vslType = vessel.vslType || '';
         
         const vslTypeMatch = selectedVesselType
@@ -57,31 +59,39 @@ const VesselList: React.FC<VesselListProps> = ({ vessels, selectedVesselIdList, 
         setSelectedVessels(e.value);
         onSelectionChange && onSelectionChange(e.value);
     };
+    
+    const onSearchChange = (e: any) => {
+        const value = e.target.value;
+        setSearchValue(value);
+
+        if (value.trim() === '') {
+            setAllData(vessels);
+        } else {
+            const filtered = vessels.filter(vsl => 
+                vsl.vslName.toLowerCase().includes(value.toLowerCase()) ||
+                vsl.vslType.toLowerCase().includes(value.toLowerCase())
+            );
+            setAllData(filtered);
+        }
+    };
 
     return (
         <div className='vessel-details-container'>
             <div>
                 <label className="headerLabel">Vessel List</label>
             </div>
-            <div className="p-inputgroup mb-2">
+            <div className="p-inputgroup">
                 <InputText
                     placeholder="Search..."
-                    style={{ height: '38px' }}
-                />
-                <button
-                    type="button"
-                    className="manual-action-btn"
-                    title="Search"
-                    style={{
-                        marginLeft: '8px',
-                        verticalAlign: 'middle'
+                    value={searchValue}
+                    onChange={onSearchChange}
+                    style={{ 
+                        height: '38px', 
+                        paddingLeft: '10px' 
                     }}
-                    onClick={() => alert('Search clicked!')}
-                >
-                   <i className="pi pi-search" style={{ fontSize: '1.2rem' }}></i>
-                </button>
+                />
             </div>
-            <div className="p-inputgroup mb-2" style={{ alignItems: 'center' }}>
+            <div className="p-inputgroup" style={{ alignItems: 'center' }}>
                 <label style={{ fontWeight: 'bold', width: '50px' }}>Type: </label>
                 <Dropdown
                     value={selectedVesselType}
