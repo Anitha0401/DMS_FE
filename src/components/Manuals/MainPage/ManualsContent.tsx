@@ -1,21 +1,21 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { RootState } from '../../../store/store';
 import { ContextMenu } from 'primereact/contextmenu';
-import { setError } from '../../store/slices/appSlice';
+import { setError } from '../../../store/slices/appSlice';
 import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import { downloadAsWord } from '../utils/DownloadManuals';
-import { downloadAsPDF } from '../utils/DownloadManuals';
-import { useTheme } from '../../contexts/ThemeContext';
+import { downloadAsWord } from '../../utils/DownloadManuals';
+import { downloadAsPDF } from '../../utils/DownloadManuals';
+import { useTheme } from '../../../contexts/ThemeContext';
 import JoditEditor from 'jodit-react';
 import CompareVersion from '../CompareVersion/CompareVersion';
 import CompareVersionDetails from '../CompareVersion/CompareVersionDetails';
 import ManualDetails from '../ViewManuals/ManualDetails';
 import ApproveManual from '../ApproveManual/ApproveManual';
 import AddEditManual from '../AddEditManual/AddEditManual';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
+import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './ManualsContent.scss';
 
 export interface ManualDetailsProps {
@@ -46,7 +46,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
      const getJoditConfig = () => ({
         readonly: true,
         toolbar: false,
-        height: 'calc(100% - 1200px)',
+        height: 300,
         showCharsCounter: false,
         showWordsCounter: false,
         showXPathInStatusbar: false,
@@ -232,11 +232,6 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                 <div className="left-section" style={{flexDirection: 'row' }}>
                     <div style={{flexDirection: 'row', display: 'inline-flex', alignItems: 'left', verticalAlign: 'middle'}}>
                         <span className='selectedText' >Selected Manual :&nbsp;</span>
-                        <span  style={{display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle', fontSize: '18px'}}>
-                        {manualInfo.selectedManualNodeObj
-                            ? ` (v${manualInfo.selectedManualNodeObj.data.manualVersion})`
-                            : ''}
-                        </span>  &nbsp;
                     </div>
                     <div style={{flexDirection: 'row', display: 'inline-flex', alignItems: 'left', verticalAlign: 'middle'}}>
                         <label className='selectedTextHighlight'
@@ -244,7 +239,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             manualInfo.selectedManualNodeObj
                             ? manualInfo.selectedManualNodeObj.label
                             : ''
-                        }
+                          }
                         >
                         {manualInfo.selectedManualNodeObj
                             ? manualInfo.selectedManualNodeObj.label
@@ -260,6 +255,15 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                         onClick={() => setVisibleManualDetailsDialog(true)}
                     >
                         <img src="/info.jpg" alt="Info" />
+                    </button>
+                    <ContextMenu model={contextMenuItems} ref={menu} style={{ minWidth: '150px' }} />
+                    <button
+                        type="button"
+                        className="download-icon-btn"
+                        title="Download Manual"
+                        onClick={e => menu.current.show(e)}
+                    >
+                        <img src="/download1.png" alt="Download" className="download-icon" />
                     </button>
                     <Button
                         icon={isFavourite ? "pi pi-star-fill" : "pi pi-star"}
@@ -280,70 +284,97 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                 </div>
             </div>
             <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{flexDirection: 'row'}}>
-                    <span style={{ fontWeight: '600', fontSize: '16px', display:'inline-flex' }}>Status :&nbsp;</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '18px', fontStyle:'bold', width:'300px', display:'inline-flex' }}>
-                    {manualInfo.selectedManualNodeObj
-                        ? manualInfo.selectedManualNodeObj.data.statusString
-                        : ''}
-                    </span>
+                <div style={{flexDirection: 'row'}}>
+                    { manualInfo.selectedManualNodeObj &&
+                         <div className="header-meta" style={{display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '4px' }}>
+                            <span className="badge category-badge"
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '20px',
+                                    fontSize: '0.875rem',
+                                    fontWeight: '600',
+                                    background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                                    color: 'white',
+                                    border: 'none'
+                                }}
+                            >
+                                {manualInfo.selectedManualNodeObj.data?.category || ' -- '}
+                            </span>
+                            <span className="badge version-badge"
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '20px',
+                                    fontSize: '0.875rem',
+                                    fontWeight: '600',
+                                    background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                                    color: 'white',
+                                    border: 'none'
+                                }}
+                            >
+                                Version {manualInfo.selectedManualNodeObj.data?.manualVersion || ' -- '}
+                            </span>
+                            <span className="update-date">
+                                <i className="pi pi-calendar"></i>
+                                Last Updated: {manualInfo.selectedManualNodeObj.data?.lastUpdated || 'N/A'}
+                            </span>
+                        </div>
+                    }
+                    <div className="header-meta" style={{display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '4px' }}>
+                        <span style={{ fontWeight: '600', fontSize: '16px', display:'inline-flex' }}>Status :&nbsp;</span>
+                        <span style={{ fontWeight: 'bold', fontSize: '18px', fontStyle:'bold', width:'300px', display:'inline-flex' }}>
+                        {manualInfo.selectedManualNodeObj
+                            ? manualInfo.selectedManualNodeObj.data.statusString
+                            : ''}
+                        </span>
 
-                    <label style={{ marginLeft: '5px', width: '220px', display: 'inline-block', fontSize: '18px', fontStyle:'normal' }}>
-                        <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={e => { setIsChecked(e.target.checked); }}
-                            className="large-checkbox"
-                            style={{ marginLeft: '6px', marginRight: '4px', verticalAlign: 'middle' }}
-                         />
-                        Include Sub Manual
-                    </label>
+                        <label style={{ marginLeft: '5px', width: '220px', display: 'inline-block', fontSize: '18px', fontStyle:'normal' }}>
+                            <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={e => { setIsChecked(e.target.checked); }}
+                                className="large-checkbox"
+                                style={{ marginLeft: '6px', marginRight: '4px', verticalAlign: 'middle' }}
+                            />
+                            Include Sub Manual
+                        </label>
                     </div>
-                     <div style={{flexDirection: 'row', display: 'block', alignItems: 'right'}}>
-                        <ContextMenu model={contextMenuItems} ref={menu} style={{ minWidth: '150px' }} />
-                        <button
-                            type="button"
-                            className="download-icon-btn"
-                            title="Download Manual"
-                            onClick={e => menu.current.show(e)}
-                        >
-                            <img src="/download1.png" alt="Download" className="download-icon" />
-                        </button>
-                        <button
-                            className="manual-action-btn"
-                            onClick={() => setVisibleCompareVersionDialog(true)}
-                            type="button"
-                        >
-                            Compare Version
-                        </button>
-                        <button
-                            className="manual-action-btn"
-                            onClick={() => { setVisibleAddEditDialog(true); }}
-                            type="button"
-                            style={{ width: '100px', marginRight: '8px' }}
-                            disabled = {!isManualReleased && manualInfo.selectedManualNodeObj?.data?.dM_StatusID !== 100}
-                        >
-                            Edit
-                        </button>
-                        <button
-                            className="manual-action-btn"
-                            onClick={() => setVisibleApproveManualDialog(true)}
-                            type="button"
-                            style={{ width:'120px'}}
-                            disabled = {isManualReleased || manualInfo.selectedManualNodeObj?.data?.dM_StatusID === 100}
-                        >
-                           Approve
-                        </button>
-                        <button
-                            className="manual-action-btn"
-                            onClick={() => alert('Send Message clicked!')}
-                            type="button"
-                            style={{ width:'140px'}}
-                            disabled = {manualInfo.selectedManualNodeObj?.data?.dM_StatusID === 100}
-                        >
-                            Send Message
-                        </button>
-                    </div>
+                </div>
+                <div style={{flexDirection: 'row', display: 'block', alignItems: 'right'}}>
+                    <button
+                        className="manual-action-btn"
+                        onClick={() => setVisibleCompareVersionDialog(true)}
+                        type="button"
+                    >
+                        Compare Version
+                    </button>
+                    <button
+                        className="manual-action-btn"
+                        onClick={() => { setVisibleAddEditDialog(true); }}
+                        type="button"
+                        style={{ width: '100px', marginRight: '8px' }}
+                        disabled = {!isManualReleased && manualInfo.selectedManualNodeObj?.data?.dM_StatusID !== 100}
+                    >
+                        Edit
+                    </button>
+                    <button
+                        className="manual-action-btn"
+                        onClick={() => setVisibleApproveManualDialog(true)}
+                        type="button"
+                        style={{ width:'120px'}}
+                        disabled = {isManualReleased || manualInfo.selectedManualNodeObj?.data?.dM_StatusID === 100}
+                    >
+                        Approve
+                    </button>
+                    <button
+                        className="manual-action-btn"
+                        onClick={() => alert('Send Message clicked!')}
+                        type="button"
+                        style={{ width:'140px'}}
+                        disabled = {manualInfo.selectedManualNodeObj?.data?.dM_StatusID === 100}
+                    >
+                        Send Message
+                    </button>
+                </div>
             </div>
             <div className='sectiontext'>
                  {manualInfo.selectedManualNodeObj ? (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as Diff from 'diff';
 import DOMPurify from 'dompurify';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
+import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './CompareVersionDetails.scss';
 
 type ManualFormProps = {
@@ -12,9 +12,7 @@ type ManualFormProps = {
 
 const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID, DM_ManualVersionID_ToCompare }) => {
     const [currentVersion, setCurrentVersion] = useState<string>('');
-    const [currentText, setCurrentText] = useState<string>('');
     const [compareVersion, setCompareVersion] = useState<string>('');
-    const [compareText, setCompareText] = useState<string>('');
     const [diffResult, setDiffResult] = useState<Diff.Change[]>([]);
 
     const formatHTMLForDisplay = (htmlContent: string) => {
@@ -104,9 +102,7 @@ const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID,
         dmsLifecycleService.getApiCall(`DMS/GetCompareVersion_Content?dm_ManualID=${manualID}&compare_ManualVersionID=${DM_ManualVersionID_ToCompare}`)
             .then(data => {
                 setCurrentVersion(data.current_Version);
-                setCurrentText(data.current_ManualContent);
                 setCompareVersion(data.compare_Version);
-                setCompareText(data.compare_ManualContent);
                 
                 // Calculate diff on the HTML content
                 const diff = Diff.diffWords(
@@ -117,9 +113,7 @@ const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID,
             })
             .catch(() => {
                 setCurrentVersion('');
-                setCurrentText('');
                 setCompareVersion('');
-                setCompareText('');
             });
         }
 

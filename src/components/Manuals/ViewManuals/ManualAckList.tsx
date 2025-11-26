@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
+import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './ManualAckList.scss';
 
 export interface ackProps {

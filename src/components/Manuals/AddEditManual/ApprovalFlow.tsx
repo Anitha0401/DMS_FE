@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
+import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './ApprovalFlow.scss'; 
 
 

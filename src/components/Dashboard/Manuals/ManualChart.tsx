@@ -1,5 +1,6 @@
 import { Chart } from 'primereact/chart';
-
+import { useEffect, useState } from 'react';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 interface ChartProps {
     newCnt : number ;
@@ -10,7 +11,24 @@ interface ChartProps {
 }
 
 const ManualChart: React.FC<ChartProps> = ({ newCnt, toApprovalCnt, releasedCnt, toAckCnt, totalDocuments }) => {
-    // Bar chart data
+    const { theme } = useTheme();
+    const [chartColors, setChartColors] = useState({
+        textColor: 'white',
+        gridColor: 'rgba(200, 200, 200, 0.2)'
+    });
+
+    useEffect(() => {
+        // Get colors based on theme
+        const root = document.documentElement;
+        const computedTextColor = getComputedStyle(root).getPropertyValue('--text-secondary').trim();
+        const computedGridColor = getComputedStyle(root).getPropertyValue('--border-color').trim();
+        
+        setChartColors({
+            textColor: computedTextColor,
+            gridColor: computedGridColor || (theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)')
+        });
+    }, [theme]);
+
     const barChartData = {
         labels: ['New Documents', 'Pending Approval', 'Released', 'To Acknowledge'],
         datasets: [
@@ -36,20 +54,18 @@ const ManualChart: React.FC<ChartProps> = ({ newCnt, toApprovalCnt, releasedCnt,
         ]
     };
 
-    // Bar chart options
     const barChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: false
+                display: false,
             },
             tooltip: {
-                backgroundColor: '#2c3e50',
+                backgroundColor: theme === 'dark' ? '#1f2937' : '#2c3e50',
                 titleColor: '#ffffff',
                 bodyColor: '#e0e0e0',
-                footerColor: '#cccccc',
-                borderColor: 'var(--border-color)',
+                borderColor: chartColors.textColor,
                 borderWidth: 1,
                 cornerRadius: 8,
                 callbacks: {
@@ -68,11 +84,11 @@ const ManualChart: React.FC<ChartProps> = ({ newCnt, toApprovalCnt, releasedCnt,
                 beginAtZero: true,
                 max: Math.max(totalDocuments * 1.2, Math.max(newCnt, toApprovalCnt, releasedCnt, toAckCnt) * 1.3),
                 grid: {
-                    color: 'var(--border-color)',
+                    color: chartColors.gridColor,
                     drawBorder: false
                 },
                 ticks: {
-                    color: 'var(--text-secondary)',
+                    color: chartColors.textColor,
                     font: {
                         size: 12
                     },
@@ -84,7 +100,7 @@ const ManualChart: React.FC<ChartProps> = ({ newCnt, toApprovalCnt, releasedCnt,
                 title: {
                     display: true,
                     text: `Total Documents: ${totalDocuments}`,
-                    color: 'var(--text-primary)',
+                    color: chartColors.textColor,
                     font: {
                         size: 14,
                         weight: 'bold'
@@ -93,10 +109,11 @@ const ManualChart: React.FC<ChartProps> = ({ newCnt, toApprovalCnt, releasedCnt,
             },
             x: {
                 grid: {
-                    display: false
+                    display: false,
+                    color: chartColors.gridColor
                 },
                 ticks: {
-                    color: 'var(--text-primary)',
+                    color: chartColors.textColor,
                     font: {
                         size: 12,
                         weight: '500'
@@ -113,7 +130,7 @@ const ManualChart: React.FC<ChartProps> = ({ newCnt, toApprovalCnt, releasedCnt,
     };
 
     return (
-         <div className="dashboard-card chart-card">
+        <div className="dashboard-card chart-card">
             <div className="card-header">
                 <h3>Document Status Overview</h3>
             </div>

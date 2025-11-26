@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import JoditEditor from 'jodit-react';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
+import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './ManualDetails.scss';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 export interface ManualDetailsProps {
     dmManualVersionID: number;

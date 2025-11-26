@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { setError } from '../../store/slices/appSlice';
+import { setError } from '../../../store/slices/appSlice';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import ManualDetails from './ManualDetails';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
+import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './UserManualList.scss';
 
 export interface UserManualProps {

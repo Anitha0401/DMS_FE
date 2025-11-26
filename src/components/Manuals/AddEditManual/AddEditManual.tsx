@@ -5,7 +5,7 @@ import { getDocument } from 'pdfjs-dist';
 import { GlobalWorkerOptions } from 'pdfjs-dist';
 import { Checkbox } from 'primereact/checkbox';
 import JoditEditor from 'jodit-react';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
+import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import ApprovalFlow from './ApprovalFlow';
 import './AddEditManual.scss';
 

@@ -4,16 +4,12 @@ interface QuickActionLinkProps {
     title: string;
     desc: string;
     icon: string;
-    action: () => void;
 }
 
-const QuickActionLink: React.FC<QuickActionLinkProps> = ({ title, desc, icon, action }) => {
+const QuickActionLink_Cicrular: React.FC<QuickActionLinkProps> = ({ title, desc, icon }) => {
     // Simple link component
     return (
-        <div 
-            className="action-link"
-            onClick={action}
-        >
+        <div className="action-link">
             <i className={icon}></i>
             <strong>{title}</strong>
             <p>{desc}</p>
@@ -21,4 +17,4 @@ const QuickActionLink: React.FC<QuickActionLinkProps> = ({ title, desc, icon, ac
     );
 };
 
-export default QuickActionLink;
+export default QuickActionLink_Cicrular;

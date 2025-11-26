@@ -1,19 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '../../../contexts/ThemeContext';
 import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import ManualsTreeView from './ManualsTreeView';
 import ManualsContent from './ManualsContent';
-import PageHeader from '../PageHeader';
+import PageHeader from '../../PageHeader';
 import UserManualList from '../ViewManuals/UserManualList';
-import dmsLifecycleService from '../../services/DMSLifecycleService';
-import './MainPage.scss';
+import dmsLifecycleService from '../../../services/DMSLifecycleService';
+import './ManualMainPage.scss';
 
 export interface ManualDetailsProps {
     userId: string;
 }
 
-const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
+const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [showUserManualDialog, setShowUserManualDialog] = useState(false); 
     const [dbInfoAction, setDbInfoAction] = useState('');
@@ -168,4 +168,4 @@ const MainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     );
 };
 
-export default MainPage;
+export default ManualMainPage;

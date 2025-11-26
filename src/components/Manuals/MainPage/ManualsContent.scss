@@ -37,7 +37,7 @@
     .selectedTextHighlight {
       color: var(--primary-color);
       font-weight: bold;
-      font-size: 1.5rem; // Reduced from 1.1rem
+      font-size: 1.4rem; // Reduced from 1.1rem
       margin: 0;
       padding: 0;
     }
@@ -64,8 +64,63 @@
         width: 32px; // Reduced from 20px
         height: 32px;
       }
+  }
+  
+  .download-icon-btn {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 0.125rem; // Reduced padding
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        margin: 0 0.125rem; // Reduced margin
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            background: var(--bg-primary);
+            transform: translateY(-1px);
+        }
+
+        img {
+            width: 50px; // Reduced size
+            height: 40px;
+         }
+   }
+  
+  .header-meta {
+    display: flex !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+    flex-wrap: wrap;
+
+    .badge {
+        padding: 0.5rem 1rem !important;
+        border-radius: 20px !important;
+        font-size: 1.875rem !important;
+        font-weight: 600 !important;
+        display: inline-block !important;
     }
 
+    .category-badge {
+        background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+        color: white !important;
+    }
+
+    .version-badge {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+        color: white !important;
+    }
+
+    .update-date {
+        color: var(--text-secondary) !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+    }
+  }
     .p-button {
       background: var(--warning-color) !important;
       border-color: var(--warning-color) !important;
@@ -87,6 +142,23 @@
       }
     }
   }
+
+.content-section {
+  flex: 1;
+  background: var(--bg-secondary);
+  overflow: auto;
+  padding: 0.25rem; // Reduced from 1rem
+  margin: 0; // Remove any margin
+  height: 100%; 
+  
+  &.with-tree {
+    width: 75%;
+  }
+
+  &.full-width {
+    width: calc(100% - 20px); 
+  }
+}
 
   .manual-action-btn {
     background: var(--primary-color);
@@ -118,44 +190,19 @@
     }
   }
 
+  .left-section {
+      flex: 1; // Take up remaining space
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+  }
 
-  .download-icon-btn {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        cursor: pointer;
-        padding: 0.125rem; // Reduced padding
-        border-radius: 4px;
-        transition: all 0.2s ease;
-        margin: 0 0.125rem; // Reduced margin
-        height: 45px;
-        align-items: center;
-        justify-content: center;
-
-        &:hover {
-            background: var(--bg-primary);
-            transform: translateY(-1px);
-        }
-
-        img {
-            width: 50px; // Reduced size
-            height: 40px;
-         }
-    }
-
-    .left-section {
-        flex: 1; // Take up remaining space
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .right-section {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem; // Space between buttons
-        flex-shrink: 0; // Don't shrink
-    }
+  .right-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem; // Space between buttons
+      flex-shrink: 0; // Don't shrink
+  }
 
   .large-checkbox {
     width: 24px !important; // Larger width

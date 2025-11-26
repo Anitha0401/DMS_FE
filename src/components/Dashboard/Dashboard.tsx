@@ -12,29 +12,33 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
     const [activeIndex, setActiveIndex] = useState(0);
   
     return (
-         <div className="dashboard-main">
-         <TabView 
-            activeIndex={activeIndex} 
-            onTabChange={(e) => setActiveIndex(e.index)}
-            className="dashboard-tabs"
-        >
-            <TabPanel 
-                header="Manuals" 
-                leftIcon="pi pi-book"
+         <div className="dashboard-main" style={{border: "2px solid #6d6d6d"}}>
+            <TabView 
+                activeIndex={activeIndex} 
+                onTabChange={(e) => setActiveIndex(e.index)}
+                className="dashboard-tabs"
             >
-                <Dashboard_Manual userId={userId} />
-            </TabPanel>
-             <TabPanel 
-                header="Circulars & Alerts" 
-                leftIcon="pi pi-envelope"
-            >
-               <Dashboard_Circulars userId={userId} />
-            </TabPanel>
-            <TabPanel 
-                header="Quick Actions" 
-                leftIcon="pi pi-bolt"
-            ></TabPanel>
-        </TabView>
+                <TabPanel 
+                     header={
+                        <div className="tab-header">
+                            <i className="pi pi-book"></i>
+                            <span>Manuals</span>
+                        </div>
+                    }
+                >
+                    <Dashboard_Manual userId={userId} />
+                </TabPanel>
+                <TabPanel 
+                   header={
+                        <div className="tab-header">
+                            <i className="pi pi-envelope"></i>
+                            <span>Circulars & Alerts</span>
+                        </div>
+                    }
+                >
+                <Dashboard_Circulars userId={userId} />
+                </TabPanel>
+            </TabView>
         </div>
     );
 };

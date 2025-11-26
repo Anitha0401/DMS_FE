@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Dropdown } from 'primereact/dropdown';
-import { Badge } from 'primereact/badge';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
@@ -27,11 +26,7 @@ const Dashboard_Manual: React.FC<DashboardProps> = ({ userId }) => {
     const navigate = useNavigate();
     const { theme, setTheme, themeOptions } = useTheme();
 
-    const handleBrowseManuals = () => {
-        navigate('/main');
-    };
-
-    const setUserActionCounts = () => {
+    const setUserActionCounts = useCallback(() => {
         dmsLifecycleService.getApiCall(`DMS/GetDashboardManualCounts?userId=${userId}`)
             .then((data: any) => {
                 if (data) {
@@ -58,19 +53,76 @@ const Dashboard_Manual: React.FC<DashboardProps> = ({ userId }) => {
                 setFavouriteCnt(0);
                 setTotalDocuments(0);
             });
-    };
+    }, [userId]);
 
+    useEffect(() => {   
+        setUserActionCounts();
+    }, [setUserActionCounts]);
+   
     const metricsData = [
-        { number: totalDocuments, label: "Total Documents", subtext: "All accessible documents", icon: "pi pi-file", css: "primary", color: "blue" },
-        { number: newCnt, label: "New Documents", subtext: "Documents under preparation", icon: "pi pi-plus-circle", css: "info", color: "blue" },
-        { number: favouriteCnt, label: "My Favorites", subtext: "Bookmarked documents", icon: "pi pi-star-fill", css: "success", color: "green" },
-        { number: (userToApproveCnt + userToReviewCnt + userToAckCnt), label: "Action Required", subtext: "Pending actions", icon: "pi pi-exclamation-triangle", css: "warning", color: "red", isAction: true },
+        { 
+            number: totalDocuments,
+            label: "Total Documents", 
+            subtext: "All accessible documents", 
+            icon: "pi pi-file", 
+            css: "primary", 
+            color: "blue",
+            action: () => navigate('/manuals')
+        },
+        { 
+            number: newCnt, 
+            label: "New Documents", 
+            subtext: "Documents under preparation", 
+            icon: "pi pi-plus-circle", 
+            css: "info", 
+            color: "blue", 
+            action: () => navigate('/manualView?mode=new') 
+        },
+        { 
+            number: favouriteCnt, 
+            label: "My Favorites", 
+            subtext: "Bookmarked documents", 
+            icon: "pi pi-star-fill", 
+            css: "success", 
+            color: "green", 
+            action: () => navigate('/manualView?mode=userfavorites') 
+        },
+        { 
+            number: toAckCnt, 
+            label: "Vsl Ack Required", 
+            subtext: "Vessel acknowledgment required", 
+            icon: "pi pi-thumbs-up", 
+            css: "info", 
+            color: "blue", 
+            action: () => navigate('/manualView?mode=vsltoack') 
+        },
     ];
 
     const actionData = [
-        { count: userToApproveCnt, text: "Pending Approvals", subtext: "documents need approval", icon: "pi pi-check-circle", css: "approval" },
-        { count: userToReviewCnt, text: "Under Review", subtext: "documents under review", icon: "pi pi-eye", css: "review"},
-        { count: userToAckCnt, text: "Acknowledgment Required", subtext: "documents need acknowledgment", icon: "pi pi-thumbs-up", css: "acknowledge"}
+        { 
+            count: userToApproveCnt, 
+            text: "Pending Approvals", 
+            subtext: "documents need approval", 
+            icon: "pi pi-check-circle", 
+            css: "approval",
+            action: () => navigate('/manualView?mode=pendingapproval') 
+        },
+        { 
+            count: userToReviewCnt, 
+            text: "Under Review", 
+            subtext: "documents under review", 
+            icon: "pi pi-eye", 
+            css: "review",
+            action: () => navigate('/manualView?mode=underreview') 
+        },
+        { 
+            count: userToAckCnt, 
+            text: "Acknowledgment Required", 
+            subtext: "documents need acknowledgment", 
+            icon: "pi pi-verified", 
+            css: "acknowledge",
+            action: () => navigate('/manualView?mode=usertoack') 
+        }
     ];
 
      const quickActions = [
@@ -97,10 +149,6 @@ const Dashboard_Manual: React.FC<DashboardProps> = ({ userId }) => {
         }
     ];
 
-    useEffect(() => {   
-        setUserActionCounts();
-    }, [userId]);
-   
     return (
         <div className='dashboard-wrapper'>
             <div className="dashboard-container">
@@ -112,9 +160,6 @@ const Dashboard_Manual: React.FC<DashboardProps> = ({ userId }) => {
                                 <i className="pi pi-th-large"></i>
                                 Document Management Dashboard
                             </h1>
-                            <p className="dashboard-subtitle">
-                                Welcome back! Document Management Overview
-                            </p>
                         </div>
                         <div className="header-actions">
                             <Dropdown 
@@ -155,6 +200,10 @@ const Dashboard_Manual: React.FC<DashboardProps> = ({ userId }) => {
                     <div className="dashboard-card action-card">
                         <div className="card-header">
                             <h3>Action Required</h3>
+                             <div className="stat-icon" style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                                <i className="pi pi-exclamation-triangle icon-blue" style={{fontSize: '1.5rem'}}></i>
+                                <div className="action-badge">{userToApproveCnt+userToReviewCnt+userToAckCnt}</div>
+                            </div>
                         </div>
                         <div className="action-items">
                             {actionData.map((data, index) => (
