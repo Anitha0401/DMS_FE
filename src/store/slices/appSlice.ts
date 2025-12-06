@@ -19,7 +19,7 @@ interface AppState {
     userInfo: any;
     isUserReqdToReadManuals: boolean;
 
-    selectedManualNodeObj: any | null; // New state to hold the selected manual node object
+    selectedManualNodeObj: any | null;
 }
 
 const initialState: AppState = {

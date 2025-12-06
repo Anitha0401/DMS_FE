@@ -85,10 +85,8 @@ const HQUserList: React.FC<HQUserListProps> = ({ hqUser, selectedHQUserList, onS
         setSearchValue(value);
         
         if (value.trim() === '') {
-            // Reset to original data when search is empty
             setAllData(hqUser);
         } else {
-            // Filter users based on search term
             const filtered = hqUser.filter(user => 
                 user.userName.toLowerCase().includes(value.toLowerCase()) ||
                 user.userRole.toLowerCase().includes(value.toLowerCase()) ||

@@ -10,8 +10,6 @@ import { Tag } from 'primereact/tag';
 import { Tree } from 'primereact/tree';
 import { SelectButton } from 'primereact/selectbutton';
 import { TreeNode } from 'primereact/treenode';
-import { ContextMenu } from 'primereact/contextmenu';
-import { MenuItem } from 'primereact/menuitem';
 import dmsLifecycleService from '../../services/DMSLifecycleService';
 import PageHeader from '../PageHeader';
 import './CircularsList.scss';
@@ -31,7 +29,6 @@ interface Circular {
     releasedDate: string;
     attachments: number;
     isNew?: boolean;
-    isCategory?: boolean;
 }
 
 interface AckRecord {
@@ -49,7 +46,11 @@ interface CircularsListProps {
 }
 
 interface TreeNodeData extends TreeNode {
-    data: Circular;
+    data: {
+        cir_MasterID: number;
+        cir_BlobID: number;
+        cir_CategoryID: number;
+    };
 }
 
 const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => {
@@ -63,20 +64,12 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
     const [sortOrder, setSortOrder] = useState('newest');
     const [filterCategory, setFilterCategory] = useState('all');
     const [nodes, setNodes] = useState<TreeNodeData[]>([]);
+    const [allNodes, setAllNodes] = useState<TreeNodeData[]>([]);
     const [selectedNodeKey, setSelectedNodeKey] = useState<any>(null);
     const [selectedNodeLabel, setSelectedNodeLabel] = useState<string | null | undefined>(null);
     const [selectedAction, setSelectedAction] = useState<string>('Add');
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const [viewMode, setViewMode] = useState('list');
-    const cm = React.useRef<ContextMenu>(null);
-
-    const menuItems: MenuItem[] = [
-        { label: 'Edit', icon: 'pi pi-fw pi-pencil', command: () => handleEdit(selectedCircular?.id || '') },
-        { label: 'View', icon: 'pi pi-fw pi-eye', command: () => handleView(selectedCircular?.id || '') },
-        { label: 'Download', icon: 'pi pi-fw pi-download', command: () => handleDownload(selectedCircular?.id || '') },
-        { label: 'Log', icon: 'pi pi-fw pi-history', command: () => handleLog(selectedCircular?.id || '') },
-        { label: 'Add to Favorites', icon: 'pi pi-fw pi-star' }
-    ];
 
     const sortOptions = [
         { label: 'Newest First', value: 'newest' },
@@ -86,15 +79,15 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
 
     const categoryOptions = [
         { label: 'All Categories', value: 'all' },
-        { label: 'S afety', value: 'safety' },
+        { label: 'Safety', value: 'safety' },
         { label: 'Operations', value: 'operations' },
         { label: 'Compliance', value: 'compliance' },
         { label: 'Technical', value: 'technical' }
     ];
 
     const viewOptions = [
-        { icon: 'pi pi-align-justify', value: 'list', label: 'List' },
-        { icon: 'pi pi-sitemap', value: 'tree', label: 'Tree' }
+        { icon: 'pi pi-align-justify', value: 'list' },
+        { icon: 'pi pi-sitemap', value: 'tree' }
     ];
 
      const getHeaderTitle = () => {
@@ -234,61 +227,18 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         {
             key: '0',
             label: 'Safety Circulars',
-            data: {
-                id: '1',
-                circularType: 'circular',
-                category: 'Safety',
-                reference: 'Safety',
-                circularNumber: 'CIR-2024-001',
-                title: 'New Safety Protocols for Vessel Operations',
-                priority: 'High',
-                status: 'Active',
-                dateIssued: '2024-11-20',
-                remarks: 'Updated safety protocols for all vessel operations effective immediately.',
-                attachments: 3,
-                releasedDate: '2024-11-21',
-                isNew: true,
-                isCategory: true
-            },
+            data: { cir_MasterID: 1, cir_BlobID: 100, cir_CategoryID: 10 },
             children: [
                 {
                     key: '0-0',
                     label: 'New Safety Protocols',
-                    data: {
-                        id: '1',
-                        circularType: 'circular',
-                        category: 'Safety',
-                        reference: 'Safety',
-                        circularNumber: 'CIR-2024-001',
-                        title: 'New Safety Protocols for Vessel Operations',
-                        priority: 'High',
-                        status: 'Active',
-                        dateIssued: '2024-11-20',
-                        remarks: 'Updated safety protocols for all vessel operations effective immediately.',
-                        attachments: 3,
-                        releasedDate: '2024-11-21',
-                        isNew: true
-                    },
+                    data: { cir_MasterID: 101, cir_BlobID: 1001, cir_CategoryID: 10 },
                     children: []
                 },
                 {
                     key: '0-1',
                     label: 'Updated Fire Drill Procedures',
-                    data: {
-                        id: '2',
-                        circularType: 'circular',
-                        category: 'Safety',
-                        reference: 'Safety',
-                        circularNumber: 'CIR-2024-002',
-                        title: 'Vessel Operations Safety manuals',
-                        priority: 'Low',
-                        status: 'Active',
-                        dateIssued: '2025-09-20',
-                        remarks: 'Updated safety protocols for all vessel operations effective immediately.',
-                        attachments: 3,
-                        releasedDate: '2024-11-21',
-                        isNew: true
-                    },
+                    data: { cir_MasterID: 102, cir_BlobID: 1002, cir_CategoryID: 10 },
                     children: []
                 }
             ]
@@ -296,41 +246,12 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         {
             key: '1',
             label: 'Operational Memos',
-            data: {
-                id: '3',
-                circularType: 'circular',
-                category: 'Safety',
-                reference: 'Safety',
-                circularNumber: 'CIR-2024-003',
-                title: 'New Protocols for Vessel Operations',
-                priority: 'Medium',
-                status: 'Active',
-                dateIssued: '2023-10-20',
-                remarks: 'Updated safety protocols for all vessel operations effective immediately.',
-                attachments: 3,
-                releasedDate: '2024-11-21',
-                isNew: true,
-                isCategory: true
-            },
+            data: { cir_MasterID: 2, cir_BlobID: 200, cir_CategoryID: 20 },
             children: [
                 {
                     key: '1-0',
                     label: 'Revised Cargo Handling Guidelines',
-                    data: {
-                        id: '3',
-                        circularType: 'circular',
-                        category: 'Safety',
-                        reference: 'Safety',
-                        circularNumber: 'CIR-2024-003',
-                        title: 'New Protocols for Vessel Operations',
-                        priority: 'Medium',
-                        status: 'Active',
-                        dateIssued: '2023-10-20',
-                        remarks: 'Updated safety protocols for all vessel operations effective immediately.',
-                        attachments: 3,
-                        releasedDate: '2024-11-21',
-                        isNew: true
-                    },
+                    data: { cir_MasterID: 201, cir_BlobID: 2001, cir_CategoryID: 20 },
                     children: []
                 }
             ]
@@ -338,22 +259,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         {
             key: '2',
             label: 'Technical Bulletins',
-            data: {
-                id: '1',
-                circularType: 'circular',
-                category: 'Safety',
-                reference: 'Safety',
-                circularNumber: 'CIR-2024-001',
-                title: 'New Safety Protocols for Vessel Operations',
-                priority: 'High',
-                status: 'Active',
-                dateIssued: '2024-11-20',
-                remarks: 'Updated safety protocols for all vessel operations effective immediately.',
-                attachments: 3,
-                releasedDate: '2024-11-21',
-                isNew: true,
-                isCategory: true
-            },
+            data: { cir_MasterID: 3, cir_BlobID: 300, cir_CategoryID: 30 },
             children: []
         }
     ];
@@ -388,38 +294,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         let node: any = nodes[0];
         return node;
     }
-    
-    const onSelectionChange = (e: any) => {
-        setSelectedNodeKey(e.value);
-        const node = findNodeByKey(nodes, e.value as string);
-        if (node) {
-            if (node.data.isCategory) {
-                setSelectedCircular(null);
-            } else {
-                setSelectedCircular(node.data as Circular);
-            }
-        }
-    }
-
-    const onTreeContextMenu = (event: any) => {
-        event.originalEvent.preventDefault();
-        const node = event.node;
-        setSelectedNodeKey(node.key);
-        if (node && !node.data.isCategory) {
-            setSelectedCircular(node.data);
-            cm.current?.show(event.originalEvent);
-        }
-        else {
-            cm.current?.hide(event.originalEvent);
-            setSelectedCircular(null);
-        }
-    };
-
-    const onListContextMenu = (event: React.MouseEvent, circular: Circular) => {
-        event.preventDefault();
-        setSelectedCircular(circular);
-        cm.current?.show(event);
-    };
     
     useEffect(() => {
         if (selectedCircular) {
@@ -504,10 +378,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         console.log('View circular:', id);
     };
 
-    const handleEdit = (id: string) => {
-        console.log('Edit circular:', id);
-    };
-
     const handleDownload = (id: string) => {
         console.log('Download circular:', id);
     };
@@ -533,7 +403,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
            <div 
                 className={`circular-item ${isSelected ? 'selected' : ''}`}
                 onClick={() => setSelectedCircular(circular)}
-                onContextMenu={(e) => onListContextMenu(e, circular)}
             >
                 <div className="circular-header">
                     <div className="circular-number-badge">
@@ -571,12 +440,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                             </div>
                         </div>
                         <div className="circular-actions">
-                             <Button 
-                                icon="pi pi-pencil" 
-                                label="Edit" 
-                                className="p-button-text"
-                                onClick={() => handleEdit(circular.id)}
-                            />
                             <Button 
                                 icon="pi pi-eye" 
                                 label="View" 
@@ -598,8 +461,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                             />
                             <Button 
                                 icon="pi pi-star" 
-                                label="Favorites" 
-                                className="p-button-text "
+                                className="p-button-text p-button-rounded"
                                 tooltip="Add to Favorites"
                             />
                         </div>
@@ -624,27 +486,8 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         />
     );
 
-    const findNodeByKey = (nodes: TreeNodeData[], key: string): TreeNodeData | null => {
-        for (const node of nodes) {
-            if (node.key === key) {
-                return node;
-            }
-            if (node.children) {
-                const found = findNodeByKey(node.children as TreeNodeData[], key);
-                if (found) {
-                    return found;
-                }
-            }
-        }
-        return null;
-    };
-
     return (
         <div className='main-page-wrapper'>
-            <ContextMenu 
-                model={menuItems} 
-                ref={cm} 
-            />
             <PageHeader
                 title={`COMPANY - ${getHeaderTitle()}`}
                 subtitle="Test User Name"
@@ -652,7 +495,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
             />
             
             <div className="circulars-split-container">
-                <div className="circulars-list-section">
+                <div className="circulars-list-container">
                     <div className="list-controls">
                         <div className="search-box">
                             <span className="p-input-icon-left">
@@ -673,32 +516,19 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                 placeholder="Category"
                                 className="filter-dropdown"
                             />
-                            {(
-                                viewMode === 'list' ? (
-                                    <Dropdown
-                                        value={sortOrder}
-                                        options={sortOptions}
-                                        onChange={(e) => setSortOrder(e.value)}
-                                        placeholder="Sort by"
-                                        className="filter-dropdown"
-                                    />
-                                ) : null
-                            )}
-                            <SelectButton
-                                value={viewMode}
-                                options={viewOptions}
-                                onChange={(e) => {
-                                    if (e.value !== null) {
-                                        setViewMode(e.value);
-                                    }
-                                }}
-                                itemTemplate={(option) => (
-                                    <div className="flex align-items-center" style={{ padding: '0.5rem 0.7rem' }}>
-                                        <i className={option.icon} style={{ fontSize: '1.2rem' }}></i>
-                                    </div>
-                                )}
-                                tooltip="Switch between List and Tree view"
-                                tooltipOptions={{ position: 'bottom' }}
+                            <Dropdown
+                                value={sortOrder}
+                                options={sortOptions}
+                                onChange={(e) => setSortOrder(e.value)}
+                                placeholder="Sort by"
+                                className="filter-dropdown"
+                            />
+                            <SelectButton 
+                                value={viewMode} 
+                                options={viewOptions} 
+                                onChange={(e) => setViewMode(e.value)} 
+                                itemTemplate={(option) => <i className={option.icon}></i>}
+                                allowEmpty={false}
                             />
                         </div>
                         <span className="results-count">{filteredCirculars.length} Circulars</span>
@@ -711,42 +541,42 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                         />
                     </div>
                     
-                    <div className="list-content">
-                        {loading ? (
-                            <div className="skeleton-list">
-                                {[1, 2, 3].map(i => (
-                                    <div key={i} className="skeleton-item">
-                                        <Skeleton width="100%" height="150px" />
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            viewMode === 'tree' ? (
-                            <Tree
-                                value={nodes}
-                                selectionMode="single"
-                                selectionKeys={selectedNodeKey}
-                                onSelectionChange={onSelectionChange}
-                                expandedKeys={expandedKeys}
-                                onToggle={(e) => {
-                                    setExpandedKeys(e.value);
-                                    cm.current?.hide(e.originalEvent);
-                                }}
-                                className="custom-tree"
-                                onContextMenu={onTreeContextMenu}
-                            />
-                            ) : ( 
-                                <DataView 
-                                value={filteredCirculars} 
-                                itemTemplate={itemTemplate}
-                                layout="list"
-                                paginator
-                                rows={10}
-                                className="circulars-dataview"
-                            />
-                            )
-                        )}
-                    </div>
+                    {loading ? (
+                        <div className="skeleton-list">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="skeleton-item">
+                                    <Skeleton width="100%" height="150px" />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        viewMode === 'tree' ? (
+                         <Tree
+                            value={nodes}
+                            selectionMode="single"
+                            selectionKeys={selectedNodeKey}
+                            expandedKeys={expandedKeys}
+                            onToggle={(e) => setExpandedKeys(e.value)}
+                            className="custom-tree"
+                            style={{ 
+                            border: 'none', 
+                            padding: 0, 
+                            paddingTop: '2px',
+                            margin: 0,
+                            background: 'var(--bg-secondary)'
+                        }}
+                        />
+                         ) : ( 
+                            <DataView 
+                            value={filteredCirculars} 
+                            itemTemplate={itemTemplate}
+                            layout="list"
+                            paginator
+                            rows={10}
+                            className="circulars-dataview"
+                        />
+                        )
+                    )}
                 </div>
                 <div className="ack-list-section">
                     <div className="section-header">
@@ -760,14 +590,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                 tooltip="Refresh Acknowledgments"
                             />
                         )}
-                        <Button 
-                            icon="pi pi-plus" 
-                            label="New Circular"
-                            className="p-button-success"
-                            onClick={handleNewCircular}
-                            rounded
-                            style={{padding:'0.2rem 0.5rem', borderRadius: '0.5rem'}}
-                        />
                     </div>
                     {selectedCircular ? (
                         <>
@@ -776,36 +598,32 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                 <p>{selectedCircular.title}</p>
                             </div>
 
-                            <div className="ack-table-container">
-                                {ackLoading ? (
-                                    <div className="skeleton-table">
-                                        <Skeleton width="100%" height="300px" />
-                                    </div>
-                                ) : (
-                                    <DataTable 
-                                        value={ackList} 
-                                        className="ack-table"
-                                        scrollable 
-                                        scrollHeight="flex"
-                                        stripedRows
-                                        paginator
-                                        rows={10}
-                                        emptyMessage="No acknowledgment records found"
-                                    >
-                                        <Column field="vesselName" header="Vessel Name" sortable />
-                                        <Column field="acknowledgedBy" header="Acknowledged By" sortable />
-                                        <Column field="acknowledgedDate" header="Date" sortable />
-                                        <Column field="status" header="Status" body={ackStatusBodyTemplate} sortable />
-                                        <Column field="remarks" header="Remarks" />
-                                    </DataTable>
-                                )}
-                            </div>
+                            {ackLoading ? (
+                                <div className="skeleton-table">
+                                    <Skeleton width="100%" height="300px" />
+                                </div>
+                            ) : (
+                                <DataTable 
+                                    value={ackList} 
+                                    className="ack-table"
+                                    stripedRows
+                                    paginator
+                                    rows={10}
+                                    emptyMessage="No acknowledgment records found"
+                                >
+                                    <Column field="vesselName" header="Vessel Name" sortable />
+                                    <Column field="acknowledgedBy" header="Acknowledged By" sortable />
+                                    <Column field="acknowledgedDate" header="Date" sortable />
+                                    <Column field="status" header="Status" body={ackStatusBodyTemplate} sortable />
+                                    <Column field="remarks" header="Remarks" />
+                                </DataTable>
+                            )}
                         </>
                     ) : (
                         <div className="no-selection">
                             <i className="pi pi-info-circle" style={{ fontSize: '3rem', color: 'var(--text-secondary)' }}></i>
                             <h3>No Circular Selected</h3>
-                            <p>Select a circular from the list to view its status.</p>
+                            <p>Select a circular from the list to view acknowledgment status</p>
                         </div>
                     )}
             </div>

@@ -8,7 +8,6 @@ interface QuickActionLinkProps {
 }
 
 const QuickActionLink: React.FC<QuickActionLinkProps> = ({ title, desc, icon, action }) => {
-    // Simple link component
     return (
         <div 
             className="action-link"

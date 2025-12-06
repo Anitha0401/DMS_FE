@@ -18,7 +18,6 @@ const ManualChart: React.FC<ChartProps> = ({ newCnt, toApprovalCnt, releasedCnt,
     });
 
     useEffect(() => {
-        // Get colors based on theme
         const root = document.documentElement;
         const computedTextColor = getComputedStyle(root).getPropertyValue('--text-secondary').trim();
         const computedGridColor = getComputedStyle(root).getPropertyValue('--border-color').trim();

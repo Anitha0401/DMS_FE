@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './CompareVersion.scss';
@@ -11,10 +11,12 @@ type ManualFormProps = {
 
 export type ManualFormData = {
     DM_ManualVersionID_ToCompare: number;
+    IsSingleVersion: boolean
 };
 
 const defaultData: ManualFormData = {
-    DM_ManualVersionID_ToCompare: -1
+    DM_ManualVersionID_ToCompare: -1,
+    IsSingleVersion: false
 };
 
 const CompareVersion: React.FC<ManualFormProps> = ({ onSubmit, closeForm, selectedManualID }) => {
@@ -43,57 +45,57 @@ const CompareVersion: React.FC<ManualFormProps> = ({ onSubmit, closeForm, select
             .catch(() => setVersionOptions([]));
     }, [selectedManualID]);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleCompare = (isSingle: boolean) => {
         if (form.DM_ManualVersionID_ToCompare === -1) {
             setError('Please select a version to compare.');
             return;
         }
         setError('');
-        onSubmit(form);
+        onSubmit({ ...form, IsSingleVersion: isSingle });
     };
 
     return (
-        <form onSubmit={handleSubmit} className="compare-manual-form">
-            <div style={{ color: 'red', height:'20px', marginLeft: '160px' }}>
-                    {error}
-            </div>
-            <div style={{ marginBottom: '1px', width: '100%', flexDirection: 'row', display: 'flex', justifyContent: 'space-between' }}>
-                <div style={{ width: '100%', flexDirection: 'column', display: 'flex', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <label style={{ fontWeight: 'bold', width: '175px', textAlign: 'right' }}>Manual : &nbsp;</label>
-                        <label className='selectedLabel'> {manualName}</label>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <label style={{ fontWeight: 'bold', width: '175px', textAlign: 'right' }}>Current Version : &nbsp;</label>
-                        <label className='selectedLabel'> {currentVersion}</label>
-                    </div>
+        <div className="compare-version-container">
+            <form onSubmit={(e) => e.preventDefault()} className="compare-manual-form">
+                <div className="form-header">
+                    <h3>Compare Manual Versions</h3>
                 </div>
-                <div className="d-flex justify-content-end" style={{ textAlign: 'right', marginRight: '60px', width: '100%' }}>
-                    <button type="submit" className="button" style={{height: '67px'}}>Compare</button>
-                    <button type="button" className="btn-gray btn-secondary ms-2" style={{height: '67px', width: '85px'}} onClick={closeForm}>Cancel
-                    </button> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                </div>
-            </div>
-            <div style={{ display: 'flex', gap: '5px', marginTop: '10px' }}>
-                <div style={{ flex: 1, minWidth: '650px', textAlign: 'left' }}>
-                    <div className="row" >
-                        <div className="manual-form-group">
-                            <label
-                                style={{ width: '175px', flexShrink: 0, textAlign: 'right' }}>Version To Compare : &nbsp;</label>
+                {error && <div className="error-message">{error}</div>}
+                <div className="form-body">
+                    <div className="info-section">
+                        <div className="info-item">
+                            <span className="info-label">Manual Name:</span>
+                            <span className="info-value">{manualName}</span>
+                        </div>
+                        <div className="info-item">
+                            <span className="info-label">Current Version:</span>
+                            <span className="info-value">{currentVersion}</span>
+                        </div>
+                    </div>
+                    <div className="info-section">
+                        <div className="info-item">
+                            <span className="info-label">Version to Compare:</span>
                             <Dropdown
-                                className="dropdown-compact"
+                                id="version-dropdown"
                                 value={form.DM_ManualVersionID_ToCompare}
                                 options={versionOptions}
                                 onChange={e => setForm(prev => ({ ...prev, DM_ManualVersionID_ToCompare: e.value }))}
                                 placeholder="Select a Version"
-                                style={{ width: '350px' }}
+                                style={{width:"250px"}}
+                                scrollHeight="400px"
+                                className="version-dropdown"
+                                panelClassName="version-dropdown-panel"
                             />
                         </div>
                     </div>
                 </div>
-            </div>
-        </form>
+                <div className="form-actions">
+                    <button type="button" className="btn btn-primary" onClick={() => handleCompare(false)}>Compare</button>
+                    <button type="button" className="btn btn-secondary" onClick={() => handleCompare(true)}>Compare 1</button>
+                    <button type="button" className="btn btn-cancel" onClick={closeForm}>Cancel</button>
+                </div>
+            </form>
+        </div>
     );
 };
 

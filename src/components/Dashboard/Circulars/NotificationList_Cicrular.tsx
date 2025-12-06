@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 
-// Interface for notifications
 export interface NotificationProps {
     userId: string;
 }
 
-// Interface for notificatio
 interface Notification {
     id: number;
     notificationTitle: string;
@@ -25,7 +23,6 @@ const NotificationList_Cicrular: React.FC<NotificationProps> = ({ userId }) => {
       const [loading, setLoading] = useState(false);
       const [notifications, setNotifications] = useState<Notification[]>([]);
   
-      // Fetch notifications from database
     const fetchNotifications = () => {
         setLoading(true);
         dmsLifecycleService.getApiCall(`DMS/GetManualNotifications?limit=10`)
@@ -45,7 +42,6 @@ const NotificationList_Cicrular: React.FC<NotificationProps> = ({ userId }) => {
             });
     };
 
-      // Mark notification as read
     const markAsRead = (notificationId: number) => {
         dmsLifecycleService.postApiCall(`DMS/MarkNotificationRead`, { 
             notificationId: notificationId,
@@ -61,7 +57,6 @@ const NotificationList_Cicrular: React.FC<NotificationProps> = ({ userId }) => {
         });
     };
 
-    // Get notification icon based on type
     const getNotificationIcon = (type: string) => {
         switch (type) {
             case 'success':
@@ -76,7 +71,6 @@ const NotificationList_Cicrular: React.FC<NotificationProps> = ({ userId }) => {
         }
     };
 
-    // Format time ago
     const formatTimeAgo = (dateString: string) => {
         const date = new Date(dateString);
         const now = new Date();
@@ -94,13 +88,11 @@ const NotificationList_Cicrular: React.FC<NotificationProps> = ({ userId }) => {
         }
     };
 
-    // Handle notification click
     const handleNotificationClick = (notification: Notification) => {
         if (!notification.isRead) {
             markAsRead(notification.id);
         }
         
-        // Navigate to relevant page if manualId exists
         if (notification.manualId) {
             navigate(`/manual/${notification.manualId}`);
         }

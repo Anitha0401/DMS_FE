@@ -434,11 +434,11 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                         background: 'var(--primary-color)',
                         border: '1px solid var(--primary-color)',
                         color: 'white',
-                        width: '38px',        // Reduced width
-                        height: '38px',       // Reduced height
-                        minWidth: '38px',     // Prevent stretching
-                        padding: '0',         // Remove padding
-                        fontSize: '0.75rem'   // Smaller icon
+                        width: '38px',
+                        height: '38px',
+                        minWidth: '38px',
+                        padding: '0',
+                        fontSize: '0.75rem'
                     }}
                 />&nbsp;&nbsp;
                 <Button 
@@ -451,11 +451,11 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                         background: 'var(--primary-color)',
                         border: '1px solid var(--primary-color)',
                         color: 'white',
-                        width: '38px',        // Reduced width
-                        height: '38px',       // Reduced height
-                        minWidth: '38px',     // Prevent stretching
-                        padding: '0',         // Remove padding
-                        fontSize: '0.75rem'   // Smaller icon
+                        width: '38px',
+                        height: '38px',
+                        minWidth: '38px',
+                        padding: '0',
+                        fontSize: '0.75rem'
                     }}
                 />&nbsp;&nbsp;
                 </div>

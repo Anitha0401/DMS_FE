@@ -1,6 +1,6 @@
 .manual-viewer-container {
     display: flex;
-    height: calc(100vh - 100px);
+    height: calc(100vh - 70px);
     gap: 0;
     background: var(--bg-primary);
     overflow: hidden;
@@ -14,18 +14,21 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    padding: 0.15rem;
+    gap: 0.5rem;
 
     .sidebar-header {
         padding: 0.5rem;
-        border-bottom: 2px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: var(--bg-secondary);
+        flex-shrink: 0;
 
         h2 {
             margin: 0;
-            font-size: 1.25rem;
+            font-size: 1.1rem;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -33,39 +36,36 @@
         }
     }
 
-    
-     .search-box {
-        flex: 0 1 auto;
-        min-width: 300px;
-        max-width: 345px;
-        margin-bottom: 0.5rem;
+    .search-box {
+        position: relative;
+        flex-shrink: 0;
 
-        .p-input-icon-left {
+        .p-input-icon-left > i {
+            left: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .search-input {
             width: 100%;
+            padding-left: 2.25rem;
+            height: 40px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
 
-            i {
-                position: absolute;
-                left: 0.75rem;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: 2;
-                pointer-events: none;
-                color: var(--text-secondary);
-            }
-
-            .search-input {
-                width: 100%;
-                padding-left: 2.5rem;
-                height: 30px; 
+            &:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 2px var(--primary-color-light);
             }
         }
     }
 
-
     .manual-list-container {
         flex: 1;
         overflow-y: auto;
-        padding: 0.25rem;
+        margin: 0 -0.5rem -0.5rem; /* Negative margin to extend scroll area */
+        padding: 0 0.5rem 0.5rem;
 
         .manual-listbox {
             border: none;
@@ -77,68 +77,72 @@
 
             .p-listbox-item {
                 padding: 0;
-                margin-bottom: 0.15rem;
-                border-radius: 8px;
-                border: 1px solid var(--border-color);
-                transition: all 0.3s ease;
+                margin: 0;
+                border-radius: 6px;
+                transition: background-color 0.2s;
 
                 &:hover {
                     background: var(--bg-hover);
-                    border-color: var(--primary-color);
                 }
 
                 &.p-highlight {
                     background: var(--primary-color);
-                    color: white;
 
-                    .manual-meta span {
-                        color: rgba(255, 255, 255, 0.9);
+                    .manual-title,
+                    .manual-category {
+                        color: var(--primary-color-text);
+                    }
+
+                    .manual-version-badge {
+                        background: var(--bg-secondary);
+                        color: var(--text-primary);
                     }
                 }
-            }
-        }
-
-        .skeleton-list {
-            .skeleton-item {
-                margin-bottom: 0.5rem;
             }
         }
     }
 }
 
 .manual-item {
-    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
     cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    gap: 1rem;
+    overflow: hidden;
 
     .manual-info {
-        .manual-title {
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin-bottom: 0.25rem;
-        }
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        overflow: hidden;
+        white-space: nowrap;
+    }
 
-        .manual-meta {
-            display: flex;
-            gap: 0.5rem;
-            font-size: 0.75rem;
+    .manual-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 
-            span {
-                padding: 0.25rem 0.5rem;
-                border-radius: 4px;
-                background: var(--bg-primary);
-                color: var(--text-secondary);
-            }
+    .manual-category {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
 
-            .category {
-                background: rgba(59, 130, 246, 0.1);
-                color: #3b82f6;
-            }
-
-            .version {
-                background: rgba(139, 92, 246, 0.1);
-                color: #8b5cf6;
-            }
-        }
+    .manual-version-badge {
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-weight: 600;
+        background: var(--purple-100);
+        color: var(--purple-700);
+        font-size: 0.8rem;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 }
 
@@ -149,9 +153,10 @@
     flex-direction: column;
     overflow: hidden;
     background: var(--bg-primary);
+    padding: 0;
 
     .content-header {
-        padding: 2rem;
+        padding: 0.5rem;
         background: var(--bg-secondary);
         border-bottom: 1px solid var(--border-color);
 
@@ -224,8 +229,13 @@
             }
 
             .content-section {
-                margin: 2rem 0;
-
+                flex: 1;
+                background: var(--bg-secondary);
+                overflow: auto;
+                padding: 0.15rem;
+                margin: 0;
+                height: 100%; 
+                
                 h3 {
                     color: var(--primary-color);
                     margin-bottom: 1rem;

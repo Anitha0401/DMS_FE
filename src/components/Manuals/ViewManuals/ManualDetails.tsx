@@ -51,7 +51,7 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
 
     const formatDate = (dateStr: string | undefined) => {
         if (!dateStr) return '';
-        // Assumes dateStr is ISO format or contains date and time
+
         return dateStr.split('T')[0]; // Returns only the date part
     };
 

@@ -11,7 +11,6 @@ interface MetricCardProps {
 }
 
 const MetricCard_Cicrular: React.FC<MetricCardProps> = ({ number, label, subtext, icon, css, color, isAction }) => {
-    // Dynamically set CSS classes based on props
     const cardClass = `stat-card ${css} ${isAction ? 'action-required-card' : ''}`;
     const iconClass = `${icon} icon-${color}`;
 

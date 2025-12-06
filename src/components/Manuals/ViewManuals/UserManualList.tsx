@@ -62,7 +62,7 @@ const UserManualList: React.FC<UserManualProps> = ({callMode, userId}) => {
 
     const formatDate = (dateStr: string) => {
         if (!dateStr) return '';
-        // Assumes dateStr is ISO format or contains date and time
+
         return dateStr.split('T')[0]; // Returns only the date part
     };
 
@@ -124,7 +124,7 @@ const UserManualList: React.FC<UserManualProps> = ({callMode, userId}) => {
                         borderBottom: '3px solid blue',
                         height: '50px',
                         display: 'flex',
-                        alignItems: 'center', // Vertically center header content and close button
+                        alignItems: 'center',
                         justifyContent: 'space-between'
                     }}
                     onHide={() => { if (!visibleManualDetailsDialog) return; setVisibleManualDetailsDialog(false); }}>

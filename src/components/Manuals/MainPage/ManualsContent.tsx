@@ -17,6 +17,7 @@ import ApproveManual from '../ApproveManual/ApproveManual';
 import AddEditManual from '../AddEditManual/AddEditManual';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './ManualsContent.scss';
+import ViewCompareManualDetails from '../CompareVersion/ViewCompareManualDetails';
 
 export interface ManualDetailsProps {
     userId: string;
@@ -37,6 +38,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     const [visibleManualDetailsDialog, setVisibleManualDetailsDialog] = useState<boolean>(false);
     const [visibleApproveManualDialog, setVisibleApproveManualDialog] = useState<boolean>(false);
     const [DM_ManualVersionID_ToCompare, setDM_ManualVersionID_ToCompare] = useState<number>(-1);
+    const [IsSingleFileDiff, setIsSingleFileDiff] = useState<boolean>(false);
     const [headerText, setHeaderText] = useState<string>('Manual Details');
     const [showConfirmPopup, setShowConfirmPopup] = useState(false);
     const menu = useRef<any>(null);
@@ -55,7 +57,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
             backgroundColor: 'var(--bg-secondary)',
             color: 'var(--text-primary)',
             fontFamily: '"Segoe UI", Arial, sans-serif',
-            fontSize: '14px',
+            fontSize: '16px',
             lineHeight: '1.6'
         }
     });
@@ -122,7 +124,6 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
            setVisibleApproveManualDialog(false);
            fetchData();
            if (onRefreshTree) onRefreshTree(); 
-           //if (typeof onRefreshTree === 'function') onRefreshTree(); 
         } catch (err: any) {
             dispatch(setError(err.message || 'Error approving manual'));
         }
@@ -143,6 +144,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     const showCompareVersion = async (data: any) => {
         try {
             setDM_ManualVersionID_ToCompare(data.DM_ManualVersionID_ToCompare);
+            setIsSingleFileDiff(data.IsSingleVersion);
             
             setVisibleCompareVersionDialog(false);
             setVisibleCompareVersionDetailsDialog(true);
@@ -224,8 +226,12 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         });
     }
 
+    const handleVersionHistory = () => {
+        console.log('View version history:');
+    };
+    
     return (
-       <div className="manuals-content">
+       <div className="manuals-content" style={{ overflowY: 'auto' }}>
         <Toast ref={toast} />
         <div className='sectionDiv'>
             <div className='selectedTextDiv'>
@@ -266,15 +272,27 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                         <img src="/download1.png" alt="Download" className="download-icon" />
                     </button>
                     <Button
+                        icon="pi pi-history"
+                        rounded
+                        tooltip="Version History"
+                        onClick={() => handleVersionHistory()}
+                        severity="info"
+                         style={{
+                            fontSize: '1rem',
+                            whiteSpace: 'nowrap',
+                            height: '2.5rem',
+                            lineHeight: '1.2rem'
+                        }}
+                    />
+                    <Button
                         icon={isFavourite ? "pi pi-star-fill" : "pi pi-star"}
                         label={isFavourite ? "My Favourite" : "Add to Favourite"}
                         className="p-button-rounded p-button-warning p-button-lg"
                         style={{
                             fontSize: '1rem',
-                            padding: '0.5rem 0.5rem',
                             minWidth: 170,
                             whiteSpace: 'nowrap',
-                            height: '2.2rem', // adjust as needed
+                            height: '2.5rem', 
                             lineHeight: '1.2rem'
                         }}
                         //tooltip={isFavourite ? "Already in Favourites" : "Add to Favourite"}
@@ -392,7 +410,8 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         </div>
         <Dialog header={'Compare Version'}
             visible={visibleCompareVersionDialog}
-            style={{ width: '450px', height: '32vh', minWidth: '90vh' }}
+            showHeader={false}
+            style={{ width: '450px', minWidth: '90vh' }}
             contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
             headerStyle={{ height: '60px', backgroundColor: '#d2e3f9ff', borderBottom: '2px solid blue' }}
             onHide={() => { if (!visibleCompareVersionDialog) return; setVisibleCompareVersionDialog(false); }}>
@@ -406,15 +425,23 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         <Dialog
             header={'Compare Version : ' + headerText}
             visible={visibleCompareVersionDetailsDialog}
-            style={{ width: '1250px', minWidth: '90vh' }}
+            style={{ width: '90%', minWidth: '90vh', height: '100%' }}
             contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
             headerStyle={{ backgroundColor: '#d2e3f9ff', borderBottom: '3px solid blue' }}
             onHide={() => { if (!visibleCompareVersionDetailsDialog) return; setVisibleCompareVersionDetailsDialog(false); }}>
-            <CompareVersionDetails
-                closeForm={() => setVisibleCompareVersionDetailsDialog(false)}
-                manualID={manualID}
-                DM_ManualVersionID_ToCompare={DM_ManualVersionID_ToCompare}
-            />
+            {IsSingleFileDiff ? (
+                 <ViewCompareManualDetails
+                    closeForm={() => setVisibleCompareVersionDetailsDialog(false)}
+                    manualID={manualID}
+                    DM_ManualVersionID_ToCompare={DM_ManualVersionID_ToCompare}
+                />
+            ) : (
+                <CompareVersionDetails
+                    closeForm={() => setVisibleCompareVersionDetailsDialog(false)}
+                    manualID={manualID}
+                    DM_ManualVersionID_ToCompare={DM_ManualVersionID_ToCompare}
+                />
+            )}
         </Dialog>
         {visibleManualDetailsDialog && (
             <Dialog
@@ -432,7 +459,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         {visibleApproveManualDialog && (
             <Dialog
                 className="no-header-dialog"
-                header={null} // or header=""
+                showHeader={false}
                 visible={visibleApproveManualDialog}
                 style={{ width: '550px', minWidth: '90vh' }}
                 contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}

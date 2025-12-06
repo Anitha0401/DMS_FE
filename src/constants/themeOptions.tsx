@@ -21,7 +21,6 @@ export const THEME_OPTIONS: ThemeOption[] = [
     { label: 'Purple Theme', value: 'purple', icon: 'pi pi-star', color: '#9333ea' }
 ];
 
-// Helper functions
 export const getThemeByValue = (value: string): ThemeOption | undefined => {
     return THEME_OPTIONS.find(theme => theme.value === value);
 };

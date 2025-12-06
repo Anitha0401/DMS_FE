@@ -38,7 +38,6 @@ const Dashboard_Manual: React.FC<DashboardProps> = ({ userId }) => {
                     setUserToReviewCnt(data.userToReviewCnt || 0);
                     setUserToAckCnt(data.userToAckCnt || 0);
                     setFavouriteCnt(data.favouriteCnt || 0);
-                    // Fix: Include toAckCnt in total calculation
                     setTotalDocuments((data.newCnt || 0) + (data.toApprovalCnt || 0) + (data.releasedCnt || 0) + (data.toAckCnt || 0));
                 }
             })

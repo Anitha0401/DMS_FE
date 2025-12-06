@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Dropdown } from 'primereact/dropdown';
+import { useTheme } from '../contexts/ThemeContext';
 import './PageHeader.scss';
 
 type PageHeaderProps = {
@@ -11,6 +13,8 @@ type PageHeaderProps = {
 
 const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, subContent, rightContent }) => {
    const navigate = useNavigate();
+   const { theme, setTheme, themeOptions } = useTheme();
+   
    return (
     <div className="header-bar">
           <div className="header-left">
@@ -18,7 +22,27 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, subContent, ri
             <span className="header-title">{title}</span>
           </div>
           <div className="header-right" style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-            {subContent && <div className="header-subcontent">{subContent}</div>}
+            <div className="header-subcontent">
+               <div className="header-actions">
+                    <Dropdown 
+                        value={theme} 
+                        options={themeOptions} 
+                        onChange={(e) => setTheme(e.value)}
+                        optionLabel="label"
+                        optionValue="value"
+                        className="theme-selector"
+                        placeholder="Select Theme"
+                        style={{ 
+                            height: '43px',
+                            minHeight: '32px',
+                            fontSize: '0.85rem'
+                        }}
+                        panelStyle={{
+                            fontSize: '0.85rem'
+                        }}
+                    />
+                </div>
+            </div>
             <div className="header-subcontent">
              <button 
               className="dashboard-link-btn"

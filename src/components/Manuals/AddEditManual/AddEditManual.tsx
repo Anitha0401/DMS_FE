@@ -115,7 +115,6 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
             .catch(() => setApprovalFlowOptions([]));
 
 
-        // Fetch manual data if editing
         if (selectedAction === 'Edit' && selectedManualID > 0) {
             dmsLifecycleService.getApiCall(`DMS/GetManualDetailsByVersionId/${selectedManualVersionID}`)
                 .then((data: any) => {
@@ -142,7 +141,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                     });
                 })
                 .catch(() => {
-                    // Optionally handle error
+                   
                 });
         }
         else {
@@ -330,7 +329,6 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                                     value={form.TextContents}
                                     tabIndex={1}
                                     onBlur={newContent => setForm(prev => ({ ...prev, TextContents: newContent }))}
-                                    // onChange={newContent => setForm(prev => ({ ...prev, TextContents: newContent }))}
                                 />
                             </div>
                         </div>

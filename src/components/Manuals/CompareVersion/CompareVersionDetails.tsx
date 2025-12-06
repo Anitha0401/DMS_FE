@@ -3,6 +3,8 @@ import * as Diff from 'diff';
 import DOMPurify from 'dompurify';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './CompareVersionDetails.scss';
+import HtmlDiff from '../../utils/HtmlDiff';
+import { text } from 'stream/consumers';
 
 type ManualFormProps = {
     closeForm: () => void;
@@ -13,6 +15,8 @@ type ManualFormProps = {
 const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID, DM_ManualVersionID_ToCompare }) => {
     const [currentVersion, setCurrentVersion] = useState<string>('');
     const [compareVersion, setCompareVersion] = useState<string>('');
+    const [compareText, setCompareText] = useState<string>('');
+    const [currentText, setCurrentText] = useState<string>('');
     const [diffResult, setDiffResult] = useState<Diff.Change[]>([]);
 
     const formatHTMLForDisplay = (htmlContent: string) => {
@@ -26,16 +30,17 @@ const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID,
             removed: {
                 backgroundColor: '#ffd7d5',
                 textDecoration: 'line-through',
-                color: '#b31d28',
+                color: '#251414',
                 display: 'inline',
             },
             added: {
                 backgroundColor: '#cdffd8',
-                color: '#22863a',
+
+                color: '#251414',
                 display: 'inline',
             },
             unchanged: {
-                color: '#24292e',
+                color: 'var(--text-primary) !important',
                 display: 'inline'
             },
             diffLine: {
@@ -45,14 +50,13 @@ const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID,
             },
             diffPanel: {
                 flex: 1,
-                padding: '10px 20px',
+                padding: '5px 5px',
                 backgroundColor: '#f6f8fa',
                 overflowX: 'auto' as React.CSSProperties['overflowX'],
                 whiteSpace: 'nowrap' as const
             }
         };
 
-        // Group changes by lines for side-by-side comparison
         const leftContent = changes.map((part, index) => {
             if (part.removed || !part.added) {
                 return (
@@ -103,8 +107,9 @@ const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID,
             .then(data => {
                 setCurrentVersion(data.current_Version);
                 setCompareVersion(data.compare_Version);
-                
-                // Calculate diff on the HTML content
+                setCurrentText(data.current_ManualContent);
+                setCompareText(data.compare_ManualContent);
+
                 const diff = Diff.diffWords(
                     data.compare_ManualContent,
                     data.current_ManualContent
@@ -120,17 +125,14 @@ const CompareVersionDetails: React.FC<ManualFormProps> = ({ closeForm, manualID,
         fetchData();
     }, [DM_ManualVersionID_ToCompare, manualID]);
 
-    const sanitizeAndRenderHTML = (content: string) => {
-        // Sanitize HTML content for security
-        const sanitizedContent = DOMPurify.sanitize(content);
-        return <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
-    };
-
     return (
         <div className="compare-version-details">
             <div style={{ marginBottom: '1px', width: '100%', flexDirection: 'column', display: 'flex' }}>
                 <div style={{ height: '100%', overflowY: 'auto', border: '1.5px solid #251414' }}>
                     {renderDiff(diffResult)}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                    <button className="button" onClick={closeForm}>Close</button>
                 </div>
             </div>
         </div>

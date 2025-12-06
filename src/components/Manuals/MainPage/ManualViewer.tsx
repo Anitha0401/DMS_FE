@@ -37,7 +37,6 @@ const ManualViewer: React.FC<ManualViewerProps> = ({ calledMode, userId }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // Fetch manuals from API
         fetchManuals(calledMode);
     }, [userId, calledMode]);
 
@@ -67,15 +66,12 @@ const ManualViewer: React.FC<ManualViewerProps> = ({ calledMode, userId }) => {
 
     const manualTemplate = (manual: TreeNodeData) => {
         return (
-            console.log(manual),
             <div className="manual-item">
                 <div className="manual-info">
                     <div className="manual-title">{manual.label}</div>
-                    <div className="manual-meta">
-                        <span className="category">{manual.data.category}</span>
-                        <span className="version">v{manual.data.manualVersion}</span>
-                    </div>
+                    <div className="manual-category">{manual.data.category}</div>
                 </div>
+                <div className="manual-version-badge">v{manual.data.manualVersion}</div>
             </div>
         );
     };

@@ -19,7 +19,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [theme, setThemeState] = useState('light');
 
     useEffect(() => {
-        // Load saved theme from localStorage
         const savedTheme = localStorage.getItem('selected-theme');
         if (savedTheme && getAllThemeValues().includes(savedTheme)) {
             setThemeState(savedTheme);
@@ -27,7 +26,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }, []);
 
     useEffect(() => {
-        // Apply theme to document
         document.documentElement.removeAttribute('data-theme');
         document.body.removeAttribute('data-theme');
         
@@ -36,7 +34,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             document.body.setAttribute('data-theme', theme);
         }, 10);
 
-        // Save to localStorage
         localStorage.setItem('selected-theme', theme);
     }, [theme]);
 

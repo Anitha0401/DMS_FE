@@ -18,6 +18,28 @@ axiosInstance.interceptors.request.use(
     }
 );
 
+// Add a response interceptor to handle token expiration
+axiosInstance.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
+        if (error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                // Attempt to refresh the token
+                await dmsLifecycleService.getToken(); // Assuming this refreshes the token
+                // The request interceptor will add the new token
+                return axiosInstance(originalRequest);
+            } catch (refreshError) {
+                // If token refresh fails, redirect to login
+                window.location.href = '/login'; 
+                return Promise.reject(refreshError);
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 const dmsLifecycleService = {
     getToken: async () => {
         try {

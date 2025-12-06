@@ -6,9 +6,9 @@
   transition: all 0.3s ease;
   height: 100vh;
   width: 100%;
-  overflow: hidden; // Prevent any scrolling
-  margin: 2;
-  padding: 2;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
 }
@@ -108,7 +108,7 @@
           margin: 0px 0 !important;
           border-radius: 2px;
           transition: all 0.2s ease;
-          
+
           &:hover {
             background: var(--primary-color) !important;
             color: white !important;
@@ -121,7 +121,7 @@
           
           .p-treenode-label {
             color: inherit !important;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             font-weight: 500;
           }
           
@@ -398,17 +398,18 @@
   width: 25%;
   min-width: 300px;
   background: var(--bg-secondary);
-  border-right: 5px solid var(--primary-color);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
 
   .tree-container {
     flex: 1;
-    overflow: hidden; // Change from auto to hidden
+    overflow: hidden;
     padding: 0 !important;
     margin: 0 !important;
     background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
     
     // Ensure no padding on child elements
     > * {
@@ -420,50 +421,40 @@
   .menu-section {
     padding: 0.5rem;
     background: var(--bg-primary);
-    border-top: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 0.25rem;
 
     .menu-link {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.6rem 0.6rem;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      background: transparent;
+      color: var(--text-secondary);
       text-decoration: none;
-      border-radius: 0;
-      border: none; // Remove border for cleaner look
-      border-bottom: 1px solid var(--border-color); // Only bottom border
-      transition: all 0.2s ease;
-      font-size: 0.95rem;
-      margin: 0;
-
-      &:last-child {
-        border-bottom: none; // Remove border from last item
-      }
+      border-radius: 6px;
+      border: none;
+      transition: all 0.2s ease-in-out;
+      font-size: 1rem;
+      font-weight: 500;
 
       &:hover {
-        background: var(--primary-color);
-        color: white;
-        transform: none; // Remove transform for cleaner look
-        text-decoration: none;
+        background: var(--primary-color-light);
+        color: var(--primary-color-text);
+        transform: translateX(4px);
       }
 
       i {
-        font-size: 0.9rem;
-        width: 14px;
+        font-size: 1.1rem;
+        width: 20px;
         text-align: center;
-        margin: 0; // Remove any margin
-        padding: 0; // Remove any padding
+        color: var(--primary-color);
       }
 
       span {
         flex: 1;
-         margin: 0; // Remove any margin
-        padding: 0; // Remove any padding
-        line-height: 1.2; // Tighter line height
+        line-height: 1.4;
       }
     }
   }
@@ -473,8 +464,8 @@
   flex: 1;
   background: var(--bg-secondary);
   overflow: auto;
-  padding: 0.25rem; // Reduced from 1rem
-  margin: 0; // Remove any margin
+  padding: 0.15rem;
+  margin: 0;
   height: 100%; 
   
   &.with-tree {

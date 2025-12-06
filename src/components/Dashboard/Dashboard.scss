@@ -23,9 +23,9 @@
 
 // Dashboard Header
 .dashboard-header {
-  margin-bottom: 2rem; // Add gap between header and content
-  padding-bottom: 1rem; // Add padding at bottom of header
-  border-bottom: 1px solid var(--border-color); // Optional: visual separator
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
   animation: fadeInDown 0.5s ease-out;
 
   .header-content {
@@ -256,7 +256,7 @@
         font-weight: 500;
         
         i {
-            font-size: 1.3rem !important; // Increased from 2.1rem
+            font-size: 1.3rem !important;
         }
         
         span {
@@ -275,7 +275,7 @@
   .p-tabview-nav-link {
       background: transparent;
       border: none;
-      color: white; // Gray text for inactive tabs
+      color: white;
       padding: 1rem 1.75rem;
       border-radius: 8px;
       transition: all 0.3s ease;
@@ -359,11 +359,11 @@
             .action-badge {
                 background: linear-gradient(135deg, #ef4444, #dc2626);
                 color: white;
-                padding: 0.25rem 0.2rem; // Reduced from 0.5rem to 0.25rem
-                border-radius: 16px; // Reduced from 20px
+                padding: 0.25rem 0.2rem;
+                border-radius: 16px;
                 font-weight: 600;
-                font-size: 0.95rem; // Slightly reduced
-                min-width: 35px; // Reduced from 40px
+                font-size: 0.95rem;
+                min-width: 35px;
                 text-align: center;
                 box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
                 line-height: 1; 
@@ -390,7 +390,7 @@
   overflow: hidden;
 
    i {
-    font-size: 2.0rem !important; // Force larger size
+    font-size: 2.0rem !important;
     width: 90px !important;
     height: 90px !important;
     line-height: 90px !important;
@@ -699,11 +699,11 @@
 
 .dashboard-header {
   margin: 0 !important;
-  padding: 0.5rem 0.5rem; // Top/Left, Right/bottom
+  padding: 0.5rem 0.5rem;
   position: sticky;
   top: 0;
   z-index: 100;
-  width: 100%; // Full width
+  width: 100%;
   box-sizing: border-box;
 
   .header-content {
@@ -712,16 +712,16 @@
     justify-content: space-between;
     flex-wrap: wrap;
     margin: 0.6rem auto;
-    padding: 0; // Remove any padding
-    width: 100%; // Ensure full width
-    max-width: none; // Remove any max-width constraint
+    padding: 0;
+    width: 100%;
+    max-width: none;
   }
 
   // Left section - Title area
   .header-content > div:first-child {
-    flex: 1; // Take available space
-    text-align: left; // Explicitly align left
-    margin-right: auto; // Push to the left
+    flex: 1;
+    text-align: left;
+    margin-right: auto;
   }
 
   h1 {
@@ -730,10 +730,10 @@
     font-weight: 700;
     margin: 0 !important;
     padding: 0 !important;
-    line-height: 1.2 !important; // Remove line height spacing
+    line-height: 1.2 !important;
     height: auto !important;
     min-height: 0 !important;
-    text-align: left; // Explicitly align left
+    text-align: left;
   }
 
   .subtitle {
@@ -788,14 +788,14 @@
   border: 1px solid var(--border-color);
   transition: all 0.3s ease;
   overflow: visible;
-  position: relative; // Add positioning context
+  position: relative;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px var(--shadow);
 
     .stat-icon {
-      transform: none; // Prevent icon transformation
+      transform: none;
     }
   }
 
@@ -804,8 +804,8 @@
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
-      position: relative; // Add positioning
-    z-index: 2; // Keep content above background effects
+    position: relative; 
+    z-index: 2;
   }
 
   .stat-icon {
@@ -903,14 +903,14 @@
     padding: 1rem;
     border-bottom: 1px solid var(--border-color);
 
-    padding: 1.25rem 1.5rem; // Increased padding
+    padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
 
     h3 {
-      font-size: 1.2rem; // Slightly larger
+      font-size: 1.2rem;
       color: var(--text-primary);
       font-weight: 600;
       margin: 0;
@@ -930,12 +930,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--text-primary);
 }
+
+  .tab-badge {
+      background: linear-gradient(135deg, #667eea, #764ba2) !important;
+      color: white !important;
+      padding: 0.25rem 0.6rem !important;
+      border-radius: 12px !important;
+      font-size: 0.75rem !important;
+      font-weight: 700 !important;
+      min-width: 24px !important;
+      text-align: center !important;
+      width: 42px !important;
+      height: 27px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      
+      &.new {
+          background: linear-gradient(135deg, #e99af1, #e99af1) !important;
+      }
+  }
 
 .action-items {
   padding: 0.75rem 1rem 1rem 1rem;
-  max-height: 250px; // Added max height to match chart
-  overflow-y: auto; // Add scroll if needed
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 .action-item {
@@ -1241,7 +1263,7 @@
     grid-template-columns: 1fr;
   }
   .chart-card .chart-container {
-    height: 220px; // Further reduced for smaller screens
+    height: 220px;
   }
   .action-items {
     max-height: 220px;
@@ -1279,7 +1301,7 @@
   }
 
   .chart-card .chart-container {
-    height: 200px; // Smaller on mobile
+    height: 200px;
     padding: 0.75rem;
   }
   
@@ -1295,7 +1317,7 @@
 
 @media (max-width: 480px) {
   .dashboard-stats {
-    grid-template-columns: 1fr; // Single column on very small screens
+    grid-template-columns: 1fr;
   }
   
   .quick-actions .action-grid {
@@ -1303,7 +1325,7 @@
   }
   
   .chart-card .chart-container {
-    height: 180px; // Even smaller on tiny screens
+    height: 180px;
   }
   
   .action-items {

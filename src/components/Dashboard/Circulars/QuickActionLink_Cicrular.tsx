@@ -7,7 +7,6 @@ interface QuickActionLinkProps {
 }
 
 const QuickActionLink_Cicrular: React.FC<QuickActionLinkProps> = ({ title, desc, icon }) => {
-    // Simple link component
     return (
         <div className="action-link">
             <i className={icon}></i>

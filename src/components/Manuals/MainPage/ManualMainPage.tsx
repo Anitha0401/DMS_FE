@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useTheme } from '../../../contexts/ThemeContext';
-import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import ManualsTreeView from './ManualsTreeView';
 import ManualsContent from './ManualsContent';
@@ -25,8 +23,6 @@ const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     const [newCnt, setNewCnt] = useState(0);
     const [favouriteCnt, setFavouriteCnt] = useState(0);
     const treeViewRef = useRef<any>(null);
-
-    const { theme, setTheme, themeOptions } = useTheme();
 
     const setUserActionCounts = () => {
         dmsLifecycleService.getApiCall(`DMS/GetUserManualCounts?userId=${userId}`)
@@ -86,27 +82,6 @@ const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
             <PageHeader
                 title="COMPANY - Document Management System"
                 subtitle="Test User Name"
-                subContent={
-                    <div className="header-actions">
-                        <Dropdown 
-                            value={theme} 
-                            options={themeOptions} 
-                            onChange={(e) => setTheme(e.value)}
-                            optionLabel="label"
-                            optionValue="value"
-                            className="theme-selector"
-                            placeholder="Select Theme"
-                            style={{ 
-                                height: '43px',
-                                minHeight: '32px',
-                                fontSize: '0.85rem'
-                            }}
-                            panelStyle={{
-                                fontSize: '0.85rem'
-                            }}
-                        />
-                    </div>
-                }
                 rightContent={dbInfoAction}
             />
             <div className="main-page-content">
