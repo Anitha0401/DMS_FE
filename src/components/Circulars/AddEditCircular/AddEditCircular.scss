@@ -1,0 +1,44 @@
+.add-edit-circular-dialog {
+    .p-dialog-header {
+        background-color: var(--primary-color);
+        color: var(--primary-color-text);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 1.5rem;
+
+        .p-dialog-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+    }
+
+    .p-dialog-content {
+        padding: 1.5rem;
+        background-color: var(--bg-secondary);
+    }
+
+    .form-grid {
+        .field {
+            margin-bottom: 1.5rem;
+
+            label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+                color: var(--text-primary);
+            }
+        }
+    }
+
+    .dialog-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border-color);
+        background-color: var(--bg-secondary);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+
+        .p-button {
+            padding: 0.75rem 1.25rem;
+        }
+    }
+}

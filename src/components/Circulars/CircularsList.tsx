@@ -16,6 +16,7 @@ import dmsLifecycleService from '../../services/DMSLifecycleService';
 import PageHeader from '../PageHeader';
 import './CircularsList.scss';
 import { setError } from '../../store/slices/appSlice';
+import AddEditCircular from './AddEditCircular/AddEditCircular';
 
 interface Circular {
     id: string;
@@ -68,6 +69,8 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
     const [selectedAction, setSelectedAction] = useState<string>('Add');
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const [viewMode, setViewMode] = useState('list');
+    const [isAddDialogVisible, setIsAddDialogVisible] = useState(false);
+    const [editingCircular, setEditingCircular] = useState<Circular | null>(null);
     const cm = React.useRef<ContextMenu>(null);
 
     const menuItems: MenuItem[] = [
@@ -94,6 +97,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
 
     const viewOptions = [
         { icon: 'pi pi-align-justify', value: 'list', label: 'List' },
+        { icon: 'pi pi-th-large', value: 'grid', label: 'Grid' },
         { icon: 'pi pi-sitemap', value: 'tree', label: 'Tree' }
     ];
 
@@ -505,7 +509,9 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
     };
 
     const handleEdit = (id: string) => {
-        console.log('Edit circular:', id);
+        const circularToEdit = circulars.find(c => c.id === id) || null;
+        setEditingCircular(circularToEdit);
+        setIsAddDialogVisible(true);
     };
 
     const handleDownload = (id: string) => {
@@ -610,8 +616,8 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
     };
 
     const handleNewCircular = () => {
-        console.log('Create new circular');
-        // TODO: Open dialog or navigate to create circular page
+        setEditingCircular(null);
+        setIsAddDialogVisible(true);
     };
     
     const headerActions = (
@@ -644,6 +650,11 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
             <ContextMenu 
                 model={menuItems} 
                 ref={cm} 
+            />
+            <AddEditCircular
+                visible={isAddDialogVisible}
+                onHide={() => setIsAddDialogVisible(false)}
+                circular={editingCircular}
             />
             <PageHeader
                 title={`COMPANY - ${getHeaderTitle()}`}
@@ -684,6 +695,8 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                     />
                                 ) : null
                             )}
+                        </div>
+                        <div className="view-switcher">
                             <SelectButton
                                 value={viewMode}
                                 options={viewOptions}
@@ -702,13 +715,13 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                             />
                         </div>
                         <span className="results-count">{filteredCirculars.length} Circulars</span>
-                        <Button 
+                        {/* <Button 
                             icon="pi pi-refresh" 
                             rounded 
                             text 
                             onClick={fetchCirculars}
                             tooltip="Refresh"
-                        />
+                        /> */}
                     </div>
                     
                     <div className="list-content">
@@ -735,7 +748,30 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                 className="custom-tree"
                                 onContextMenu={onTreeContextMenu}
                             />
-                            ) : ( 
+                            ) : viewMode === 'grid' ? (
+                                <div className="circulars-grid">
+                                    {filteredCirculars.map((circular) => (
+                                        <div key={circular.id} className="grid-item" onClick={() => setSelectedCircular(circular)}>
+                                            <div className="grid-item-header">
+                                                <h4>{circular.circularNumber}</h4>
+                                            </div>
+                                            <h3 className="grid-item-title">{circular.title}</h3>
+                                            <div className="meta-left">
+                                                <div className="meta-item">
+                                                    <i className="pi pi-folder"></i>
+                                                    <span>{circular.category}</span>
+                                                    <i className="pi pi-calendar"></i>
+                                                    <span>{new Date(circular.dateIssued).toLocaleDateString()}</span>
+                                                </div>
+                                                <div className="meta-item">
+                                                    <i className="pi pi-paperclip"></i>
+                                                    <span>{circular.attachments} Attachments</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
                                 <DataView 
                                 value={filteredCirculars} 
                                 itemTemplate={itemTemplate}

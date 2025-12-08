@@ -884,7 +884,7 @@
 
 .dashboard-content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 2rem;
   margin-bottom: 1.5rem;
 }
@@ -896,7 +896,6 @@
   box-shadow: 0 2px 12px var(--shadow);
   border: 1px solid var(--border-color);
   overflow: hidden;
-  width: 100%;
   box-sizing: border-box;
 
   .card-header {

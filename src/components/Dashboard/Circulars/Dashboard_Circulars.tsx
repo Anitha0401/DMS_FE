@@ -6,6 +6,8 @@ import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import MetricCard from './MetricCard_Cicrular';
 import ActionItem from './ActionItem_Cicrular';
 import NotificationList from './NotificationList_Cicrular';
+import CircularsChart from './CircularsChart';
+import AlertsChart from './AlertsChart';
 
 export interface DashboardProps {
     userId: string;
@@ -135,10 +137,11 @@ const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
                             {actionData.map((data, index) => (
                                 <ActionItem key={index} {...data} />
                             ))}
-                           
                         </div>
                     </div>
-
+                    <div className="dashboard-card">
+                        <CircularsChart />
+                    </div>
                     <div className="dashboard-card action-card">
                         <div className="card-header">
                             <h3>Alerts Action Required</h3>
@@ -148,7 +151,10 @@ const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
                                 <ActionItem key={index} {...data} />
                             ))}
                            
-                        </div>
+                        </div>                        
+                    </div>
+                     <div className="dashboard-card">
+                        <AlertsChart />
                     </div>
                  </div>
 
