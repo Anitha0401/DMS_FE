@@ -22,7 +22,7 @@ const ManualViewerWrapper: React.FC<{ userId: string }> = ({ userId }) => {
 
 const CircularViewerWrapper: React.FC<{ userId: string }> = ({ userId }) => {
   const [searchParams] = useSearchParams();
-  const calledMode = searchParams.get('mode') || 'all';
+  const calledMode = searchParams.get('cirmode') || 'all';
   
   return <CircularsList userId={userId} calledMode={calledMode} />;
 };

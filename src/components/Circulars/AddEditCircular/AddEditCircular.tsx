@@ -8,20 +8,23 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import './AddEditCircular.scss';
 
 interface Circular {
-    id: string;
+    ciR_CategoryID: number;
+    ciR_MasterID: number;
     circularType: string;
     category: string;
-    circularNumber: string;
+    ciR_Number: string;
     reference: string,
     title: string;
-    status: 'Active' | 'Archived' | 'Draft';
+    statusString: 'Active' | 'Archived' | 'Draft';
     priority: 'High' | 'Medium' | 'Low';
     dateIssued: string;
-    remarks: string;
+    cIRLevel: number;
     releasedDate: string;
-    attachments: number;
-    isNew?: boolean;
+    attachmentCount: number;
+    isActive?: boolean;
+    isFavourite? : boolean;
     isCategory?: boolean;
+    remarks?: string;
 }
 
 interface AddEditCircularProps {
@@ -88,9 +91,9 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ visible, onHide, circ
                     <InputText id="title" value={formData.title || ''} onChange={(e) => handleInputChange(e, 'title')} />
                 </div>
                 <div className="field col-12 md:col-6">
-                    <label htmlFor="circularNumber">Circular Number</label>
-                    <InputText id="circularNumber" value={formData.circularNumber || ''} onChange={(e) => handleInputChange(e, 'circularNumber')} />
-                </div>
+                    <label htmlFor="ciR_Number">Circular Number</label>
+                    <InputText id="ciR_Number" value={formData.ciR_Number || ''} onChange={(e) => handleInputChange(e, 'ciR_Number')} />
+                </div>ciR_Number
                 <div className="field col-12 md:col-6">
                     <label htmlFor="category">Category</label>
                     <Dropdown id="category" value={formData.category} options={categoryOptions} onChange={(e) => handleInputChange(e, 'category')} placeholder="Select a Category" />
@@ -101,7 +104,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ visible, onHide, circ
                 </div>
                 <div className="field col-12 md:col-6">
                     <label htmlFor="status">Status</label>
-                    <Dropdown id="status" value={formData.status} options={statusOptions} onChange={(e) => handleInputChange(e, 'status')} placeholder="Select a Status" />
+                    <Dropdown id="status" value={formData.statusString} options={statusOptions} onChange={(e) => handleInputChange(e, 'statusString')} placeholder="Select a Status" />
                 </div>
                 <div className="field col-12 md:col-6">
                     <label htmlFor="dateIssued">Date Issued</label>

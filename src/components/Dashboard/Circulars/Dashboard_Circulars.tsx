@@ -7,7 +7,6 @@ import MetricCard from './MetricCard_Cicrular';
 import ActionItem from './ActionItem_Cicrular';
 import NotificationList from './NotificationList_Cicrular';
 import CircularsChart from './CircularsChart';
-import AlertsChart from './AlertsChart';
 
 export interface DashboardProps {
     userId: string;
@@ -69,21 +68,21 @@ const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
             icon: 'pi pi-inbox',
             color: 'primary',
             subText: 'View all circulars',
-            action: () => navigate('/circulars')
+            action: () => navigate('/circulars?cirmode=circulars')
         },
        {
             label: 'Browse Alerts',
             icon: 'pi pi-bell',
             color: 'primary',
             subText: 'View all alerts',
-            action: () => navigate('/alerts')
+            action: () => navigate('/alerts?cirmode=alerts')
         },
         {
             label: 'Reports',
             icon: 'pi pi-chart-bar',
             color: 'success',
             subText: 'Generate reports',
-            action: () => navigate('/circularreports')
+            action: () => navigate('/circularreports?cirmode=circulars')
         }
     ];
 
@@ -140,7 +139,7 @@ const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
                         </div>
                     </div>
                     <div className="dashboard-card">
-                        <CircularsChart />
+                        <CircularsChart circularType="circulars" />
                     </div>
                     <div className="dashboard-card action-card">
                         <div className="card-header">
@@ -154,7 +153,6 @@ const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
                         </div>                        
                     </div>
                      <div className="dashboard-card">
-                        <AlertsChart />
                     </div>
                  </div>
 
