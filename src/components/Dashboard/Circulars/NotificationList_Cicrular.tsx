@@ -25,7 +25,7 @@ const NotificationList_Cicrular: React.FC<NotificationProps> = ({ userId }) => {
   
     const fetchNotifications = () => {
         setLoading(true);
-        dmsLifecycleService.getApiCall(`DMS/GetManualNotifications?limit=10`)
+        dmsLifecycleService.getApiCall(`Circular/GetCircularsNotifications?limit=10`)
             .then((data: any) => {
                 if (data && Array.isArray(data)) {
                     setNotifications(data);
@@ -106,7 +106,7 @@ const NotificationList_Cicrular: React.FC<NotificationProps> = ({ userId }) => {
     return (
         <div>
           <div className="card-header">
-              <h3>Recent Activity</h3>
+              <h3>Notifications</h3>
               {loading && <i className="pi pi-spin pi-spinner"></i>}
           </div>
           <div className="notifications">

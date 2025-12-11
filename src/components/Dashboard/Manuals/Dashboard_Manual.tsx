@@ -185,7 +185,7 @@ const Dashboard_Manual: React.FC<DashboardProps> = ({ userId }) => {
                     ))}
                 </div>
 
-                <div className="dashboard-content">
+                <div className="dashboard-content-manuals">
                     <div className="charts-section">
                        <ManualChart 
                             newCnt={newCnt} 

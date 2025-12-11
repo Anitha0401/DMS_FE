@@ -4,19 +4,16 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import MetricCard from './MetricCard_Cicrular';
-import ActionItem from './ActionItem_Cicrular';
 import NotificationList from './NotificationList_Cicrular';
 import CircularsChart from './CircularsChart';
+import RecentCircularsList from './RecentCircularsList';
+import './RecentCircularsList.scss';
 
 export interface DashboardProps {
     userId: string;
 }
 
 const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
-    const [newCircularsCnt, setNewCircularsCnt] = useState(0);
-    const [newAlertsCnt, setNewAlertsCnt] = useState(0);
-    const [toAckCircularsCnt, setToAckCircularsCnt] = useState(0); 
-    const [toAckAlertsCnt, setToAckAlertsCnt] = useState(0); 
     const [totalCirculars, setTotalCirculars] = useState(0);
     const [totalAlerts, setTotalAlerts] = useState(0);
     
@@ -28,62 +25,25 @@ const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
     };
 
     const setUserActionCounts = () => {
-        dmsLifecycleService.getApiCall(`DMS/GetDashboardManualCounts?userId=${userId}`)
+        dmsLifecycleService.getApiCall(`Circular/GetDashboardCircularCounts`)
             .then((data: any) => {
+                console.log('Dashboard counts data:', data);
                 if (data) {
                     setTotalCirculars(data.totalCirculars || 0);
                     setTotalAlerts(data.totalAlerts || 0);
-                    setNewCircularsCnt(data.newCircularsCnt || 0);
-                    setNewAlertsCnt(data.newAlertsCnt || 0);
-                    setToAckCircularsCnt(data.toAckCircularsCnt || 0);
-                    setToAckAlertsCnt(data.toAckAlertsCnt || 0);
                 }
             })
             .catch(() => {
                 setTotalCirculars(0);
                 setTotalAlerts(0);
-                setNewCircularsCnt(0);
-                setNewAlertsCnt(0);
-                setToAckCircularsCnt(0);
-                setToAckAlertsCnt(0);
             });
     };
 
     const metricsData = [
-        { number: totalCirculars, label: "Total Circulars", subtext: "All accessible circulars", icon: "pi pi-envelope", css: "primary", color: "blue" },
-        { number: newCircularsCnt, label: "New Circulars", subtext: "Circulars under preparation", icon: "pi pi-send", css: "info", color: "blue" },
-        { number: totalAlerts, label: "Total Alerts", subtext: "All accessible alerts", icon: "pi pi-bell", css: "primary", color: "blue" },
-        { number: newAlertsCnt, label: "New Alerts", subtext: "Alerts under preparation", icon: "pi pi-exclamation-circle", css: "info", color: "blue" },
-    ];
-
-    const actionData = [
-        { count: toAckCircularsCnt, text: "Pending Approvals", subtext: "documents need approval", icon: "pi pi-check-circle", css: "approval" },
-        { count: toAckAlertsCnt, text: "Under Review", subtext: "documents under review", icon: "pi pi-eye", css: "review"},
-        { count: toAckAlertsCnt, text: "To Acknowledge", subtext: "documents need acknowledgment", icon: "pi pi-verified", css: "acknowledge"},
-    ];
-
-     const quickActions = [
-        {
-            label: 'Browse Circulars',
-            icon: 'pi pi-inbox',
-            color: 'primary',
-            subText: 'View all circulars',
-            action: () => navigate('/circulars?cirmode=circulars')
-        },
-       {
-            label: 'Browse Alerts',
-            icon: 'pi pi-bell',
-            color: 'primary',
-            subText: 'View all alerts',
-            action: () => navigate('/alerts?cirmode=alerts')
-        },
-        {
-            label: 'Reports',
-            icon: 'pi pi-chart-bar',
-            color: 'success',
-            subText: 'Generate reports',
-            action: () => navigate('/circularreports?cirmode=circulars')
-        }
+        { number: totalCirculars, label: "Total Circulars", subtext: "All accessible circulars", icon: "pi pi-envelope", css: "primary", color: "blue", action: () => navigate('/circularreports?cirmode=circulars') },
+        { number: 0, label: "View Circulars Report", subtext: "Generate detailed reports", icon: "pi pi-chart-bar", css: "info", color: "blue", action: () => navigate('/circularreports?cirmode=circulars') },
+        { number: totalAlerts, label: "Total Alerts", subtext: "All accessible alerts", icon: "pi pi-bell", css: "primary", color: "blue", action: () => navigate('/alerts?cirmode=alerts') },
+        { number: 0, label: "View Alerts Report", subtext: "Generate detailed reports", icon: "pi pi-chart-bar", css: "info", color: "blue", action: () => navigate('/circularreports?cirmode=alerts') },
     ];
 
     useEffect(() => {   
@@ -93,7 +53,6 @@ const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
     return (
         <div className='dashboard-wrapper'>
             <div className="dashboard-container">
-                {/* Header */}
                 <div className="dashboard-header">
                     <div className="header-content">
                         <div>
@@ -120,67 +79,28 @@ const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
                     </div>
                 </div>
 
-                {/* Key Metrics Cards */}
                 <div className="dashboard-stats">
                     {metricsData.map((data, index) => (
                         <MetricCard key={index} {...data} />
                     ))}
                 </div>
 
-                <div className="dashboard-content">
-                    <div className="dashboard-card action-card">
-                        <div className="card-header">
-                            <h3>Circulars Action Required</h3>
-                        </div>
-                        <div className="action-items">
-                            {actionData.map((data, index) => (
-                                <ActionItem key={index} {...data} />
-                            ))}
-                        </div>
+                <div className="dashboard-content-circulars">
+                    <div className="dashboard-card">
+                        <RecentCircularsList userId={userId} circularType="circulars" limit={5} />
                     </div>
                     <div className="dashboard-card">
                         <CircularsChart circularType="circulars" />
                     </div>
-                    <div className="dashboard-card action-card">
-                        <div className="card-header">
-                            <h3>Alerts Action Required</h3>
-                        </div>
-                        <div className="action-items">
-                            {actionData.map((data, index) => (
-                                <ActionItem key={index} {...data} />
-                            ))}
-                           
-                        </div>                        
+                    <div className="dashboard-card">
+                        <RecentCircularsList userId={userId} circularType="alerts" limit={5} />
                     </div>
-                     <div className="dashboard-card">
+                    <div className="dashboard-card">
+                        <CircularsChart circularType="alerts" />
                     </div>
                  </div>
 
-                {/* Quick Actions */}
                 <div className="dashboard-stats">
-                    <div className="dashboard-card">
-                        <div className="card-header">
-                            <h3>Quick Actions</h3>
-                        </div>
-                         <div className="quick-actions-grid">
-                            {quickActions.map((action, index) => (
-                                <div 
-                                    key={index}
-                                    className={`quick-action-card quick-action-${action.color}`}
-                                    onClick={action.action}
-                                >
-                                   <div className="action-icon-wrapper">
-                                        <i className={action.icon}></i>
-                                    </div>
-                                    <h3>{action.label}</h3>
-                                    <div className="action-desc">{action.subText}</div>
-                                </div>
-                            ))}
-                        </div>
-                      
-                    </div>  
-
-                    {/* Notifications */}
                    <div className="dashboard-card notifications-card">
                        <NotificationList userId={userId}></NotificationList>
                     </div>
