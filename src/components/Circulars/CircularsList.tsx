@@ -12,6 +12,7 @@ import { SelectButton } from 'primereact/selectbutton';
 import { TreeNode } from 'primereact/treenode';
 import { ContextMenu } from 'primereact/contextmenu';
 import { MenuItem } from 'primereact/menuitem';
+import { useDispatch, useSelector } from 'react-redux';
 import dmsLifecycleService from '../../services/DMSLifecycleService';
 import PageHeader from '../PageHeader';
 import './CircularsList.scss';
@@ -38,13 +39,14 @@ interface Circular {
     remarks?: string;
 }
 
-interface AckRecord {
-    id: string;
-    vesselName: string;
+interface AckList {
+    cIR_UserAckID: string;
+    vsselID: string;
+    vslName: string;
     acknowledgedBy: string;
-    acknowledgedDate: string;
+    dateRead: string;
     status: 'Acknowledged' | 'Pending' | 'Overdue';
-    remarks?: string;
+    comments?: string;
 }
 
 interface CircularsListProps {
@@ -57,12 +59,16 @@ interface TreeNodeData extends TreeNode {
 }
 
 const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => {
+    const dispatch = useDispatch();
     const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([]);
     
     const [circulars, setCirculars] = useState<Circular[]>([]);
     const [dbInfoAction, setDbInfoAction] = useState('');
     const [selectedCircular, setSelectedCircular] = useState<Circular | null>(null);
-    const [ackList, setAckList] = useState<AckRecord[]>([]);
+    const [ackList, setAckList] = useState<AckList[]>([]);
+    const [filteredAckList, setFilteredAckList] = useState<AckList[]>([]);
+    const [vesselFilter, setVesselFilter] = useState<string>('all');
+    const [vesselOptions, setVesselOptions] = useState<{ label: string; value: string }[]>([{ label: 'All Vessels', value: 'all' }]);
     const [loading, setLoading] = useState(true);
     const [ackLoading, setAckLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -97,10 +103,9 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         { icon: 'pi pi-th-large', value: 'grid', label: 'Grid' },
         { icon: 'pi pi-sitemap', value: 'tree', label: 'Tree' }
     ];
-
     
     useEffect(() => {
-        dmsLifecycleService.getApiCall(`circular/GetCategories?circularType=${calledMode}`)
+        dmsLifecycleService.getApiCall(`circular/GetCategories?isToIncludeAll=true&circularType=${calledMode}`)
             .then(data => {
                 const options = data.map((item: any ) => ({
                     label: item.category ,
@@ -262,50 +267,33 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
     };
     
     useEffect(() => {
-        console.log('Selected Circular:', selectedCircular);
         if (selectedCircular) {
             fetchAckList(selectedCircular.ciR_MasterID);
         }
     }, [selectedCircular]);
 
+    useEffect(() => {
+        if (vesselFilter === 'all') {
+            setFilteredAckList(ackList);
+        } else {
+            setFilteredAckList(ackList.filter(item => item.vslName === vesselFilter));
+        }
+    }, [vesselFilter, ackList]);
+
     const fetchAckList = async (circularId: number) => {
         setAckLoading(true);
         
-        setTimeout(() => {
-            const dummyAckData: AckRecord[] = [
-                {
-                    id: '1',
-                    vesselName: 'MV Ocean Star',
-                    acknowledgedBy: 'John Smith',
-                    acknowledgedDate: '2024-11-21',
-                    status: 'Acknowledged',
-                    remarks: 'Received and understood'
-                },
-                {
-                    id: '2',
-                    vesselName: 'MV Sea Explorer',
-                    acknowledgedBy: 'Pending',
-                    acknowledgedDate: '-',
-                    status: 'Pending'
-                },
-                {
-                    id: '3',
-                    vesselName: 'MV Pacific Queen',
-                    acknowledgedBy: 'Mike Johnson',
-                    acknowledgedDate: '2024-11-22',
-                    status: 'Acknowledged',
-                    remarks: 'Acknowledged'
-                },
-                {
-                    id: '4',
-                    vesselName: 'MV Atlantic Wave',
-                    acknowledgedBy: 'Pending',
-                    acknowledgedDate: '-',
-                    status: 'Overdue',
-                    remarks: 'Overdue by 2 days'
-                }
-            ];
-            setAckList(dummyAckData);
+        setTimeout(async () => {
+            const ackList: AckList[] = await dmsLifecycleService.getApiCall(`Circular/GetVesselAckList/${circularId}`);
+            setAckList(ackList);
+            setFilteredAckList(ackList);
+            
+            // Extract unique vessels for filter dropdown
+            const vessels = Array.from(new Set(ackList.map(item => item.vslName)));
+            const vesselOpts = [{ label: 'All Vessels', value: 'all' }, ...vessels.map(v => ({ label: v, value: v }))];
+            setVesselOptions(vesselOpts);
+            setVesselFilter('all');
+            
             setAckLoading(false);
         }, 500);
     };
@@ -337,7 +325,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         }
     };
 
-    const ackStatusBodyTemplate = (rowData: AckRecord) => {
+    const ackStatusBodyTemplate = (rowData: AckList) => {
         return <Tag value={rowData.status} severity={getAckStatusColor(rowData.status)} />;
     };
 
@@ -482,6 +470,27 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         return null;
     };
 
+    const updateCIR = async (data: any) => {
+        try {
+            setIsAddDialogVisible(false);
+
+            var url ='Circular/EditCircular';
+            if (selectedAction === 'Add') {
+                url = 'Circular/AddCircular';
+            }
+
+            const response = await dmsLifecycleService.postApiCall(url, data);
+
+            fetchCirculars();
+            await LoadTreeNodeData();
+
+            findNodeByKey(nodes, String(response.ciR_MasterID));    
+            //setSelectedCircular(response. || null);
+        } catch (err: any) {
+            dispatch(setError(err.message || 'Error adding manual'));
+        }
+    }
+
     return (
         <div className='main-page-wrapper'>
             <ContextMenu 
@@ -489,9 +498,12 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                 ref={cm} 
             />
             <AddEditCircular
-                visible={isAddDialogVisible}
-                onHide={() => setIsAddDialogVisible(false)}
-                circular={editingCircular}
+                isVisible={isAddDialogVisible}
+                onSubmit={updateCIR}
+                closeForm={() => setIsAddDialogVisible(false)}
+                circularType={calledMode || 'all'}
+                selectedAction={selectedAction}
+                selectedCIR_MasterID={(selectedAction=='Add') ? -1 : selectedCircular?.ciR_MasterID || 0}
             />
             <PageHeader
                 title={`COMPANY - ${getHeaderTitle()}`}
@@ -648,10 +660,25 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                     </div>
                     {selectedCircular ? (
                         <>
-                        {console.log('Rendering ack list for circular:', selectedCircular)}
+                        
                             <div className="selected-circular-info">
-                                <h3>{selectedCircular.ciR_Number}</h3>
-                                <p>{selectedCircular.title}</p>
+                                <div className="circular-header">
+                                    <div className="circular-details">
+                                        <h3>{selectedCircular.ciR_Number}</h3>
+                                        <p>{selectedCircular.title}</p>
+                                    </div>
+                                    <div className="filter-group">
+                                        <label htmlFor="vessel-filter">Vessel:</label>
+                                        <Dropdown
+                                            id="vessel-filter"
+                                            value={vesselFilter}
+                                            options={vesselOptions}
+                                            onChange={(e) => setVesselFilter(e.value)}
+                                            placeholder="Select Vessel"
+                                            style={{ width: '250px' }}
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="ack-table-container">
@@ -661,7 +688,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                     </div>
                                 ) : (
                                     <DataTable 
-                                        value={ackList} 
+                                        value={filteredAckList} 
                                         className="ack-table"
                                         scrollable 
                                         scrollHeight="flex"
@@ -670,9 +697,9 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                         rows={10}
                                         emptyMessage="No acknowledgment records found"
                                     >
-                                        <Column field="vesselName" header="Vessel Name" sortable />
+                                        <Column field="vslName" header="Vessel Name" sortable />
                                         <Column field="acknowledgedBy" header="Acknowledged By" sortable />
-                                        <Column field="acknowledgedDate" header="Date" sortable />
+                                        <Column field="dateRead" header="Date" sortable />
                                         <Column field="status" header="Status" body={ackStatusBodyTemplate} sortable />
                                         <Column field="remarks" header="Remarks" />
                                     </DataTable>

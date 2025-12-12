@@ -8,9 +8,10 @@ interface MetricCardProps {
     css?: string;
     color?: string;
     isAction?: boolean;
+    action?: () => void;
 }
 
-const MetricCard_Cicrular: React.FC<MetricCardProps> = ({ number, label, subtext, icon, css, color, isAction }) => {
+const MetricCard_Cicrular: React.FC<MetricCardProps> = ({ number, label, subtext, icon, css, color, isAction, action }) => {
     const cardClass = `stat-card ${css} ${isAction ? 'action-required-card' : ''}`;
     const iconClass = `${icon} icon-${color}`;
 
@@ -21,7 +22,16 @@ const MetricCard_Cicrular: React.FC<MetricCardProps> = ({ number, label, subtext
                     <i className={iconClass}></i>
                 </div>
                 <div className="stat-details">
-                    <div className="stat-number">{number}</div>
+                    <div
+                        className="stat-number"
+                        onClick={action}
+                        style={{ 
+                            cursor: 'pointer',
+                            textDecoration: 'underline'
+                        }}
+                    >
+                        {number}
+                    </div>
                     <div className="stat-label">{label}</div>
                 </div>
             </div>

@@ -4,6 +4,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import Dashboard_Manual from './Manuals/Dashboard_Manual';
 import Dashboard_Circulars from './Circulars/Dashboard_Circulars';
 import './Dashboard.scss';
+import Dashboard_OtherDocuments from './OtherDocuments/Dashboard_OtherDocument';
 
 export interface DashboardProps {
     userId: string;
@@ -63,6 +64,16 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
                     }
                 >
                 <Dashboard_Circulars userId={userId} />
+                </TabPanel>
+                <TabPanel 
+                   header={
+                        <div className="tab-header">
+                            <i className="pi pi-envelope"></i>
+                            <span>Other Documents</span>
+                        </div>
+                    }
+                >
+                <Dashboard_OtherDocuments userId={userId} />
                 </TabPanel>
             </TabView>
         </div>

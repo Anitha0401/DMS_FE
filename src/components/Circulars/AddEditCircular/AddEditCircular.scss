@@ -1,44 +1,373 @@
 .add-edit-circular-dialog {
     .p-dialog-header {
-        background-color: var(--primary-color);
-        color: var(--primary-color-text);
-        border-bottom: 1px solid var(--border-color);
-        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark, #1976d2));
+        color: white;
+        border-bottom: none;
+        padding: 1.5rem 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        .dialog-header-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.35rem;
+            font-weight: 600;
+
+            i {
+                font-size: 1.5rem;
+            }
+        }
 
         .p-dialog-title {
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             font-weight: 600;
+        }
+
+        .p-dialog-header-icon {
+            color: white;
+            
+            &:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
         }
     }
 
     .p-dialog-content {
-        padding: 1.5rem;
+        padding: 0.51rem;
         background-color: var(--bg-secondary);
+        max-height: 95vh;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: var(--surface-ground);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
     }
 
     .form-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .form-section {
+            background: var(--surface-card);
+            border-radius: 12px;
+            padding: 0.25rem;
+            border: 1px solid var(--surface-border);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+            .section-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin: 0 0 0.5rem 0;
+                padding-bottom: 0.75rem;
+                border-bottom: 2px solid var(--surface-border);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                i {
+                    color: var(--primary-color);
+                    font-size: 1.2rem;
+                }
+            }
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .field {
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.25rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
 
             label {
                 display: block;
                 margin-bottom: 0.5rem;
                 font-weight: 600;
                 color: var(--text-primary);
+                font-size: 0.95rem;
+
+                .required {
+                    color: #ef4444;
+                    margin-left: 0.25rem;
+                }
+            }
+
+            .p-inputtext,
+            .p-dropdown,
+            .p-calendar {
+                height: 2.5rem;
+                font-size: 1rem;
+                border-radius: 8px;
+                border: 2px solid var(--surface-border);
+                transition: all 0.3s ease;
+                padding-left: 0.4rem;
+
+                &:focus,
+                &:enabled:focus {
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 33, 150, 243), 0.2);
+                }
+
+                &:hover:not(:focus) {
+                    border-color: var(--primary-color);
+                }
+            }
+
+            .p-inputtextarea {
+                min-height: 6rem;
+                font-size: 1rem;
+                border-radius: 8px;
+                border: 2px solid var(--surface-border);
+                transition: all 0.3s ease;
+                resize: vertical;
+
+                &:focus,
+                &:enabled:focus {
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 33, 150, 243), 0.2);
+                }
+
+                &:hover:not(:focus) {
+                    border-color: var(--primary-color);
+                }
+            }
+
+            .p-dropdown {
+                .p-dropdown-label {
+                    display: flex;
+                    align-items: center;
+                }
+
+                 .p-dropdown-items {
+                    .p-dropdown-item {
+                        font-size: 2.1rem;
+                        padding: 0.75rem 1rem;
+                    }
+                }
+                .p-inputtext {
+                    border: none;
+                    height: auto;
+                    box-shadow: none;
+                    &:focus,
+                    &:enabled:focus {
+                        border: none;
+                        box-shadow: none;
+                    }
+                }
+            }
+
+            .p-calendar {
+                .p-inputtext {
+                    border: none;
+                    height: auto;
+                    box-shadow: none;
+                    
+                    &:focus,
+                    &:enabled:focus {
+                        border: none;
+                        box-shadow: none;
+                    }
+                }
+            }
+
+            .file-info {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                font-weight: 400;
+                margin-left: 0.25rem;
+            }
+
+            .p-fileupload {
+                border: 2px dashed var(--surface-border);
+                border-radius: 8px;
+                background: var(--surface-ground);
+                transition: all 0.3s ease;
+
+                &:hover {
+                    border-color: var(--primary-color);
+                    background: var(--surface-hover);
+                }
+
+                .p-fileupload-buttonbar {
+                    background: transparent;
+                    border: none;
+                    padding: 0.75rem 1rem;
+                    border-bottom: 1px solid var(--surface-border);
+
+                    .file-upload-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        width: 100%;
+
+                        .file-count {
+                            color: var(--primary-color);
+                            font-weight: 600;
+                            font-size: 0.9rem;
+                        }
+                    }
+
+                    .p-button {
+                        border-radius: 6px;
+                        font-weight: 500;
+                        padding: 0.75rem 1.5rem;
+                        font-size: 2rem;
+                    }
+                }
+
+                .p-fileupload-content {
+                    background: transparent;
+                    border: none;
+                    padding: 0.5rem;
+                    min-height: 40px;
+
+                    .file-upload-empty {
+                        text-align: center;
+                        padding: 0.5rem 0.5rem;
+                        color: var(--text-secondary);
+
+                        i {
+                            font-size: 2rem;
+                            display: block;
+                            margin-bottom: 0.5rem;
+                            opacity: 0.5;
+                        }
+
+                        p {
+                            margin: 0;
+                            font-size: 0.85rem;
+                        }
+                    }
+
+                    .file-upload-item {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding: 0.25rem;
+                        margin-bottom: 0.25rem;
+                        background: var(--surface-card);
+                        border: 1px solid var(--surface-border);
+                        border-radius: 8px;
+                        transition: all 0.2s ease;
+
+                        &:hover {
+                            border-color: var(--primary-color);
+                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                        }
+
+                        .file-info-wrapper {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.75rem;
+                            flex: 1;
+
+                            i {
+                                font-size: 1.5rem;
+                                color: var(--primary-color);
+                            }
+
+                            .file-details {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 0.25rem;
+
+                                .file-name {
+                                    font-weight: 600;
+                                    color: var(--text-primary);
+                                    font-size: 0.9rem;
+                                }
+
+                                .file-size {
+                                    font-size: 1rem;
+                                    color: var(--text-secondary);
+                                }
+                            }
+                        }
+                        .p-button {
+                            &:hover {
+                                background: rgba(239, 68, 68, 0.1);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
     .dialog-footer {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid var(--border-color);
-        background-color: var(--bg-secondary);
+        padding: 0.25rem 0rem;
+        background-color: var(--surface-ground);
         display: flex;
         justify-content: flex-end;
-        gap: 0.5rem;
+        gap: 1rem;
 
         .p-button {
-            padding: 0.75rem 1.25rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            min-width: 100px;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            &.p-button-success {
+                background: linear-gradient(135deg, #10b981, #059669);
+                border: none;
+                gap: 0.5rem;
+            }
+
+            &.p-button-outlined {
+                &:hover {
+                    background: var(--surface-hover);
+                }
+                gap: 0.5rem;
+            }
         }
     }
 }
+
+// Dropdown panel styling (global to apply to dropdown overlays)
+.p-dropdown-panel {
+    .p-dropdown-items {
+        .p-dropdown-item {
+            font-size: 1rem !important;
+            padding: 0.75rem 1rem !important;
+            
+            span {
+                font-size: 1rem !important;
+            }
+        }
+    }
+}
+
+// Additional global dropdown styling
+.p-dropdown-item {
+    font-size: 1.1rem !important;
+    padding: 0.75rem 1rem !important;
+}
+

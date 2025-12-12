@@ -1,0 +1,30 @@
+.document-list-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+
+    .p-datatable {
+        flex: 1;
+        font-size: 1.2rem;
+    }
+
+    .document-list-header {
+        padding: 1rem;
+        border-bottom: 1px solid var(--surface-d);
+
+        h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            i {
+                color: var(--primary-color);
+            }
+        }
+    }
+}

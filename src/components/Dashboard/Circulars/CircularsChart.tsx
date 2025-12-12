@@ -24,7 +24,7 @@ interface CircularsChartProps {
 }
 
 const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
-    const [chartType, setChartType] = useState('doughnut');
+    const [chartType, setChartType] = useState('bar');
     const [chartData, setChartData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -59,7 +59,9 @@ const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
                                 'rgba(255, 99, 132, 0.6)',
                                 'rgba(54, 162, 235, 0.6)',
                                 'rgba(153, 102, 255, 0.6)',
-                                'rgba(255, 159, 64, 0.6)'
+                                'rgba(255, 159, 64, 0.6)',
+                                'rgba(16, 185, 129, 0.6)',
+                                'rgba(236, 72, 153, 0.6)'
                             ],
                             borderColor: [
                                 'rgba(75, 192, 192, 1)',
@@ -67,7 +69,9 @@ const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
                                 'rgba(255, 99, 132, 1)',
                                 'rgba(54, 162, 235, 1)',
                                 'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
+                                'rgba(255, 159, 64, 1)',
+                                'rgba(16, 185, 129, 1)',
+                                'rgba(236, 72, 153, 1)'
                             ],
                             borderWidth: 2,
                             fill: false,
@@ -91,7 +95,9 @@ const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
                                 'rgba(255, 99, 132, 0.6)',
                                 'rgba(54, 162, 235, 0.6)',
                                 'rgba(153, 102, 255, 0.6)',
-                                'rgba(255, 159, 64, 0.6)'
+                                'rgba(255, 159, 64, 0.6)',
+                                'rgba(16, 185, 129, 0.6)',
+                                'rgba(236, 72, 153, 0.6)'
                             ],
                             borderColor: [
                                 'rgba(75, 192, 192, 1)',
@@ -99,7 +105,9 @@ const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
                                 'rgba(255, 99, 132, 1)',
                                 'rgba(54, 162, 235, 1)',
                                 'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
+                                'rgba(255, 159, 64, 1)',
+                                'rgba(16, 185, 129, 1)',
+                                'rgba(236, 72, 153, 1)'
                             ],
                             borderWidth: 2,
                             fill: false,
@@ -223,6 +231,7 @@ const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
 
     const options = useMemo(() => ({
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 display: chartType !== 'bar' && chartType !== 'line',
@@ -282,7 +291,6 @@ const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
                     value={chartType} 
                     options={chartTypeOptions} 
                     onChange={(e) => setChartType(e.value)}
-                    optionLabel="label"
                     optionValue="value"
                     itemTemplate={(option) => <i className={option.icon} title={option.label}></i>}
                 />
@@ -292,7 +300,9 @@ const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
                     <i className="pi pi-spin pi-spinner" style={{ fontSize: '2rem' }}></i>
                 </div>
             ) : (chartData && totalCount > 0 ) ? (
-                <Chart type={chartType as 'doughnut' | 'pie' | 'bar' | 'line' | 'polarArea'} data={chartData} options={options} plugins={[centerTextPlugin]} />
+                <div style={{ height: chartType === 'bar' || chartType === 'line' ? '400px' : '350px' }}>
+                    <Chart type={chartType as 'doughnut' | 'pie' | 'bar' | 'line' | 'polarArea'} data={chartData} options={options} plugins={[centerTextPlugin]} />
+                </div>
             ) : (
                 <div style={{ textAlign: 'center', padding: '2rem' }}>No data available</div>
             )}

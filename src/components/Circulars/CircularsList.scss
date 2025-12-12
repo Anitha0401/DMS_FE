@@ -195,21 +195,81 @@
 
         .selected-circular-info {
             background: var(--bg-primary);
-            padding: 0.175rem;
+            padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1rem;
 
-            h3 {
-                margin: 0 0 0.5rem 0;
-                color: var(--primary-color);
-                font-size: 1rem;
-            }
+            .circular-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 1rem;
 
-            p {
-                margin: 0;
-                color: var(--text-secondary);
-                font-size: 0.875rem;
+                .circular-details {
+                    flex: 1;
+
+                    h3 {
+                        margin: 0 0 0.5rem 0;
+                        color: var(--primary-color);
+                        font-size: 1.75rem;
+                    }
+
+                    p {
+                        margin: 0;
+                        color: var(--text-secondary);
+                        font-size: 0.975rem;
+                    }
+                }
+
+                .filter-group {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    flex-shrink: 0;
+
+                    label {
+                        font-weight: 600;
+                        color: var(--text-primary);
+                        font-size: 1rem;
+                        white-space: nowrap;
+                    }
+
+                    .p-dropdown {
+                        font-size: 1rem;
+                    }
+                }
             }
+        }
+
+        .ack-filter-controls {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+
+            .filter-group {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+
+                label {
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    font-size: 1rem;
+                    white-space: nowrap;
+                }
+
+                .p-dropdown {
+                    font-size: 1rem;
+                }
+            }
+        }
+
+        .ack-table-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .ack-table {
@@ -220,19 +280,19 @@
             .p-datatable-thead > tr > th {
                 font-size: 1rem !important;
                 font-weight: 600 !important;
-                padding: 1rem !important;
+                padding: 0.6rem !important;
             }
 
             // Increase font size for table body cells
             .p-datatable-tbody > tr > td {
-                font-size: 0.9rem !important;
-                padding: 0.5rem !important;
+                font-size: 1.2rem !important;
+                padding: 0.25rem !important;
             }
 
             // Increase tag font size
             .p-tag {
-                font-size: 0.9rem !important;
-                padding: 0.4rem 0.75rem !important;
+                font-size: 0.95rem !important;
+                padding: 0.4rem 0.55rem !important;
             }
         }
 

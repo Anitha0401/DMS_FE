@@ -40,10 +40,42 @@ const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
     };
 
     const metricsData = [
-        { number: totalCirculars, label: "Total Circulars", subtext: "All accessible circulars", icon: "pi pi-envelope", css: "primary", color: "blue", action: () => navigate('/circularreports?cirmode=circulars') },
-        { number: 0, label: "View Circulars Report", subtext: "Generate detailed reports", icon: "pi pi-chart-bar", css: "info", color: "blue", action: () => navigate('/circularreports?cirmode=circulars') },
-        { number: totalAlerts, label: "Total Alerts", subtext: "All accessible alerts", icon: "pi pi-bell", css: "primary", color: "blue", action: () => navigate('/alerts?cirmode=alerts') },
-        { number: 0, label: "View Alerts Report", subtext: "Generate detailed reports", icon: "pi pi-chart-bar", css: "info", color: "blue", action: () => navigate('/circularreports?cirmode=alerts') },
+        { 
+            number: totalCirculars, 
+            label: "Total Circulars", 
+            subtext: "All accessible circulars",
+            icon: "pi pi-envelope", 
+            css: "primary", 
+            color: "blue", 
+            action: () => navigate('/circulars?cirmode=circulars') 
+        },
+        { 
+            number: 0, 
+            label: "View Circulars Report", 
+            subtext: "Generate detailed reports",
+            icon: "pi pi-chart-bar",
+            css: "info", 
+            color: "blue", 
+            action: () => navigate('/circularreports?cirmode=circulars') 
+        },
+        { 
+            number: totalAlerts, 
+            label: "Total Alerts", 
+            subtext: "All accessible alerts", 
+            icon: "pi pi-bell", 
+            css: "primary", 
+            color: "blue", 
+            action: () => navigate('/circulars?cirmode=alerts') 
+        },
+        { 
+            number: 0, 
+            label: "View Alerts Report", 
+            subtext: "Generate detailed reports", 
+            icon: "pi pi-chart-bar", 
+            css: "info", 
+            color: "blue", 
+            action: () => navigate('/circularreports?cirmode=alerts') 
+        },
     ];
 
     useEffect(() => {   
