@@ -12,12 +12,12 @@ import { SelectButton } from 'primereact/selectbutton';
 import { TreeNode } from 'primereact/treenode';
 import { ContextMenu } from 'primereact/contextmenu';
 import { MenuItem } from 'primereact/menuitem';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import dmsLifecycleService from '../../services/DMSLifecycleService';
 import PageHeader from '../PageHeader';
-import './CircularsList.scss';
 import { setError } from '../../store/slices/appSlice';
 import AddEditCircular from './AddEditCircular/AddEditCircular';
+import './CircularsList.scss';
 
 interface Circular {
     ciR_CategoryID: number;
@@ -61,7 +61,8 @@ interface TreeNodeData extends TreeNode {
 const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => {
     const dispatch = useDispatch();
     const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([]);
-    
+    const [mode, setMode] = useState<string>('');
+    const [headerTitle, setHeaderTitle] = useState('');
     const [circulars, setCirculars] = useState<Circular[]>([]);
     const [dbInfoAction, setDbInfoAction] = useState('');
     const [selectedCircular, setSelectedCircular] = useState<Circular | null>(null);
@@ -105,6 +106,8 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
     ];
     
     useEffect(() => {
+        localStorage.setItem('lastDashboardTab', 'circulars');
+
         dmsLifecycleService.getApiCall(`circular/GetCategories?isToIncludeAll=true&circularType=${calledMode}`)
             .then(data => {
                 const options = data.map((item: any ) => ({
@@ -116,62 +119,70 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
             .catch(() => setCategoryOptions([]));
     }, []);
     
-     const getHeaderTitle = () => {
-        switch (calledMode) {
-            case 'all':
-                return 'Circulars & Alerts Dashboard';
-            case 'new':
-                return 'New Circulars & Alerts List';
-            case 'favorites':
-                return 'My Favorites';
-            case 'toack':
-                return 'Acknowledgment Required';
-            case 'pending':
-                return 'Pending Circulars';
-            case 'acknowledged':
-                return 'Acknowledged Circulars';
-            case 'archived':
-                return 'Archived Circulars';
-
-            case 'circulars':
-                return 'Circulars Dashboard';
-            case 'newcirculars':
-                return 'New Circulars List';
-             case 'favoritescirculars':
-                return 'My Favorites Circulars';
-            case 'toackcirculars':
-                return 'Acknowledgment Required Circulars';
-            case 'pendingcirculars':
-                return 'Pending Circulars';
-            case 'acknowledgedcirculars':
-                return 'Acknowledged Circulars';
-            case 'archivedcirculars':
-                return 'Archived Circulars';
-                
-            case 'alerts':
-                return 'Alerts Dashboard';
-            case 'newalerts':
-                return 'New Alerts List';
-             case 'favoritesalerts':
-                return 'My Favorites Alerts';
-            case 'toackalerts':
-                return 'Acknowledgment Required Alerts';
-            case 'pendingalerts':
-                return 'Pending Alerts';
-            case 'acknowledgedalerts':
-                return 'Acknowledged Alerts';
-            case 'archivedalerts':
-                return 'Archived Alerts';
-            default:
-                return 'Circulars & Alerts Dashboard';
-        }
-    };
-
     useEffect(() => {
-        if (calledMode) {
-            localStorage.setItem('lastDashboardTab', 'circulars');
-        }
+        const getHeaderTitle = () => {
+            if (!calledMode) {
+                return 'Circulars & Alerts Dashboard';
+            }
+ 
+            const titleMap: { [key: string]: string } = {
+                'all': 'Dashboard',
+                'new': 'New',
+                'favorites': 'My Favorites',
+                'toack': 'Acknowledgment Required',
+                'pending': 'Pending',
+                'acknowledged': 'Acknowledged',
+                'archived': 'Archived'
+            };
+    
+            let modeValue = calledMode;
+            let type = 'Circulars & Alerts';
+    
+            if (calledMode.endsWith('circulars')) {
+                modeValue = calledMode.replace('circulars', '');
+                type = 'Circulars';
+            } else if (calledMode.endsWith('alerts')) {
+                modeValue = calledMode.replace('alerts', '');
+                type = 'Alerts';
+            }
+
+            const baseTitle = titleMap[modeValue] || '';
+            setMode(type);
+            return `${baseTitle} ${type}`;
+        };
+
+        setHeaderTitle(getHeaderTitle());
     }, [calledMode]);
+    
+    const getHeaderTitle = () => {
+        if (!calledMode) {
+            return 'Circulars & Alerts Dashboard';
+        }
+
+        const titleMap: { [key: string]: string } = {
+            'all': 'Dashboard',
+            'new': 'New',
+            'favorites': 'My Favorites',
+            'toack': 'Acknowledgment Required',
+            'pending': 'Pending',
+            'acknowledged': 'Acknowledged',
+            'archived': 'Archived'
+        };
+
+        let mode = calledMode;
+        let type = 'Circulars & Alerts';
+
+        if (calledMode.endsWith('circulars')) {
+            mode = calledMode.replace('circulars', '');
+            type = 'Circulars';
+        } else if (calledMode.endsWith('alerts')) {
+            mode = calledMode.replace('alerts', '');
+            type = 'Alerts';
+        }
+
+        const baseTitle = titleMap[mode] || '';
+        return `${baseTitle} ${type}`;
+    };
 
     useEffect(() => {
         fetchCirculars();
@@ -297,7 +308,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
             setAckLoading(false);
         }, 500);
     };
-
+    
     const getPriorityIcon = (priority: string) => {
         switch (priority) {
             case 'High': return 'pi-exclamation-triangle';
@@ -444,16 +455,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         setEditingCircular(null);
         setIsAddDialogVisible(true);
     };
-    
-    const headerActions = (
-        <Button 
-            icon="pi pi-plus" 
-            label="New Circular"
-            className="p-button-success"
-            onClick={handleNewCircular}
-            tooltip="Create New Circular"
-        />
-    );
 
     const findNodeByKey = (nodes: TreeNodeData[], key: string): TreeNodeData | null => {
         for (const node of nodes) {
@@ -506,7 +507,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                 selectedCIR_MasterID={(selectedAction=='Add') ? -1 : selectedCircular?.ciR_MasterID || 0}
             />
             <PageHeader
-                title={`COMPANY - ${getHeaderTitle()}`}
+                title={`COMPANY - ${headerTitle}`}
                 subtitle="Test User Name"
                 rightContent={dbInfoAction}
             />
@@ -520,7 +521,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                 <InputText
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="Search circulars..."
+                                    placeholder={`Search ${mode}...`}
                                     className="search-input"
                                 />
                             </span>
@@ -564,14 +565,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                 tooltipOptions={{ position: 'bottom' }}
                             />
                         </div>
-                        <span className="results-count">{filteredCirculars.length} Circulars</span>
-                        {/* <Button 
-                            icon="pi pi-refresh" 
-                            rounded 
-                            text 
-                            onClick={fetchCirculars}
-                            tooltip="Refresh"
-                        /> */}
+                        <span className="results-count">{filteredCirculars.length} ${mode}</span>                        
                     </div>
                     
                     <div className="list-content">
@@ -605,7 +599,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                             <div className="grid-item-header">
                                                 <h4>{circular.ciR_Number}</h4>
                                             </div>
-                                            <h3 className="grid-item-title">{circular.title}</h3>
+                                            <div className="grid-item-title" style={{height:'20px'}}>{circular.title}</div>
                                             <div className="meta-left">
                                                 <div className="meta-item">
                                                     <i className="pi pi-folder"></i>
@@ -640,18 +634,9 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                 <div className="ack-list-section">
                     <div className="section-header">
                         <h2><i className="pi pi-check-square"></i> Acknowledgment Status</h2>
-                        {selectedCircular && (
-                            <Button 
-                                icon="pi pi-refresh" 
-                                rounded 
-                                text 
-                                onClick={() => fetchAckList(selectedCircular.ciR_MasterID)}
-                                tooltip="Refresh Acknowledgments"
-                            />
-                        )}
                         <Button 
                             icon="pi pi-plus" 
-                            label="New Circular"
+                            label={`New ${mode}`}
                             className="p-button-success"
                             onClick={handleNewCircular}
                             rounded
@@ -661,56 +646,57 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                     {selectedCircular ? (
                         <>
                         
-                            <div className="selected-circular-info">
-                                <div className="circular-header">
-                                    <div className="circular-details">
+                                <div className="selected-circular-info">
+                                    <div className="circular-header">
+                                        <div className="circular-details">
                                         <h3>{selectedCircular.ciR_Number}</h3>
                                         <p>{selectedCircular.title}</p>
-                                    </div>
-                                    <div className="filter-group">
-                                        <label htmlFor="vessel-filter">Vessel:</label>
-                                        <Dropdown
-                                            id="vessel-filter"
-                                            value={vesselFilter}
-                                            options={vesselOptions}
-                                            onChange={(e) => setVesselFilter(e.value)}
-                                            placeholder="Select Vessel"
-                                            style={{ width: '250px' }}
-                                        />
+                                        </div>
+                                        <div className="filter-group">
+                                            <label htmlFor="vessel-filter">Vessel:</label>
+                                            <Dropdown
+                                                id="vessel-filter"
+                                                value={vesselFilter}
+                                                options={vesselOptions}
+                                                onChange={(e) => setVesselFilter(e.value)}
+                                                placeholder="Select Vessel"
+                                                style={{ width: '250px' }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="ack-table-container">
-                                {ackLoading ? (
-                                    <div className="skeleton-table">
-                                        <Skeleton width="100%" height="300px" />
-                                    </div>
-                                ) : (
-                                    <DataTable 
-                                        value={filteredAckList} 
-                                        className="ack-table"
-                                        scrollable 
-                                        scrollHeight="flex"
-                                        stripedRows
-                                        paginator
-                                        rows={10}
-                                        emptyMessage="No acknowledgment records found"
-                                    >
-                                        <Column field="vslName" header="Vessel Name" sortable />
-                                        <Column field="acknowledgedBy" header="Acknowledged By" sortable />
-                                        <Column field="dateRead" header="Date" sortable />
-                                        <Column field="status" header="Status" body={ackStatusBodyTemplate} sortable />
-                                        <Column field="remarks" header="Remarks" />
-                                    </DataTable>
-                                )}
-                            </div>
+                        
+                                <div className="ack-table-container">
+                                    {ackLoading ? (
+                                        <div className="skeleton-table">
+                                            <Skeleton width="100%" height="300px" />
+                                        </div>
+                                    ) : (
+                                        <DataTable 
+                                            value={filteredAckList} 
+                                            className="ack-table"
+                                            scrollable 
+                                            scrollHeight="flex"
+                                            stripedRows
+                                            paginator
+                                            rows={10}
+                                            rowsPerPageOptions={[10, 20, 50]}
+                                            emptyMessage="No acknowledgment records found"
+                                        >
+                                            <Column field="vslName" header="Vessel Name" sortable />
+                                            <Column field="acknowledgedBy" header="Acknowledged By" sortable />
+                                            <Column field="dateRead" header="Date" sortable />
+                                            <Column field="status" header="Status" body={ackStatusBodyTemplate} sortable />
+                                            <Column field="remarks" header="Remarks" />
+                                        </DataTable>
+                                    )}
+                                </div>
                         </>
                     ) : (
                         <div className="no-selection">
                             <i className="pi pi-info-circle" style={{ fontSize: '3rem', color: 'var(--text-secondary)' }}></i>
-                            <h3>No Circular Selected</h3>
-                            <p>Select a circular from the list to view its status.</p>
+                            <h3>No ${mode} Selected</h3>
+                            <p>Select a ${mode} from the list to view its status.</p>
                         </div>
                     )}
             </div>
