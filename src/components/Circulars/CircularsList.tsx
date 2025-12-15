@@ -154,36 +154,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         setHeaderTitle(getHeaderTitle());
     }, [calledMode]);
     
-    const getHeaderTitle = () => {
-        if (!calledMode) {
-            return 'Circulars & Alerts Dashboard';
-        }
-
-        const titleMap: { [key: string]: string } = {
-            'all': 'Dashboard',
-            'new': 'New',
-            'favorites': 'My Favorites',
-            'toack': 'Acknowledgment Required',
-            'pending': 'Pending',
-            'acknowledged': 'Acknowledged',
-            'archived': 'Archived'
-        };
-
-        let mode = calledMode;
-        let type = 'Circulars & Alerts';
-
-        if (calledMode.endsWith('circulars')) {
-            mode = calledMode.replace('circulars', '');
-            type = 'Circulars';
-        } else if (calledMode.endsWith('alerts')) {
-            mode = calledMode.replace('alerts', '');
-            type = 'Alerts';
-        }
-
-        const baseTitle = titleMap[mode] || '';
-        return `${baseTitle} ${type}`;
-    };
-
     useEffect(() => {
         fetchCirculars();
         LoadTreeNodeData();
@@ -502,7 +472,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                 isVisible={isAddDialogVisible}
                 onSubmit={updateCIR}
                 closeForm={() => setIsAddDialogVisible(false)}
-                circularType={calledMode || 'all'}
+                circularType={mode}
                 selectedAction={selectedAction}
                 selectedCIR_MasterID={(selectedAction=='Add') ? -1 : selectedCircular?.ciR_MasterID || 0}
             />
@@ -547,6 +517,8 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                 ) : null
                             )}
                         </div>
+                        <span className="results-count">{filteredCirculars.length} {mode}</span>                        
+
                         <div className="view-switcher">
                             <SelectButton
                                 value={viewMode}
@@ -565,7 +537,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                 tooltipOptions={{ position: 'bottom' }}
                             />
                         </div>
-                        <span className="results-count">{filteredCirculars.length} ${mode}</span>                        
                     </div>
                     
                     <div className="list-content">
@@ -594,30 +565,37 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                             />
                             ) : viewMode === 'grid' ? (
                                 <div className="circulars-grid">
-                                    {filteredCirculars.map((circular) => (
-                                        <div key={circular.ciR_MasterID} className="grid-item" onClick={() => setSelectedCircular(circular)}>
-                                            <div className="grid-item-header">
-                                                <h4>{circular.ciR_Number}</h4>
-                                            </div>
-                                            <div className="grid-item-title" style={{height:'20px'}}>{circular.title}</div>
-                                            <div className="meta-left">
-                                                <div className="meta-item">
-                                                    <i className="pi pi-folder"></i>
-                                                    <span>{circular.category}</span>
-                                                    <i className="pi pi-calendar"></i>
-                                                    <span>{new Date(circular.dateIssued).toLocaleDateString()}</span>
+                                    {filteredCirculars.map((circular) => {
+                                        const isSelected = selectedCircular?.ciR_MasterID === circular.ciR_MasterID;
+                                        return (
+                                            <div 
+                                                key={circular.ciR_MasterID} 
+                                                className={`grid-item ${isSelected ? 'selected' : ''}`} 
+                                                onClick={() => setSelectedCircular(circular)}
+                                            >
+                                                <div className="grid-item-header">
+                                                    <h4>{circular.ciR_Number}</h4>
                                                 </div>
-                                                <div className="meta-item">
-                                                    <i className="pi pi-paperclip"></i>
-                                                    <span>{circular.attachmentCount} Attachments</span>
+                                                <div className="grid-item-title" style={{height:'20px'}}>{circular.title}</div>
+                                                <div className="meta-left">
+                                                    <div className="meta-item">
+                                                        <i className="pi pi-folder"></i>
+                                                        <span>{circular.category}</span>
+                                                        <i className="pi pi-calendar"></i>
+                                                        <span>{new Date(circular.dateIssued).toLocaleDateString()}</span>
+                                                    </div>
+                                                    <div className="meta-item">
+                                                        <i className="pi pi-paperclip"></i>
+                                                        <span>{circular.attachmentCount} Attachments</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             ) : (
                                 <div style={{ height: 'calc(100vh - 170px)', overflow: 'auto' }}>
-                                    <DataView 
+                                  <DataView 
                                     value={filteredCirculars} 
                                     itemTemplate={itemTemplate}
                                     layout="list"
@@ -625,7 +603,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                     rows={5}
                                     paginatorPosition="top"
                                     className="circulars-dataview"
-                                />
+                                  />
                                 </div>
                             )
                         )}
@@ -640,63 +618,62 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                             className="p-button-success"
                             onClick={handleNewCircular}
                             rounded
-                            style={{padding:'0.2rem 0.5rem', borderRadius: '0.5rem'}}
+                            style={{padding:'0.2rem 0.5rem', borderRadius: '0.5rem', fontSize: '1.2rem'}}
                         />
                     </div>
                     {selectedCircular ? (
                         <>
-                        
-                                <div className="selected-circular-info">
-                                    <div className="circular-header">
-                                        <div className="circular-details">
+                            <div className="selected-circular-info">
+                                <div className="circular-header">
+                                    <div className="circular-details">
                                         <h3>{selectedCircular.ciR_Number}</h3>
                                         <p>{selectedCircular.title}</p>
-                                        </div>
-                                        <div className="filter-group">
-                                            <label htmlFor="vessel-filter">Vessel:</label>
-                                            <Dropdown
-                                                id="vessel-filter"
-                                                value={vesselFilter}
-                                                options={vesselOptions}
-                                                onChange={(e) => setVesselFilter(e.value)}
-                                                placeholder="Select Vessel"
-                                                style={{ width: '250px' }}
-                                            />
-                                        </div>
+                                    </div>
+                                    <div className="filter-group">
+                                        <label htmlFor="vessel-filter">Vessel:</label>
+                                        <Dropdown
+                                            id="vessel-filter"
+                                            value={vesselFilter}
+                                            options={vesselOptions}
+                                            onChange={(e) => setVesselFilter(e.value)}
+                                            placeholder="Select Vessel"
+                                            style={{ width: '250px' }}
+                                        />
                                     </div>
                                 </div>
-                        
-                                <div className="ack-table-container">
-                                    {ackLoading ? (
-                                        <div className="skeleton-table">
-                                            <Skeleton width="100%" height="300px" />
-                                        </div>
-                                    ) : (
-                                        <DataTable 
-                                            value={filteredAckList} 
-                                            className="ack-table"
-                                            scrollable 
-                                            scrollHeight="flex"
-                                            stripedRows
-                                            paginator
-                                            rows={10}
-                                            rowsPerPageOptions={[10, 20, 50]}
-                                            emptyMessage="No acknowledgment records found"
-                                        >
-                                            <Column field="vslName" header="Vessel Name" sortable />
-                                            <Column field="acknowledgedBy" header="Acknowledged By" sortable />
-                                            <Column field="dateRead" header="Date" sortable />
-                                            <Column field="status" header="Status" body={ackStatusBodyTemplate} sortable />
-                                            <Column field="remarks" header="Remarks" />
-                                        </DataTable>
-                                    )}
-                                </div>
+                            </div>
+                    
+                            <div className="ack-table-container">
+                                {ackLoading ? (
+                                    <div className="skeleton-table">
+                                        <Skeleton width="100%" height="300px" />
+                                    </div>
+                                ) : (
+                                    <DataTable 
+                                        value={filteredAckList} 
+                                        className="ack-table"
+                                        scrollable 
+                                        scrollHeight="flex"
+                                        stripedRows
+                                        paginator
+                                        rows={10}
+                                        rowsPerPageOptions={[10, 20, 50]}
+                                        emptyMessage="No acknowledgment records found"
+                                    >
+                                        <Column field="vslName" header="Vessel Name" sortable />
+                                        <Column field="acknowledgedBy" header="Acknowledged By" sortable />
+                                        <Column field="dateRead" header="Date" sortable />
+                                        <Column field="status" header="Status" body={ackStatusBodyTemplate} sortable />
+                                        <Column field="remarks" header="Remarks" />
+                                    </DataTable>
+                                )}
+                            </div>
                         </>
                     ) : (
                         <div className="no-selection">
                             <i className="pi pi-info-circle" style={{ fontSize: '3rem', color: 'var(--text-secondary)' }}></i>
-                            <h3>No ${mode} Selected</h3>
-                            <p>Select a ${mode} from the list to view its status.</p>
+                            <h3>No {mode} Selected</h3>
+                            <p>Select a {mode} from the list to view its status.</p>
                         </div>
                     )}
             </div>

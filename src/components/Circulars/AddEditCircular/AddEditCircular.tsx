@@ -25,6 +25,7 @@ interface CircularFormData {
     circularType: string;
     ciR_CategoryID: number;
     ciR_Number: string;
+    allowedUserToAck: string;
     reference: string,
     title: string;
     status: 'Active' | 'Archived' | 'Draft';
@@ -49,6 +50,7 @@ const defaultData: CircularFormData = {
     circularType: 'circulars',
     ciR_CategoryID: -1,
     ciR_Number: '',
+    allowedUserToAck: '',
     reference: '',
     title: '',
     status: 'Draft',
@@ -79,71 +81,80 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialDat
     ];
 
     useEffect(() => {
-        dmsLifecycleService.getApiCall(`circular/GetCategories?isToIncludeAll=false&circularType=${circularType}`)
-            .then(data => {
-                const options = data.map((item: any ) => ({
-                    label: item.category ,
-                    value: item.ciR_CategoryID ,
-                }));
-                setCategoryOptions(options);
-            })
-            .catch(() => setCategoryOptions([]));
+        const fetchData = async () => {
+            if (isVisible) {
+                dmsLifecycleService.getApiCall(`circular/GetCategories?isToIncludeAll=false&circularType=${circularType}`)
+                    .then(data => {
+                        const options = data.map((item: any) => ({
+                            label: item.category,
+                            value: item.ciR_CategoryID,
+                        }));
+                        setCategoryOptions(options);
+                    })
+                    .catch(() => setCategoryOptions([]));
 
-            if (selectedAction === 'Edit' && selectedCIR_MasterID > 0) {
-            dmsLifecycleService.getApiCall(`circular/GetCIRDetails/${selectedCIR_MasterID}`)
-                .then((data: any) => {
+                if (selectedAction === 'Edit' && selectedCIR_MasterID > 0) {
+                    dmsLifecycleService.getApiCall(`circular/GetCIRDetails/${selectedCIR_MasterID}`)
+                        .then((data: any) => {
+                            setFormData({
+                                ciR_MasterID: data.ciR_MasterID ?? selectedCIR_MasterID ?? -1,
+                                ciR_BlobID: data.ciR_BlobID ?? -1,
+                                circularType: data.circularType ?? circularType,
+                                ciR_CategoryID: data.ciR_CategoryID ?? -1,
+                                ciR_Number: data.ciR_Number ?? '',
+                                allowedUserToAck: data.allowedUserToAck ?? '',
+                                reference: data.reference ?? '',
+                                title: data.title ?? '',
+                                status: data.status ?? 'Draft',
+                                priority: data.priority ?? '3',
+                                dateIssued: data.dateIssued ? new Date(data.dateIssued) : null,
+                                releasedDate: data.releasedDate ? new Date(data.releasedDate) : null,
+                                remarks: data.remarks ?? '',
+                                createdBy: data.createdBy ?? '',
+                                description: data.description ?? '',
+                                fileName: data.fileName ?? '',
+                                fileType: data.fileType ?? '',
+                                originalFileType: data.originalFileType ?? '',
+                                blobSize: data.blobSize ?? '0',
+                                blobContents: data.blobContents ?? '',
+                                calledMode: 'Edit'
+                            });
+                        })
+                        .catch(() => {
+
+                        });
+                }
+                else if (selectedAction === 'Add') {
+                    // For add mode, reset to default or initialData
+                    var cir_MasterID = await dmsLifecycleService.postApiCall(`circular/AddCirMaster?circularType=${circularType}`, {});
+
                     setFormData({
-                        ciR_MasterID: data.ciR_MasterID ?? selectedCIR_MasterID ?? -1,
-                        ciR_BlobID: data.ciR_BlobID ?? -1,
-                        circularType: data.circularType ?? circularType,
-                        ciR_CategoryID: data.ciR_CategoryID ?? -1,
-                        ciR_Number: data.ciR_Number ?? '',
-                        reference: data.reference ?? '',
-                        title: data.title ?? '',
-                        status: data.status ?? 'Draft',
-                        priority: data.priority ?? '3',
-                        dateIssued: data.dateIssued ? new Date(data.dateIssued) : null,
-                        releasedDate: data.releasedDate ? new Date(data.releasedDate) : null,
-                        remarks: data.remarks ?? '',
-                        createdBy: data.createdBy ?? '',
-                        description: data.description ?? '',
-                        fileName: data.fileName ?? '',
-                        fileType: data.fileType ?? '',
-                        originalFileType: data.originalFileType ?? '',
-                        blobSize: data.blobSize ?? '0',
-                        blobContents: data.blobContents ?? '',
-                        calledMode: 'Edit'
+                        ciR_MasterID: cir_MasterID,
+                        ciR_BlobID: -1,
+                        circularType: circularType,
+                        ciR_CategoryID: -1,
+                        ciR_Number: '',
+                        allowedUserToAck: '',
+                        reference: '',
+                        title: '',
+                        status: 'Draft',
+                        priority: "3",
+                        dateIssued: null,
+                        releasedDate: null,
+                        remarks: '',
+                        description: '',
+                        fileName: '',
+                        fileType: '',
+                        originalFileType: '',
+                        blobSize: '0',
+                        blobContents: undefined,
+                        calledMode: 'Add'
                     });
-                })
-                .catch(() => {
-                   
-                });
-        }
-        else {
-            // For add mode, reset to default or initialData
-            setFormData({
-                ciR_MasterID: -1,
-                ciR_BlobID: -1,
-                circularType: circularType,
-                ciR_CategoryID: -1,
-                ciR_Number: '',
-                reference: '',
-                title: '',
-                status: 'Draft',
-                priority: "3",
-                dateIssued: null,
-                releasedDate: null,
-                remarks: '',
-                description: '',
-                fileName: '',
-                fileType: '',
-                originalFileType: '',
-                blobSize: '0',
-                blobContents: undefined,
-                calledMode: 'Add'
-            });
-        }
-    }, []);
+                }
+            }
+        };
+        fetchData();
+    }, [isVisible, selectedAction, selectedCIR_MasterID, circularType]);
     
     const handleInputChange = (e: any, name: string) => {
         const val = (e.target && e.target.value !== undefined) ? e.target.value : e.value;
@@ -159,9 +170,14 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialDat
         
         // Fetch circular number based on selected category
         if (categoryID && selectedAction !== 'Edit') {
-            dmsLifecycleService.getApiCall(`circular/GetNextCIRNumbersByCategory?categoryID=${categoryID}`)
+            dmsLifecycleService.getApiCall(`circular/GetNextCIRNumbersByCategory?categoryID=${categoryID}&cir_MasterID=${formData.ciR_MasterID}`)
                 .then((data: any) => {
-                    setFormData(prev => ({ ...prev, ciR_Number: data.circularNumber || data }));
+                    console.log('Fetched circular number:', data);
+                    setFormData(prev => ({ 
+                        ...prev, 
+                        ciR_Number: data.cirNumber || '',
+                        allowedUserToAck: data.allowedUserToAck || ''
+                    }));
                 })
                 .catch(() => {
                     console.error('Failed to fetch circular number');
@@ -262,6 +278,12 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialDat
         onSubmit(dataToSubmit);
     };
 
+    const handleCancel = async () => {
+        await dmsLifecycleService.deleteApiCall(`circular/RemoveTempCIR?cir_MasterID=${formData.ciR_MasterID}`, {});
+
+        closeForm();
+    };
+
     return (
         <Dialog
            visible={isVisible}
@@ -271,7 +293,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialDat
                    <span>{selectedAction === 'Edit' ? 'Edit' : 'Add New'} {circularType === 'circulars' ? 'Circular' : 'Alert'}</span>
                </div>
            }
-           style={{ width: '60vw' }}
+           style={{ width: '90vw', maxWidth: '1200px', height: '95vh' }}
            onHide={closeForm}
            className="add-edit-circular-dialog"
            modal
@@ -279,13 +301,13 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialDat
         >
             <form onSubmit={handleSubmit} className="add-edit-manual-form">
                    <div className="dialog-footer">
-                        <Button type="button" label="Cancel" icon="pi pi-times" onClick={closeForm} className="p-button-secondary p-button-outlined" />
+                        <Button type="button" label="Cancel" icon="pi pi-times" onClick={handleCancel} className="p-button-secondary p-button-outlined" />
                         <Button type="submit" label="Save" icon="pi pi-check" className="p-button-success" />
                     </div>
                 <div className="p-fluid form-grid">
                  
                     <div className="form-section">
-                        <div className="field-row">
+                        <div className="field-row three-columns">
                             <div className="field">
                                 <label htmlFor="category">
                                     Category <span className="required">*</span>
@@ -300,13 +322,24 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialDat
                             </div>
                             <div className="field">
                                 <label htmlFor="ciR_Number">
-                                    Circular Number <span className="required">*</span>
+                                    Circular Number 
                                 </label>
                                 <InputText 
                                     id="ciR_Number" 
                                     value={formData.ciR_Number || ''} 
                                     onChange={(e) => handleInputChange(e, 'ciR_Number')}
                                     placeholder="Enter circular number"
+                                />
+                            </div>
+                             <div className="field">
+                                <label htmlFor="allowedUserToAck">
+                                    Allowed User To Ack
+                                </label>
+                                <InputText 
+                                    id="allowedUserToAck" 
+                                    value={formData.allowedUserToAck || ''} 
+                                    onChange={(e) => handleInputChange(e, 'allowedUserToAck')}
+                                    placeholder="Allowed user to ack"
                                 />
                             </div>
                         </div>
