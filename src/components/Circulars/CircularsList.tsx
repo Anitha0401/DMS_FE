@@ -12,12 +12,14 @@ import { SelectButton } from 'primereact/selectbutton';
 import { TreeNode } from 'primereact/treenode';
 import { ContextMenu } from 'primereact/contextmenu';
 import { MenuItem } from 'primereact/menuitem';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import dmsLifecycleService from '../../services/DMSLifecycleService';
 import PageHeader from '../PageHeader';
+import './CircularsList.scss';
 import { setError } from '../../store/slices/appSlice';
 import AddEditCircular from './AddEditCircular/AddEditCircular';
-import './CircularsList.scss';
+import { Dialog } from 'primereact/dialog';
+import CircularsLogDetails from './CircularsLogDetails';
 
 interface Circular {
     ciR_CategoryID: number;
@@ -82,7 +84,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const [viewMode, setViewMode] = useState('list');
     const [isAddDialogVisible, setIsAddDialogVisible] = useState(false);
-    const [editingCircular, setEditingCircular] = useState<Circular | null>(null);
+    const [showCircularsLogDialog, setShowCircularsLogDialog] = useState<boolean>(false);
     const cm = React.useRef<ContextMenu>(null);
 
     const menuItems: MenuItem[] = [
@@ -316,7 +318,8 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
 
     const handleEdit = (id: number) => {
         const circularToEdit = circulars.find(c => c.ciR_MasterID === id) || null;
-        setEditingCircular(circularToEdit);
+        setSelectedCircular(circularToEdit);  
+        setSelectedAction('Edit');
         setIsAddDialogVisible(true);
     };
 
@@ -325,8 +328,9 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
     };
 
     const handleLog = (id: number) => {
-        console.log('View log for circular:', id);
-        // TODO: Open log dialog or navigate to log page
+        const circularToLog = circulars.find(c => c.ciR_MasterID === id) || null;
+        setSelectedCircular(circularToLog);
+        setShowCircularsLogDialog(true);
     };
 
     const filteredCirculars = circulars.filter(circular => {
@@ -421,11 +425,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         );
     };
 
-    const handleNewCircular = () => {
-        setEditingCircular(null);
-        setIsAddDialogVisible(true);
-    };
-
     const findNodeByKey = (nodes: TreeNodeData[], key: string): TreeNodeData | null => {
         for (const node of nodes) {
             if (node.key === key) {
@@ -441,6 +440,12 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         return null;
     };
 
+
+    const handleNewCircular = () => {
+        setSelectedAction('Add');
+        setIsAddDialogVisible(true);
+    };
+    
     const updateCIR = async (data: any) => {
         try {
             setIsAddDialogVisible(false);
@@ -452,11 +457,15 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
 
             const response = await dmsLifecycleService.postApiCall(url, data);
 
-            fetchCirculars();
-            await LoadTreeNodeData();
-
-            findNodeByKey(nodes, String(response.ciR_MasterID));    
-            //setSelectedCircular(response. || null);
+            setIsAddDialogVisible(false);
+            if (selectedAction === 'Add') {
+                await LoadTreeNodeData();
+                //setSelectedCircular(response. || null);
+            } else {
+                //setNewNodeKey(data.DM_ManualID);
+                await LoadTreeNodeData();
+            }
+                      
         } catch (err: any) {
             dispatch(setError(err.message || 'Error adding manual'));
         }
@@ -467,14 +476,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
             <ContextMenu 
                 model={menuItems} 
                 ref={cm} 
-            />
-            <AddEditCircular
-                isVisible={isAddDialogVisible}
-                onSubmit={updateCIR}
-                closeForm={() => setIsAddDialogVisible(false)}
-                circularType={mode}
-                selectedAction={selectedAction}
-                selectedCIR_MasterID={(selectedAction=='Add') ? -1 : selectedCircular?.ciR_MasterID || 0}
             />
             <PageHeader
                 title={`COMPANY - ${headerTitle}`}
@@ -678,6 +679,42 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                     )}
             </div>
         </div>
+        {showCircularsLogDialog && (
+            <Dialog
+                className="manual-details-dialog"
+                header={`${mode === 'circulars' ? 'Circular' : 'Alert'} Log Details`}
+                visible={showCircularsLogDialog}
+                style={{ width: '1250px', minWidth: '90vh', height: '100vh', maxHeight: '95vh' }}
+                contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
+                onHide={() => { if (!showCircularsLogDialog) return; setShowCircularsLogDialog(false); }}>
+                    <CircularsLogDetails selectedCIR_MasterID ={selectedCircular?.ciR_MasterID || 0 } />
+            </Dialog>
+        )}
+
+        {isAddDialogVisible && (
+              <Dialog
+                visible={isAddDialogVisible}
+                header={
+                    <div className="dialog-header-content">
+                        <i className={mode === 'circulars' ? 'pi pi-inbox' : 'pi pi-bell'}></i>
+                        <span>{selectedAction === 'Edit' ? 'Edit' : 'Add New'} {mode === 'circulars' ? 'Circular' : 'Alert'}</span>
+                    </div>
+                }
+                style={{ width: '90vw', maxWidth: '1200px', height: '95vh' }}
+                onHide={() => { if (!isAddDialogVisible) return; setIsAddDialogVisible(false); }}
+                className="add-edit-circular-dialog"
+                modal
+                draggable={false}
+            >
+                <AddEditCircular
+                    onSubmit={updateCIR}
+                    onCancel={() => setIsAddDialogVisible(false)}
+                    circularType={mode}
+                    selectedAction={selectedAction}
+                    selectedCIR_MasterID={(selectedAction=='Add') ? -1 : selectedCircular?.ciR_MasterID || 0}
+                />
+            </Dialog>
+        )}
     </div>
     );
 };

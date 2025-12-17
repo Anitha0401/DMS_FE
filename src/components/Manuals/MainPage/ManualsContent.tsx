@@ -18,6 +18,7 @@ import AddEditManual from '../AddEditManual/AddEditManual';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './ManualsContent.scss';
 import ViewCompareManualDetails from '../CompareVersion/ViewCompareManualDetails';
+import ManualVersionHistory from './ManualVersionHistory';
 
 export interface ManualDetailsProps {
     userId: string;
@@ -37,6 +38,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     const [visibleCompareVersionDetailsDialog, setVisibleCompareVersionDetailsDialog] = useState<boolean>(false);
     const [visibleManualDetailsDialog, setVisibleManualDetailsDialog] = useState<boolean>(false);
     const [visibleApproveManualDialog, setVisibleApproveManualDialog] = useState<boolean>(false);
+    const [visibleVersionHistoryDialog, setVisibleVersionHistoryDialog] = useState<boolean>(false);
     const [DM_ManualVersionID_ToCompare, setDM_ManualVersionID_ToCompare] = useState<number>(-1);
     const [IsSingleFileDiff, setIsSingleFileDiff] = useState<boolean>(false);
     const [headerText, setHeaderText] = useState<string>('Manual Details');
@@ -225,10 +227,6 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
             closable: true
         });
     }
-
-    const handleVersionHistory = () => {
-        console.log('View version history:');
-    };
     
     return (
        <div className="manuals-content" style={{ overflowY: 'auto' }}>
@@ -275,7 +273,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                         icon="pi pi-history"
                         rounded
                         tooltip="Version History"
-                        onClick={() => handleVersionHistory()}
+                        onClick={() => setVisibleVersionHistoryDialog(true)}
                         severity="info"
                          style={{
                             fontSize: '1rem',
@@ -488,6 +486,17 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                     selectedManualID={manualInfo.selectedManualNodeObj?.data?.dM_ManualID}
                     selectedManualVersionID={manualInfo.selectedManualNodeObj?.data?.dM_ManualVersionID}
                 />
+            </Dialog>
+        )}
+        {visibleVersionHistoryDialog && (
+            <Dialog
+                className="manual-details-dialog"
+                header={'Manual Version History Details'}
+                visible={visibleVersionHistoryDialog}
+                style={{ width: '1250px', minWidth: '90vh', height: '100vh', maxHeight: '95vh' }}
+                contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
+                onHide={() => { if (!visibleVersionHistoryDialog) return; setVisibleVersionHistoryDialog(false); }}>
+                <ManualVersionHistory closeForm={() => setVisibleVersionHistoryDialog(false)} />
             </Dialog>
         )}
         {showConfirmPopup && <CustomConfirmDialog />}

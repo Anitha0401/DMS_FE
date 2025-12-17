@@ -10,10 +10,9 @@ import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './AddEditCircular.scss';
 
 interface AddEditCircularProps {
-    isVisible: boolean;
     initialData?: CircularFormData;
     onSubmit: (data: CircularFormData) => void;
-    closeForm: () => void;
+    onCancel: () => void;
     circularType: string;
     selectedAction: string;
     selectedCIR_MasterID: number;
@@ -68,7 +67,7 @@ const defaultData: CircularFormData = {
     calledMode: 'New'
 }
 
-const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialData, onSubmit, closeForm, circularType, selectedAction, selectedCIR_MasterID }) => {
+const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit, onCancel, circularType, selectedAction, selectedCIR_MasterID }) => {
     const [formData, setFormData] = useState<CircularFormData>(initialData || defaultData);
     const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -82,7 +81,6 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialDat
 
     useEffect(() => {
         const fetchData = async () => {
-            if (isVisible) {
                 dmsLifecycleService.getApiCall(`circular/GetCategories?isToIncludeAll=false&circularType=${circularType}`)
                     .then(data => {
                         const options = data.map((item: any) => ({
@@ -106,7 +104,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialDat
                                 reference: data.reference ?? '',
                                 title: data.title ?? '',
                                 status: data.status ?? 'Draft',
-                                priority: data.priority ?? '3',
+                                priority: data.priority?.toString() ?? '3',
                                 dateIssued: data.dateIssued ? new Date(data.dateIssued) : null,
                                 releasedDate: data.releasedDate ? new Date(data.releasedDate) : null,
                                 remarks: data.remarks ?? '',
@@ -151,10 +149,28 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialDat
                         calledMode: 'Add'
                     });
                 }
-            }
         };
         fetchData();
-    }, [isVisible, selectedAction, selectedCIR_MasterID, circularType]);
+    }, [ selectedAction, selectedCIR_MasterID, circularType]);
+
+    useEffect(() => {
+        if (selectedAction === 'Edit' && formData.blobContents && formData.fileName) {
+            const byteCharacters = atob(formData.blobContents as string);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: formData.fileType });
+            const file = new File([blob], formData.fileName, { type: formData.fileType });
+
+            setUploadedFiles([file]);
+            setFormData(prev => ({
+                ...prev,
+                blobContents: byteArray
+            }));
+        }
+    }, [formData.blobContents, formData.fileName, selectedAction, formData.fileType]);
     
     const handleInputChange = (e: any, name: string) => {
         const val = (e.target && e.target.value !== undefined) ? e.target.value : e.value;
@@ -279,201 +295,187 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ isVisible, initialDat
     };
 
     const handleCancel = async () => {
-        await dmsLifecycleService.deleteApiCall(`circular/RemoveTempCIR?cir_MasterID=${formData.ciR_MasterID}`, {});
-
-        closeForm();
+        if(selectedAction === 'Add' && formData.ciR_MasterID > 0){
+            await dmsLifecycleService.deleteApiCall(`circular/RemoveTempCIR?cir_MasterID=${formData.ciR_MasterID}`, {});
+        }
+        onCancel();
     };
 
     return (
-        <Dialog
-           visible={isVisible}
-           header={
-               <div className="dialog-header-content">
-                   <i className={circularType === 'circulars' ? 'pi pi-inbox' : 'pi pi-bell'}></i>
-                   <span>{selectedAction === 'Edit' ? 'Edit' : 'Add New'} {circularType === 'circulars' ? 'Circular' : 'Alert'}</span>
-               </div>
-           }
-           style={{ width: '90vw', maxWidth: '1200px', height: '95vh' }}
-           onHide={closeForm}
-           className="add-edit-circular-dialog"
-           modal
-           draggable={false}
-        >
-            <form onSubmit={handleSubmit} className="add-edit-manual-form">
-                   <div className="dialog-footer">
-                        <Button type="button" label="Cancel" icon="pi pi-times" onClick={handleCancel} className="p-button-secondary p-button-outlined" />
-                        <Button type="submit" label="Save" icon="pi pi-check" className="p-button-success" />
-                    </div>
-                <div className="p-fluid form-grid">
-                 
-                    <div className="form-section">
-                        <div className="field-row three-columns">
-                            <div className="field">
-                                <label htmlFor="category">
-                                    Category <span className="required">*</span>
-                                </label>
-                                <Dropdown 
-                                    id="category" 
-                                    value={formData.ciR_CategoryID} 
-                                    options={categoryOptions} 
-                                    onChange={handleCategoryChange} 
-                                    placeholder="Select a Category"
-                                />
-                            </div>
-                            <div className="field">
-                                <label htmlFor="ciR_Number">
-                                    Circular Number 
-                                </label>
-                                <InputText 
-                                    id="ciR_Number" 
-                                    value={formData.ciR_Number || ''} 
-                                    onChange={(e) => handleInputChange(e, 'ciR_Number')}
-                                    placeholder="Enter circular number"
-                                />
-                            </div>
-                             <div className="field">
-                                <label htmlFor="allowedUserToAck">
-                                    Allowed User To Ack
-                                </label>
-                                <InputText 
-                                    id="allowedUserToAck" 
-                                    value={formData.allowedUserToAck || ''} 
-                                    onChange={(e) => handleInputChange(e, 'allowedUserToAck')}
-                                    placeholder="Allowed user to ack"
-                                />
-                            </div>
+        <form onSubmit={handleSubmit} className="add-edit-manual-form">
+            <div className="dialog-footer">
+                <Button type="button" label="Cancel" icon="pi pi-times" onClick={handleCancel} className="p-button-secondary p-button-outlined" />
+                <Button type="submit" label="Save" icon="pi pi-check" className="p-button-success" />
+            </div>
+            <div className="p-fluid form-grid">
+                
+                <div className="form-section">
+                    <div className="field-row three-columns">
+                        <div className="field">
+                            <label htmlFor="category">
+                                Category <span className="required">*</span>
+                            </label>
+                            <Dropdown 
+                                id="category" 
+                                value={formData.ciR_CategoryID} 
+                                options={categoryOptions} 
+                                onChange={handleCategoryChange} 
+                                placeholder="Select a Category"
+                            />
                         </div>
                         <div className="field">
-                            <label htmlFor="title">
-                                Title <span className="required">*</span>
+                            <label htmlFor="ciR_Number">
+                                Circular Number 
                             </label>
                             <InputText 
-                                id="title" 
-                                value={formData.title || ''} 
-                                onChange={(e) => handleInputChange(e, 'title')}
-                                placeholder="Enter circular title"
+                                id="ciR_Number" 
+                                value={formData.ciR_Number || ''} 
+                                onChange={(e) => handleInputChange(e, 'ciR_Number')}
+                                placeholder="Enter circular number"
                             />
                         </div>
-                        <div className="field-row">
                             <div className="field">
-                                <label htmlFor="priority">
-                                    Priority <span className="required">*</span>
-                                </label>
-                                <Dropdown 
-                                    id="priority" 
-                                    value={formData.priority} 
-                                    options={priorityOptions} 
-                                    onChange={(e) => handleInputChange(e, 'priority')} 
-                                    placeholder="Select Priority"
-                                />
-                            </div>
-                            <div className="field">
-                                <label htmlFor="dateIssued">
-                                    Date Issued <span className="required">*</span>
-                                </label>
-                                <Calendar 
-                                    id="dateIssued" 
-                                    value={formData.dateIssued ? new Date(formData.dateIssued) : null} 
-                                    onChange={(e) => handleInputChange(e, 'dateIssued')} 
-                                    showIcon
-                                    dateFormat="dd-mm-yy"
-                                    placeholder="Select date"
-                                    timeOnly={false}
-                                    showTime={false}
-                                />
-                            </div>
-                        </div>
-                        <div className="field">
-                            <label htmlFor="reference">Reference</label>
-                            <InputText 
-                                id="reference" 
-                                value={formData.reference || ''} 
-                                onChange={(e) => handleInputChange(e, 'reference')}
-                                placeholder="Enter reference"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <div className="field">
-                            <label htmlFor="attachments">
-                                Upload Files
-                                <span className="file-info"> (PDF, DOC, DOCX, XLS, XLSX - Max 10MB per file)</span>
+                            <label htmlFor="allowedUserToAck">
+                                Allowed User To Ack
                             </label>
-                            <FileUpload
-                                ref={fileUploadRef}
-                                name="attachments"
-                                multiple
-                                accept=".pdf,.doc,.docx,.xls,.xlsx"
-                                maxFileSize={10000000}
-                                onSelect={onFileSelect}
-                                onRemove={onFileRemove}
-                                onClear={onFileClear}
-                                emptyTemplate={
-                                    <div className="file-upload-empty">
-                                        <i className="pi pi-cloud-upload"></i>
-                                        <p>Drag and drop files here or click to browse</p>
-                                    </div>
-                                }
-                                headerTemplate={(options) => {
-                                    const { chooseButton, uploadButton, cancelButton } = options;
-                                    return (
-                                        <div className="file-upload-header" style={{gap: '2.5rem'}}>
-                                            {chooseButton}
-                                            {uploadedFiles && uploadedFiles.length > 0 && (
-                                                <span className="file-count">
-                                                    {uploadedFiles.length} file(s) selected
-                                                </span>
-                                            )}
-                                        </div>
-                                    );
-                                }}
-                                itemTemplate={(file: any, props: any) => (
-                                    <div className="file-upload-item">
-                                        <div className="file-info-wrapper">
-                                            <i className="pi pi-file"></i>
-                                            <div className="file-details">
-                                                <span className="file-name">{file?.name || 'Unknown'}</span>
-                                                <span className="file-size">{file?.size ? (file.size / 1024).toFixed(2) : '0'} KB</span>
-                                            </div>
-                                        </div>
-                                        <Button
-                                            type="button"
-                                            icon="pi pi-times"
-                                            className="p-button-rounded p-button-danger p-button-text"
-                                            onClick={() => {
-                                                if (props?.onRemove) {
-                                                    props.onRemove(new Event('remove'));
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                )}
-                                chooseLabel="Select Files"
-                                chooseOptions={{
-                                    icon: 'pi pi-folder-open',
-                                    className: 'p-button-outlined'
-                                }}
+                            <InputText 
+                                id="allowedUserToAck" 
+                                value={formData.allowedUserToAck || ''} 
+                                onChange={(e) => handleInputChange(e, 'allowedUserToAck')}
+                                placeholder="Allowed user to ack"
                             />
                         </div>
                     </div>
-                    
-                    <div className="form-section">
+                    <div className="field">
+                        <label htmlFor="title">
+                            Title <span className="required">*</span>
+                        </label>
+                        <InputText 
+                            id="title" 
+                            value={formData.title || ''} 
+                            onChange={(e) => handleInputChange(e, 'title')}
+                            placeholder="Enter circular title"
+                        />
+                    </div>
+                    <div className="field-row">
                         <div className="field">
-                            <label htmlFor="remarks">Remarks</label>
-                            <InputTextarea 
-                                id="remarks" 
-                                value={formData.remarks || ''} 
-                                onChange={(e) => handleInputChange(e, 'remarks')} 
-                                rows={3}
-                                placeholder="Enter additional remarks"
-                                autoResize
+                            <label htmlFor="priority">
+                                Priority <span className="required">*</span>
+                            </label>
+                            <Dropdown 
+                                id="priority" 
+                                value={formData.priority} 
+                                options={priorityOptions} 
+                                onChange={(e) => handleInputChange(e, 'priority')} 
+                                placeholder="Select Priority"
                             />
                         </div>
+                        <div className="field">
+                            <label htmlFor="dateIssued">
+                                Date Issued <span className="required">*</span>
+                            </label>
+                            <Calendar 
+                                id="dateIssued" 
+                                value={formData.dateIssued ? new Date(formData.dateIssued) : null} 
+                                onChange={(e) => handleInputChange(e, 'dateIssued')} 
+                                showIcon
+                                dateFormat="dd-mm-yy"
+                                placeholder="Select date"
+                                timeOnly={false}
+                                showTime={false}
+                            />
+                        </div>
+                    </div>
+                    <div className="field">
+                        <label htmlFor="reference">Reference</label>
+                        <InputText 
+                            id="reference" 
+                            value={formData.reference || ''} 
+                            onChange={(e) => handleInputChange(e, 'reference')}
+                            placeholder="Enter reference"
+                        />
                     </div>
                 </div>
-            </form>
-        </Dialog>
+
+                <div className="form-section">
+                    <div className="field">
+                        <label htmlFor="attachments">
+                            Upload Files
+                            <span className="file-info"> (PDF, DOC, DOCX, XLS, XLSX - Max 10MB per file)</span>
+                        </label>
+                        <FileUpload
+                            ref={fileUploadRef}
+                            name="attachments"
+                            multiple
+                            accept=".pdf,.doc,.docx,.xls,.xlsx"
+                            maxFileSize={10000000}
+                            onSelect={onFileSelect}
+                            onRemove={onFileRemove}
+                            onClear={onFileClear}
+                            emptyTemplate={
+                                <div className="file-upload-empty">
+                                    <i className="pi pi-cloud-upload"></i>
+                                    <p>Drag and drop files here or click to browse</p>
+                                </div>
+                            }
+                            headerTemplate={(options) => {
+                                const { chooseButton, uploadButton, cancelButton } = options;
+                                return (
+                                    <div className="file-upload-header" style={{gap: '2.5rem'}}>
+                                        {chooseButton}
+                                        {uploadedFiles && uploadedFiles.length > 0 && (
+                                            <span className="file-count">
+                                                {uploadedFiles.length} file(s) selected
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            }}
+                            itemTemplate={(file: any, props: any) => (
+                                <div className="file-upload-item">
+                                    <div className="file-info-wrapper">
+                                        <i className="pi pi-file"></i>
+                                        <div className="file-details">
+                                            <span className="file-name">{file?.name || 'Unknown'}</span>
+                                            <span className="file-size">{file?.size ? (file.size / 1024).toFixed(2) : '0'} KB</span>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        icon="pi pi-times"
+                                        className="p-button-rounded p-button-danger p-button-text"
+                                        onClick={() => {
+                                            if (props?.onRemove) {
+                                                props.onRemove(new Event('remove'));
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            )}
+                            chooseLabel="Select Files"
+                            chooseOptions={{
+                                icon: 'pi pi-folder-open',
+                                className: 'p-button-outlined'
+                            }}
+                        />
+                    </div>
+                </div>
+                
+                <div className="form-section">
+                    <div className="field">
+                        <label htmlFor="remarks">Remarks</label>
+                        <InputTextarea 
+                            id="remarks" 
+                            value={formData.remarks || ''} 
+                            onChange={(e) => handleInputChange(e, 'remarks')} 
+                            rows={3}
+                            placeholder="Enter additional remarks"
+                            autoResize
+                        />
+                    </div>
+                </div>
+            </div>
+        </form>
     );
 };
 export default AddEditCircular;
