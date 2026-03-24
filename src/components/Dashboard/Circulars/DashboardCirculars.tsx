@@ -3,8 +3,8 @@ import { Dropdown } from 'primereact/dropdown';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
-import MetricCard from './MetricCard_Cicrular';
-import NotificationList from './NotificationList_Cicrular';
+import MetricCard from './MetricCardCicrular';
+import NotificationList from './NotificationListCicrular';
 import CircularsChart from './CircularsChart';
 import RecentCircularsList from './RecentCircularsList';
 import './RecentCircularsList.scss';
@@ -13,7 +13,7 @@ export interface DashboardProps {
     userId: string;
 }
 
-const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
+const DashboardCirculars: React.FC<DashboardProps> = ({ userId }) => {
     const [totalCirculars, setTotalCirculars] = useState(0);
     const [totalAlerts, setTotalAlerts] = useState(0);
     
@@ -142,4 +142,4 @@ const Dashboard_Circulars: React.FC<DashboardProps> = ({ userId }) => {
     );
 };
 
-export default Dashboard_Circulars;
+export default DashboardCirculars;

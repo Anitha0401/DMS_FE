@@ -12,7 +12,7 @@ export interface DashboardProps {
     userId: string;
 }
 
-const Dashboard_Manual: React.FC<DashboardProps> = ({ userId }) => {
+const DashboardManual: React.FC<DashboardProps> = ({ userId }) => {
     const [newCnt, setNewCnt] = useState(0);
     const [toApprovalCnt, setToApprovalCnt] = useState(0); 
     const [toAckCnt, setToAckCnt] = useState(0); 
@@ -247,4 +247,4 @@ const Dashboard_Manual: React.FC<DashboardProps> = ({ userId }) => {
     );
 };
 
-export default Dashboard_Manual;
+export default DashboardManual;

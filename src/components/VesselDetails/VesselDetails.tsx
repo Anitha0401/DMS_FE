@@ -87,11 +87,6 @@ const VesselDetails: React.FC<VesselFormProps> = ({ manualTitle, onSubmit, close
         fetchData();
     }, [selectedAction, selectedManualID]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSubmit(form);

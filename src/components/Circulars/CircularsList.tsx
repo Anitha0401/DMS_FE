@@ -12,7 +12,7 @@ import { SelectButton } from 'primereact/selectbutton';
 import { TreeNode } from 'primereact/treenode';
 import { ContextMenu } from 'primereact/contextmenu';
 import { MenuItem } from 'primereact/menuitem';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import dmsLifecycleService from '../../services/DMSLifecycleService';
 import PageHeader from '../PageHeader';
 import './CircularsList.scss';
@@ -79,7 +79,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
     const [filterCategory, setFilterCategory] = useState(-1);
     const [nodes, setNodes] = useState<TreeNodeData[]>([]);
     const [selectedNodeKey, setSelectedNodeKey] = useState<any>(null);
-    const [selectedNodeLabel, setSelectedNodeLabel] = useState<string | null | undefined>(null);
     const [selectedAction, setSelectedAction] = useState<string>('Add');
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const [viewMode, setViewMode] = useState('list');
@@ -119,7 +118,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                 setCategoryOptions(options);
             })
             .catch(() => setCategoryOptions([]));
-    }, []);
+    }, [calledMode]);
     
     useEffect(() => {
         const getHeaderTitle = () => {
@@ -200,7 +199,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                 if (firstNode && firstNode.key) {
                     const firstKey = String(firstNode.key);
                     setExpandedKeys({ [firstKey]: true });
-                    setSelectedNodeLabel(firstNode.label);
                     setSelectedNodeKey(data[0].key);
                 }
             }
@@ -317,6 +315,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
     };
 
     const handleEdit = (id: number) => {
+        console.log('Edit circular:', id);
         const circularToEdit = circulars.find(c => c.ciR_MasterID === id) || null;
         setSelectedCircular(circularToEdit);  
         setSelectedAction('Edit');
@@ -460,7 +459,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
             setIsAddDialogVisible(false);
             if (selectedAction === 'Add') {
                 await LoadTreeNodeData();
-                //setSelectedCircular(response. || null);
+                setSelectedCircular(response || null);
             } else {
                 //setNewNodeKey(data.DM_ManualID);
                 await LoadTreeNodeData();
@@ -504,7 +503,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                 onChange={(e) => setFilterCategory(e.value)}
                                 placeholder="Category"
                                 className="filter-dropdown"
-                                style={{width: "200px"}}
+                                style={{width: "300px"}}
                             />
                             {(
                                 viewMode === 'list' ? (
@@ -711,7 +710,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                     onCancel={() => setIsAddDialogVisible(false)}
                     circularType={mode}
                     selectedAction={selectedAction}
-                    selectedCIR_MasterID={(selectedAction=='Add') ? -1 : selectedCircular?.ciR_MasterID || 0}
+                    selectedCIR_MasterID={(selectedAction==='Add') ? -1 : selectedCircular?.ciR_MasterID || 0}
                 />
             </Dialog>
         )}

@@ -9,7 +9,7 @@ export interface ManualDetailsProps {
     closeForm: () => void;
 }
 
-export type ManualDetails = {
+export type ManualDetailsProp = {
     categoryName: string;
     manualCode: string;
     manualNo: string;
@@ -33,7 +33,7 @@ export type ManualDetails = {
 };
 
 const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeForm }) => {
-   const [manualData, setManualData] = useState<ManualDetails>();
+   const [manualData, setManualData] = useState<ManualDetailsProp>();
    const [loading, setLoading] = useState(true);
    const { theme } = useTheme(); 
     

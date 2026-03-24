@@ -44,7 +44,7 @@ const CircularsLogDetails: React.FC<CircularsLogProps> = ({ selectedCIR_MasterID
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [selectedCIR_MasterID]);
 
     return (
         <div className="manual-details">

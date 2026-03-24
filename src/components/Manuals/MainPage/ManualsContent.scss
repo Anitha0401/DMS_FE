@@ -117,7 +117,7 @@
         color: var(--text-secondary) !important;
         display: flex !important;
         align-items: center !important;
-        gap: 0.5rem !important;
+        gap: 1.5rem !important;
         font-size: 0.9rem;
     }
   }
@@ -386,6 +386,37 @@
 
     &:hover {
       background: var(--border-color);
+    }
+  }
+}
+
+// Global ContextMenu hover styling (rendered outside component)
+.p-contextmenu {
+  .p-menuitem {
+    &:hover,
+    &.p-menuitem-active,
+    &.p-focus {
+      > .p-menuitem-content {
+        background: var(--primary-color) !important;
+        
+        .p-menuitem-link {
+          .p-menuitem-text {
+            color: white !important;
+          }
+          .p-menuitem-icon {
+            color: white !important;
+          }
+        }
+      }
+    }
+  }
+  
+  .p-menuitem-content:hover {
+    background: var(--primary-color) !important;
+    
+    .p-menuitem-link .p-menuitem-text,
+    .p-menuitem-link .p-menuitem-icon {
+      color: white !important;
     }
   }
 }

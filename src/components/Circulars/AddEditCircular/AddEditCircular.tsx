@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
@@ -419,7 +418,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
                                 </div>
                             }
                             headerTemplate={(options) => {
-                                const { chooseButton, uploadButton, cancelButton } = options;
+                                const { chooseButton } = options;
                                 return (
                                     <div className="file-upload-header" style={{gap: '2.5rem'}}>
                                         {chooseButton}

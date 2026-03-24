@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Chart } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -34,11 +34,7 @@ const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
         { icon: 'pi pi-chart-bar', value: 'bar', label: 'Bar' }
     ], []);
 
-    useEffect(() => {
-        fetchChartData();
-    }, [circularType]);
-
-    const fetchChartData = async () => {
+    const fetchChartData = useCallback(async () => {
         setLoading(true);
         try {
             const data = await dmsLifecycleService.getApiCall(`Circular/GetCIR_CategoryChartData?circularType=${circularType}`);
@@ -127,7 +123,11 @@ const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [circularType]);
+
+    useEffect(() => {
+        fetchChartData();
+    }, [fetchChartData]);
 
     const getChartTitle = () => {
         const type = circularType?.toLowerCase() || 'circulars';
@@ -137,14 +137,6 @@ const CircularsChart: React.FC<CircularsChartProps> = ({ circularType }) => {
             case 'alerts':
                 return 'Alerts by Category';
         }
-    };
-
-    const itemTemplate = (option: any) => {
-        return (
-            <div className="chart-type-option" title={option.label}>
-                <i className={option.icon}></i>
-            </div>
-        );
     };
 
     const maxValue = useMemo(() => {

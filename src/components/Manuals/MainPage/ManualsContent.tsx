@@ -331,7 +331,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             </span>
                             <span className="update-date">
                                 <i className="pi pi-calendar"></i>
-                                Last Updated: {manualInfo.selectedManualNodeObj.data?.lastUpdated || 'N/A'}
+                                Last Updated:  {manualInfo.selectedManualNodeObj.data?.lastUpdated || 'N/A'}
                             </span>
                         </div>
                     }

@@ -61,9 +61,22 @@ export async function generateHTMLContent(manualText: string, dmManualVersionID:
             .header-table {
               margin-bottom: 20px;
             }
+            .watermark {
+              position: fixed;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%) rotate(-45deg);
+              font-size: 80px;
+              color: rgba(200, 200, 200, 0.3);
+              z-index: -1;
+              pointer-events: none;
+              font-weight: bold;
+              white-space: nowrap;
+            }
           </style>
         </head>
         <body>
+          <div class="watermark">CONFIDENTIAL</div>
           <table class="header-table" style="width:100%;height:140px;border-collapse: collapse;">
             <tr>
               <td style="width:10%; text-align:center;">
@@ -144,6 +157,26 @@ export async function downloadAsPDF(manualText: string, dmManualVersionID: numbe
 
     doc.html(tempDiv, {
         callback: function (doc) {
+            // Add watermark to all pages
+            const pageCount = doc.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(60);
+                doc.setTextColor(100, 100, 100);
+                doc.saveGraphicsState();
+                
+                // Center the watermark and rotate it
+                const pageWidth = doc.internal.pageSize.getWidth()+150;
+                const pageHeight = doc.internal.pageSize.getHeight()+150;
+                
+                doc.text('Downloaded Copy', pageWidth / 2, pageHeight / 2, {
+                    align: 'center',
+                    angle: 45,
+                    renderingMode: 'stroke'
+                });
+                
+                doc.restoreGraphicsState();
+            }
             doc.save(`${manualName || 'manual'}.pdf`);
             document.body.removeChild(tempDiv); // Clean up
         },

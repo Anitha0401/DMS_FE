@@ -98,11 +98,6 @@ const RecentCircularsList: React.FC<RecentCircularsListProps> = ({ userId, circu
         }
     };
 
-    const handleCircularClick = (circular: Circular) => {
-        const mode = circularType === 'circulars' ? 'circulars' : 'alerts';
-        navigate(`/circulars?cirmode=${mode}&selectedId=${circular.ciR_MasterID}`);
-    };
-
     const handleViewAll = () => {
         const mode = circularType === 'circulars' ? 'circulars' : 'alerts';
         navigate(`/circulars?cirmode=${mode}`);

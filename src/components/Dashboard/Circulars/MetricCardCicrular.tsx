@@ -11,7 +11,7 @@ interface MetricCardProps {
     action?: () => void;
 }
 
-const MetricCard_Cicrular: React.FC<MetricCardProps> = ({ number, label, subtext, icon, css, color, isAction, action }) => {
+const MetricCardCicrular: React.FC<MetricCardProps> = ({ number, label, subtext, icon, css, color, isAction, action }) => {
     const cardClass = `stat-card ${css} ${isAction ? 'action-required-card' : ''}`;
     const iconClass = `${icon} icon-${color}`;
 
@@ -43,4 +43,4 @@ const MetricCard_Cicrular: React.FC<MetricCardProps> = ({ number, label, subtext
     );
 };
 
-export default MetricCard_Cicrular;
+export default MetricCardCicrular;

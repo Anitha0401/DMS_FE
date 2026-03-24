@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { TabView, TabPanel } from 'primereact/tabview';
-import Dashboard_Manual from './Manuals/Dashboard_Manual';
-import Dashboard_Circulars from './Circulars/Dashboard_Circulars';
+import DashboardManual from './Manuals/DashboardManual';
+import DashboardCirculars from './Circulars/DashboardCirculars';
+import DashboardOtherDocuments from './OtherDocuments/DashboardOtherDocument';
 import './Dashboard.scss';
-import Dashboard_OtherDocuments from './OtherDocuments/Dashboard_OtherDocument';
 
 export interface DashboardProps {
     userId: string;
@@ -17,15 +17,16 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
     // Map tab names to indices
     const tabMapping: { [key: string]: number } = {
         'manuals': 0,
-        'circulars': 1
+        'circulars': 1,
+        'otherdocuments': 2
     };
 
     useEffect(() => {
         // Get last opened tab from localStorage or location state
-        const lastTab = location.state?.activeTab || localStorage.getItem('lastDashboardTab') || 'circulars';
+        const lastTab = location.state?.activeTab || localStorage.getItem('lastDashboardTab') || 'manuals';
         console.log('Last opened tab:', lastTab);
         // Set active index based on the tab name
-        const index = tabMapping[lastTab] ?? 1; // Default to circulars (index 1)
+        const index = tabMapping[lastTab] ?? 0; // Default to manuals (index 0)
         setActiveIndex(index);
     }, [location.state]);
 
@@ -53,7 +54,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
                         </div>
                     }
                 >
-                    <Dashboard_Manual userId={userId} />
+                    <DashboardManual userId={userId} />
                 </TabPanel>
                 <TabPanel 
                    header={
@@ -63,7 +64,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
                         </div>
                     }
                 >
-                <Dashboard_Circulars userId={userId} />
+                <DashboardCirculars userId={userId} />
                 </TabPanel>
                 <TabPanel 
                    header={
@@ -73,7 +74,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
                         </div>
                     }
                 >
-                <Dashboard_OtherDocuments userId={userId} />
+                <DashboardOtherDocuments userId={userId} />
                 </TabPanel>
             </TabView>
         </div>

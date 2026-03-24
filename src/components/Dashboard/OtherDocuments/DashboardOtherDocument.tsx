@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
-import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import OtherDocumentList from './OtherDocumentList';
 import DocumentVesselList from './DocumentVesselList';
-import './Dashboard_OtherDocument.scss';
+import './DashboardOtherDocument.scss';
 
 export interface DashboardProps {
     userId: string;
 }
 
-const Dashboard_OtherDocuments: React.FC<DashboardProps> = ({ userId }) => {
+const DashboardOtherDocuments: React.FC<DashboardProps> = ({ userId }) => {
     const [selectedVesselId, setSelectedVesselId] = useState<number | null>(null);
 
     const handleVesselSelection = (selectedIds: number[]) => {
@@ -19,10 +18,10 @@ const Dashboard_OtherDocuments: React.FC<DashboardProps> = ({ userId }) => {
     return (
         <div className='dashboard-wrapper other-documents-dashboard'>
             <Splitter style={{ height: 'calc(100vh - 100px)' }}>
-                <SplitterPanel size={40} minSize={20}>
+                <SplitterPanel size={25} minSize={15}>
                     <DocumentVesselList onSelectionChange={handleVesselSelection} />
                 </SplitterPanel>
-                <SplitterPanel size={60} minSize={50}>
+                <SplitterPanel size={75} minSize={50}>
                     <OtherDocumentList vesselId={selectedVesselId} />
                 </SplitterPanel>
             </Splitter>
@@ -30,4 +29,4 @@ const Dashboard_OtherDocuments: React.FC<DashboardProps> = ({ userId }) => {
     );
 };
 
-export default Dashboard_OtherDocuments;
+export default DashboardOtherDocuments;

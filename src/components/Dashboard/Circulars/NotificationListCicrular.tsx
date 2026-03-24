@@ -18,7 +18,7 @@ interface Notification {
     userId: string;
 }
 
-const NotificationList_Cicrular: React.FC<NotificationProps> = ({ userId }) => {
+const NotificationListCicrular: React.FC<NotificationProps> = ({ userId }) => {
     const navigate = useNavigate();
       const [loading, setLoading] = useState(false);
       const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -159,4 +159,4 @@ const NotificationList_Cicrular: React.FC<NotificationProps> = ({ userId }) => {
     );
 };
 
-export default NotificationList_Cicrular;
+export default NotificationListCicrular;
