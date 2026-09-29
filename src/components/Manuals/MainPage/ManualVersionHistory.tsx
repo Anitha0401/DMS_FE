@@ -80,7 +80,7 @@ const ManualVersionHistory: React.FC<ManualDetailsProps> = ({ closeForm }) => {
     }, []);
 
     return (
-        <div className="manual-details">
+        <div className="manual-details version-history-details">
             <DataTable
                 value={versionHistoryDetails}
                 paginator
@@ -93,8 +93,8 @@ const ManualVersionHistory: React.FC<ManualDetailsProps> = ({ closeForm }) => {
                         {loading ? 'Loading...' : 'No data found.'}
                     </span>
                 }
-                className="manual-list p-datatable-gridlines"
-                style={{ width: '100%', minHeight: '100%', border: 'none !important' }}
+                className="manual-list version-history-table"
+                style={{ width: '100%', minHeight: '100%' }}
             >
                 <Column field="versionNumber" header="Version" sortable />
                 <Column field="createdBy" header="Created By" sortable />

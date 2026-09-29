@@ -151,33 +151,6 @@ const DashboardManual: React.FC<DashboardProps> = ({ userId }) => {
     return (
         <div className='dashboard-wrapper'>
             <div className="dashboard-container">
-                {/* Header */}
-                <div className="dashboard-header">
-                    <div className="header-content">
-                        <div>
-                             <h1 className="dashboard-title">
-                                <i className="pi pi-th-large"></i>
-                                Document Management Dashboard
-                            </h1>
-                        </div>
-                        <div className="header-actions">
-                            <Dropdown 
-                                value={theme} 
-                                options={themeOptions} 
-                                onChange={(e) => setTheme(e.value)}
-                                optionLabel="label"
-                                optionValue="value"
-                                className="theme-selector"
-                                placeholder="Select Theme"
-                            />
-                            <button className="refresh-btn" onClick={setUserActionCounts}>
-                                <i className="pi pi-refresh"></i>
-                                Refresh
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Key Metrics Cards */}
                 <div className="dashboard-stats">
                     {metricsData.map((data, index) => (

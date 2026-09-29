@@ -60,6 +60,13 @@ interface TreeNodeData extends TreeNode {
     data: Circular;
 }
 
+const formatDisplayDate = (value: string | Date | null | undefined): string => {
+    if (!value) return '-';
+
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+};
+
 const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => {
     const dispatch = useDispatch();
     const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([]);
@@ -88,7 +95,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
 
     const menuItems: MenuItem[] = [
         { label: 'Edit', icon: 'pi pi-fw pi-pencil', command: () => handleEdit(selectedCircular?.ciR_MasterID || 0) },
-        { label: 'View', icon: 'pi pi-fw pi-eye', command: () => handleView(selectedCircular?.ciR_MasterID || 0) },
         { label: 'Download', icon: 'pi pi-fw pi-download', command: () => handleDownload(selectedCircular?.ciR_MasterID || 0) },
         { label: 'Log', icon: 'pi pi-fw pi-history', command: () => handleLog(selectedCircular?.ciR_MasterID || 0) },
         { label: 'Add to Favorites', icon: 'pi pi-fw pi-star' }
@@ -310,10 +316,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         return <Tag value={rowData.status} severity={getAckStatusColor(rowData.status)} />;
     };
 
-    const handleView = (id: number) => {
-        console.log('View circular:', id);
-    };
-
     const handleEdit = (id: number) => {
         console.log('Edit circular:', id);
         const circularToEdit = circulars.find(c => c.ciR_MasterID === id) || null;
@@ -393,12 +395,6 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                 onClick={() => handleEdit(circular.ciR_MasterID)}
                             />
                             <Button 
-                                icon="pi pi-eye" 
-                                label="View" 
-                                className="p-button-text"
-                                onClick={() => handleView(circular.ciR_MasterID)}
-                            />
-                            <Button 
                                 icon="pi pi-download" 
                                 label="Download" 
                                 className="p-button-text"
@@ -449,20 +445,24 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         try {
             setIsAddDialogVisible(false);
 
-            var url ='Circular/EditCircular';
+            var response;
             if (selectedAction === 'Add') {
-                url = 'Circular/AddCircular';
+                response = await dmsLifecycleService.postApiCall('Circular/AddCircular', data); 
+            }
+            else {
+                response = await dmsLifecycleService.putApiCall('Circular/EditCircular', data);
             }
 
-            const response = await dmsLifecycleService.postApiCall(url, data);
-
             setIsAddDialogVisible(false);
+            await fetchCirculars();
             if (selectedAction === 'Add') {
                 await LoadTreeNodeData();
                 setSelectedCircular(response || null);
             } else {
-                //setNewNodeKey(data.DM_ManualID);
                 await LoadTreeNodeData();
+                setSelectedCircular((current) => current?.ciR_MasterID === data.ciR_MasterID
+                    ? { ...current, ...data }
+                    : current);
             }
                       
         } catch (err: any) {
@@ -626,11 +626,29 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                             <div className="selected-circular-info">
                                 <div className="circular-header">
                                     <div className="circular-details">
-                                        <h3>{selectedCircular.ciR_Number}</h3>
-                                        <p>{selectedCircular.title}</p>
+                                        <div className="circular-eyebrow">
+                                            <span>{selectedCircular.ciR_Number}</span>
+                                            <span className={`custom-tag priority-${selectedCircular.priority.toLowerCase()}`}>
+                                                <i className={`pi ${getPriorityIcon(selectedCircular.priority)}`}></i>
+                                                {selectedCircular.priority}
+                                            </span>
+                                            <span className={`custom-tag status-${selectedCircular.statusString.toLowerCase()}`}>
+                                                <i className={`pi ${getStatusIcon(selectedCircular.statusString)}`}></i>
+                                                {selectedCircular.statusString}
+                                            </span>
+                                        </div>
+                                        <h3>{selectedCircular.title}</h3>
+                                        <p>{selectedCircular.reference || 'No reference provided'}</p>
+                                        <div className="circular-meta">
+                                            <span><i className="pi pi-folder" />{selectedCircular.category}</span>
+                                            <span><i className="pi pi-calendar" />Issued {formatDisplayDate(selectedCircular.dateIssued)}</span>
+                                            <span><i className="pi pi-send" />Released {formatDisplayDate(selectedCircular.releasedDate)}</span>
+                                            <span><i className="pi pi-sitemap" />Level {selectedCircular.cIRLevel || '-'}</span>
+                                            <span><i className="pi pi-paperclip" />{selectedCircular.attachmentCount || 0} attachments</span>
+                                        </div>
                                     </div>
                                     <div className="filter-group">
-                                        <label htmlFor="vessel-filter">Vessel:</label>
+                                        <label htmlFor="vessel-filter">Filter acknowledgements</label>
                                         <Dropdown
                                             id="vessel-filter"
                                             value={vesselFilter}
@@ -641,6 +659,26 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                         />
                                     </div>
                                 </div>
+                                <div className="circular-summary-grid">
+                                    <div className="summary-item">
+                                        <span className="summary-label">Acknowledged</span>
+                                        <strong>{ackList.filter((item) => item.status === 'Acknowledged').length}</strong>
+                                    </div>
+                                    <div className="summary-item">
+                                        <span className="summary-label">Pending</span>
+                                        <strong>{ackList.filter((item) => item.status === 'Pending').length}</strong>
+                                    </div>
+                                    <div className="summary-item">
+                                        <span className="summary-label">Overdue</span>
+                                        <strong>{ackList.filter((item) => item.status === 'Overdue').length}</strong>
+                                    </div>
+                                </div>
+                                {selectedCircular.remarks && (
+                                    <div className="circular-message">
+                                        <span className="summary-label">Message / Remarks</span>
+                                        <p>{selectedCircular.remarks}</p>
+                                    </div>
+                                )}
                             </div>
                     
                             <div className="ack-table-container">
@@ -680,11 +718,11 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         </div>
         {showCircularsLogDialog && (
             <Dialog
-                className="manual-details-dialog"
-                header={`${mode === 'circulars' ? 'Circular' : 'Alert'} Log Details`}
+                className="circular-log-dialog"
+                header={`${mode === 'Circulars' ? 'Circular' : 'Alert'} Log Details`}
                 visible={showCircularsLogDialog}
-                style={{ width: '1250px', minWidth: '90vh', height: '100vh', maxHeight: '95vh' }}
-                contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
+                style={{ width: '94vw', maxWidth: '1500px', height: '88vh', maxHeight: '92vh' }}
+                contentStyle={{ padding: '0.75rem', backgroundColor: '#f8fafc' }}
                 onHide={() => { if (!showCircularsLogDialog) return; setShowCircularsLogDialog(false); }}>
                     <CircularsLogDetails selectedCIR_MasterID ={selectedCircular?.ciR_MasterID || 0 } />
             </Dialog>
@@ -695,11 +733,11 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                 visible={isAddDialogVisible}
                 header={
                     <div className="dialog-header-content">
-                        <i className={mode === 'circulars' ? 'pi pi-inbox' : 'pi pi-bell'}></i>
-                        <span>{selectedAction === 'Edit' ? 'Edit' : 'Add New'} {mode === 'circulars' ? 'Circular' : 'Alert'}</span>
+                        <i className={mode === 'Circulars' ? 'pi pi-inbox' : 'pi pi-bell'}></i>
+                        <span>{selectedAction === 'Edit' ? 'Edit' : 'Add New'} {mode === 'Circulars' ? 'Circular' : 'Alert'}</span>
                     </div>
                 }
-                style={{ width: '90vw', maxWidth: '1200px', height: '95vh' }}
+                style={{ width: '94vw', maxWidth: '1400px', height: '95vh' }}
                 onHide={() => { if (!isAddDialogVisible) return; setIsAddDialogVisible(false); }}
                 className="add-edit-circular-dialog"
                 modal

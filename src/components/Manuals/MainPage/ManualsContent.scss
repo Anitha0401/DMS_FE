@@ -8,6 +8,12 @@
   height: 100%;
 
   .sectionDiv {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .sectionDiv {
     background: var(--bg-secondary);
     color: var(--text-primary);
     padding: 0; 
@@ -141,6 +147,40 @@
       background: var(--text-muted) !important;
       border-color: var(--text-muted) !important;
     }
+  }
+}
+
+.manual-edit-dialog {
+  .p-dialog-header {
+    display: flex;
+    min-height: 4.25rem;
+    max-height: 6.5rem;
+    overflow: hidden;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .p-dialog-header .p-dialog-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 0;
+    max-width: none;
+    display: -webkit-box;
+    overflow: hidden;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .p-dialog-header .p-dialog-header-icon {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .manual-edit-dialog .p-dialog-header {
+    min-height: 3.75rem;
   }
 }
 
@@ -303,6 +343,66 @@
         font-size: 0.75rem !important;
         min-height: 20px !important;
       }
+    }
+  }
+}
+
+.manuals-content .selectedTextDiv {
+  min-height: 3.5rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 0.35rem;
+  padding: 0.45rem 0.65rem;
+
+  .left-section {
+    min-width: 0;
+    flex: 1 1 22rem;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .selectedTextHighlight {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .right-section {
+    flex: 0 0 auto;
+  }
+}
+
+.manuals-content > .sectionDiv > div:nth-child(2) {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0.35rem 0;
+}
+
+.manuals-content .sectiontext {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  margin-top: 0.35rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+}
+
+@media (max-width: 900px) {
+  .manuals-content .selectedTextDiv {
+    align-items: flex-start;
+
+    .left-section {
+      flex-basis: 100%;
+    }
+
+    .right-section {
+      width: 100%;
+      justify-content: flex-end;
     }
   }
 }

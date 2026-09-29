@@ -13,6 +13,142 @@
     overflow-x: hidden;  
 }
 
+.manual-rights-dialog {
+    width: min(94vw, 1400px) !important;
+    max-height: 94vh;
+
+    .p-dialog-content {
+        height: calc(94vh - 4.5rem);
+        padding: 0.5rem !important;
+        overflow: hidden;
+    }
+}
+
+.vessel-details-form {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d7e0ea;
+    box-shadow: none;
+
+    .p-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+
+        .p-checkbox-box {
+            width: 16px;
+            height: 16px;
+        }
+
+        .p-checkbox-input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+    }
+
+    input[type='checkbox'] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .vessel-rights-toolbar {
+        align-items: center;
+        gap: 1rem;
+        padding: 0 0 0.75rem;
+        border-bottom: 1px solid #dbe3ec;
+
+        .manual-details-header {
+            min-width: 0;
+
+            h3 {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+    }
+
+    .vessel-rights-grid {
+        display: grid !important;
+        grid-template-columns: minmax(260px, 1fr) minmax(220px, 0.72fr) minmax(360px, 1.35fr);
+        align-items: stretch;
+        gap: 0.75rem !important;
+        flex: 1;
+        min-height: 0;
+        margin-top: 0 !important;
+    }
+
+    .vessel-rights-panel {
+        width: auto !important;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    .vessel-rights-panel > * {
+        height: 100%;
+    }
+
+    .vessel-details-container,
+    .vessel-rank-list-container {
+        height: 100%;
+        min-height: 0;
+        padding: 0.75rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        box-shadow: none;
+        background: #f8fafc;
+    }
+
+    .vessel-rank-list,
+    .vessel-rank-list .p-datatable-scrollable-body,
+    .vessel-details-container .p-datatable-scrollable-body {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .vessel-details-container .p-inputgroup,
+    .vessel-rank-list-container .p-inputgroup {
+        margin-bottom: 0.55rem;
+    }
+}
+
+@media (max-width: 1000px) {
+    .manual-rights-dialog .p-dialog-content {
+        overflow-y: auto;
+    }
+
+    .vessel-details-form {
+        height: auto;
+
+        .vessel-rights-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            overflow: visible;
+        }
+
+        .hq-panel {
+            grid-column: 1 / -1;
+        }
+    }
+}
+
+@media (max-width: 650px) {
+    .vessel-details-form .vessel-rights-grid {
+        grid-template-columns: 1fr;
+
+        .hq-panel {
+            grid-column: auto;
+        }
+    }
+}
+
 .vessel-details-container {
     background: var(--bg-primary);
     color: var(--text-primary);

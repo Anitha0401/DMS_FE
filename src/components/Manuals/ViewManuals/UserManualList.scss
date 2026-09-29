@@ -100,3 +100,76 @@
     text-align: center !important;
     width: 100% !important;
 }
+
+.version-history-details {
+    height: 78vh;
+    min-height: 420px;
+    padding: 0;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+}
+
+.version-history-details .version-history-table {
+    height: 100%;
+    min-height: 0;
+    border: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
+}
+
+.version-history-details .version-history-table .p-datatable-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.version-history-details .version-history-table .p-datatable-thead > tr > th {
+    height: 44px !important;
+    max-height: none !important;
+    padding: 0.7rem 0.8rem !important;
+    border: 0 !important;
+    border-bottom: 1px solid #dbe3ec !important;
+    background: #f5f8fb !important;
+    color: #334155;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.version-history-details .version-history-table .p-datatable-tbody > tr {
+    height: 48px;
+    max-height: none;
+}
+
+.version-history-details .version-history-table .p-datatable-tbody > tr > td {
+    height: 48px;
+    padding: 0.7rem 0.8rem;
+    border: 0 !important;
+    border-bottom: 1px solid #edf1f5 !important;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.version-history-details .version-history-table .p-datatable-tbody > tr:last-child > td {
+    border-bottom: 0 !important;
+}
+
+.version-history-details .version-history-table .p-paginator {
+    min-height: 48px;
+    border: 0 !important;
+    border-top: 1px solid #dbe3ec !important;
+    background: #fff;
+}
+
+@media (max-width: 800px) {
+    .version-history-details {
+        height: 70vh;
+    }
+
+    .version-history-details .version-history-table .p-datatable-thead > tr > th,
+    .version-history-details .version-history-table .p-datatable-tbody > tr > td {
+        white-space: nowrap;
+    }
+}

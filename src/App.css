@@ -9,6 +9,14 @@ body {
   margin: 0 !important;
   padding: 0 !important;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-width: 320px;
+  background: var(--bg-primary, #f8fafc);
+  color: var(--text-primary, #1e293b);
+}
+
+html,
+#root {
+  min-height: 100%;
 }
 
 .App {
@@ -224,6 +232,38 @@ body {
 /* PrimeReact Overrides */
 .p-component {
   font-family: inherit;
+}
+
+.p-dialog {
+  max-width: calc(100vw - 1.5rem);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.p-dialog .p-dialog-header {
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--border-color) !important;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.p-dialog .p-dialog-content {
+  background: var(--bg-primary);
+}
+
+.p-button,
+button {
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.p-button:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+.p-dropdown:focus-within {
+  outline: 2px solid color-mix(in srgb, var(--primary-color) 55%, transparent);
+  outline-offset: 2px;
 }
 
 .p-dropdown  {

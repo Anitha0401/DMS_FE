@@ -25,29 +25,49 @@ const formatDate = (dateStr?: string) => {
     }
 };
 
+const normalizeLogResponse = (response: any): CircularsLogData[] => {
+    const records = Array.isArray(response)
+        ? response
+        : response?.data ?? response?.items ?? response?.results ?? response?.$values ?? [];
+
+    if (!Array.isArray(records)) return [];
+
+    return records.map((item: any) => ({
+        Logdate: item.Logdate ?? item.LogDate ?? item.logdate ?? item.logDate,
+        UserId: item.UserId ?? item.UserID ?? item.userId ?? item.userID,
+        UserName: item.UserName ?? item.username ?? item.userName,
+        UserRole: item.UserRole ?? item.userRole,
+        Activity: item.Activity ?? item.activity,
+        Remarks: item.Remarks ?? item.remarks ?? item.Remark ?? item.remark
+    }));
+};
+
 const CircularsLogDetails: React.FC<CircularsLogProps> = ({ selectedCIR_MasterID }) => {
     const [logDetails, setLogDetails] = useState<CircularsLogData[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
+        let mounted = true;
         setLoading(true);
-        try {
-            dmsLifecycleService.getApiCall(`circular/GetCircularLogs?ciR_MasterID=${selectedCIR_MasterID}`)
-                .then((data: any) => {
-                    setLogDetails(data);
-                })
-                .catch(() => {
-                    setLogDetails([]);
-                });
-        } catch (err: any) {
-            console.error(err.message || 'Error fetching circular log data!!');
-        } finally {
-            setLoading(false);
-        }
+
+        dmsLifecycleService.getApiCall(`circular/GetCircularLogs?ciR_MasterID=${selectedCIR_MasterID}`)
+            .then((data: any) => {
+                if (mounted) setLogDetails(normalizeLogResponse(data));
+            })
+            .catch(() => {
+                if (mounted) setLogDetails([]);
+            })
+            .finally(() => {
+                if (mounted) setLoading(false);
+            });
+
+        return () => {
+            mounted = false;
+        };
     }, [selectedCIR_MasterID]);
 
     return (
-        <div className="manual-details">
+        <div className="manual-details circular-log-page">
             <DataTable
                 value={logDetails}
                 paginator
@@ -55,13 +75,14 @@ const CircularsLogDetails: React.FC<CircularsLogProps> = ({ selectedCIR_MasterID
                 loading={loading}
                 sortField="Logdate"
                 sortOrder={-1}
+                className="manual-list circular-log-table"
+                style={{ width: '100%' }}
+                tableStyle={{ minWidth: '900px' }}
                 emptyMessage={
-                    <span style={{ display: 'block', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: '1.1rem' }}>
-                        {loading ? 'Loading...' : 'No data found.'}
+                    <span className="circular-log-empty">
+                        No data found.
                     </span>
                 }
-                className="manual-list p-datatable-gridlines"
-                style={{ width: '100%', minHeight: '100%', border: 'none !important' }}
             >
                 <Column field="Logdate" header="Log Date" body={(row: CircularsLogData) => formatDate(row.Logdate)} sortable />
                 <Column field="UserId" header="User ID" sortable />

@@ -113,7 +113,7 @@ const VesselDetails: React.FC<VesselFormProps> = ({ manualTitle, onSubmit, close
 
     return (
         <form onSubmit={handleSubmit} className="vessel-details-form">
-            <div style={{ marginBottom: '1px', width: '100%', flexDirection: 'row', display: 'flex', justifyContent: 'space-between' }}>
+            <div className="vessel-rights-toolbar" style={{ marginBottom: '1px', width: '100%', flexDirection: 'row', display: 'flex', justifyContent: 'space-between' }}>
                 <div className="manual-details-header">
                     <h3 
                      data-title={manualTitle?.replace(/_/g, ' ')}
@@ -138,8 +138,8 @@ const VesselDetails: React.FC<VesselFormProps> = ({ manualTitle, onSubmit, close
                     </button>
                 </div>
             </div>
-            <div style={{ display: 'flex', gap: '25px', marginTop: '10px' }}>
-                <div style={{ width: '500px' }}>
+            <div className="vessel-rights-grid" style={{ display: 'flex', gap: '25px', marginTop: '10px' }}>
+                <div className="vessel-rights-panel vessel-panel" style={{ width: '500px' }}>
                     <VesselList
                         vessels={vesselList}
                         selectedVesselIdList={form.VesselIdList}
@@ -147,7 +147,7 @@ const VesselDetails: React.FC<VesselFormProps> = ({ manualTitle, onSubmit, close
                         isViewMode={selectedAction === 'View'}
                     />
                 </div>
-                <div style={{ width: '300px'}}>
+                <div className="vessel-rights-panel rank-panel" style={{ width: '300px'}}>
                     <VesselRankList
                         vslRank={vslRank}
                         selectedVesselRankList={form.VesselRankList}
@@ -155,7 +155,7 @@ const VesselDetails: React.FC<VesselFormProps> = ({ manualTitle, onSubmit, close
                         isViewMode={selectedAction === 'View'}
                     />
                 </div>
-                <div style={{ width: '650px'}}>
+                <div className="vessel-rights-panel hq-panel" style={{ width: '650px'}}>
                     <HQUserList
                         hqUser={hqUser}
                         selectedHQUserList={form.HQ_UsersIDList}

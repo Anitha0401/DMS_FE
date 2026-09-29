@@ -69,7 +69,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
 
     const config = {
         readonly: false,
-        height: 'calc(100% - 1500px)', 
+        height: 'clamp(280px, 48vh, 420px)',
         toolbar: true,
         placeholder: '',
         toolbarAdaptive: false,
@@ -208,12 +208,12 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
 
     return (
         <form onSubmit={handleSubmit} className="add-edit-manual-form">
-            <div style={{ marginBottom: '1px', width: '100%', flexDirection: 'row', display: 'flex', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <div className="manual-form-toolbar" style={{ marginBottom: '1px', width: '100%', flexDirection: 'row', display: 'flex', justifyContent: 'space-between' }}>
+                <div className="manual-form-status" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <label style={{ fontWeight: 'bold', width: '75px' }}>Status : </label>
                     <label className='selectedTextHighlight' style={{width: '350px'}}> {form.StatusString}</label>
                 </div>
-                <div className="d-flex justify-content-end" style={{ textAlign: 'right', width: '100%' }}>
+                <div className="manual-form-actions d-flex justify-content-end" style={{ textAlign: 'right', width: '100%' }}>
                     <button type="button" className="button" onClick={handlePublish}>Publish</button> &nbsp;&nbsp;
                     <button type="submit" className="button">Save</button>
                     <button type="button" className="button btn-secondary ms-2" onClick={closeForm}>
@@ -221,10 +221,10 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                     </button>
                 </div>
             </div>
-            <div style={{ display: 'flex', gap: '5px', marginTop: '10px' }}>
-                <div style={{ flex: 1, minWidth: '650px', textAlign: 'left' }}>
+            <div className="manual-form-body" style={{ display: 'flex', gap: '5px', marginTop: '10px' }}>
+                <div className="manual-form-main" style={{ flex: 1, minWidth: '650px', textAlign: 'left' }}>
                     <div className="row" >
-                        <div style={{ display: 'flex', gap: '20px', flexDirection: 'row' }}>
+                        <div className="manual-form-row category-row" style={{ display: 'flex', gap: '20px', flexDirection: 'row' }}>
                             <div className="manual-form-group">
                                 <label
                                     style={{ width: '110px', flexShrink: 0 }}>Category</label>
@@ -252,7 +252,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                                 <label style={{ width: '150px', textAlign: 'left', marginLeft: '5px' }}>Allow Export</label>
                             </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '20px', flexDirection: 'row' }}>
+                        <div className="manual-form-row code-row" style={{ display: 'flex', gap: '20px', flexDirection: 'row' }}>
                             <div className="manual-form-group">
                                 <label
                                     style={{ width: '110px', flexShrink: 0 }}>Manual Code</label>
@@ -273,7 +273,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                                 <label style={{ width: '250px', textAlign: 'left', marginLeft: '5px' }}>Acknowledgement Required</label>
                             </div>
                         </div>
-                        <div className="manual-form-group">
+                        <div className="manual-form-group manual-name-row">
                             <label style={{ width: '110px', flexShrink: 0 }}>Manual Name</label>
                             <input
                                 className="form-control"
@@ -283,7 +283,7 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                                 style={{ width: '770px' }}
                             />
                         </div>
-                        <div style={{ display: 'flex', gap: '20px', flexDirection: 'row', height: '100px' }}>
+                        <div className="manual-form-row approval-row" style={{ display: 'flex', gap: '20px', flexDirection: 'row', height: '100px' }}>
                             <div className="manual-form-group">
                                 <label style={{ width: '110px', flexShrink: 0 }}>Aprpoval Flow</label>
                                 <Checkbox
@@ -315,14 +315,14 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
                                 </div>
                             )}
                         </div>
-                        <div className="manual-form-group1">
+                        <div className="manual-form-group1 context-section">
                             <div className="manual-form-group">
                                 <label style={{ width: '110px', flexShrink: 0 }}>Context</label>
                                 <ContextMenu model={contextMenuItems} ref={menu} style={{ minWidth: '150px' }} />
                                 <a onClick={e => menu.current.show(e)} style={{ marginLeft: '5px', fontSize: '16px' }}>Import</a>
                                 <input type="file" accept="application/pdf" onChange={handleFileChange} />;
                             </div>
-                            <div className="col-sm-9" style={{ width: '100%', height: '395px' }}>
+                            <div className="col-sm-9" style={{ width: '100%', height: '355px' }}>
                                 <JoditEditor
                                     ref={editorRef}
                                     config={config}

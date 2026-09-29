@@ -64,24 +64,23 @@ const CompareVersion: React.FC<ManualFormProps> = ({ onSubmit, closeForm, select
                 <div className="form-body">
                     <div className="info-section">
                         <div className="info-item">
-                            <span className="info-label">Manual Name:</span>
+                            <span className="info-label">Manual Name</span>
                             <span className="info-value">{manualName}</span>
                         </div>
                         <div className="info-item">
-                            <span className="info-label">Current Version:</span>
+                            <span className="info-label">Current Version</span>
                             <span className="info-value">{currentVersion}</span>
                         </div>
                     </div>
-                    <div className="info-section">
-                        <div className="info-item">
-                            <span className="info-label">Version to Compare:</span>
+                    <div className="compare-selection">
+                        <label htmlFor="version-dropdown">Version to Compare</label>
+                        <div className="selection-control">
                             <Dropdown
                                 id="version-dropdown"
                                 value={form.DM_ManualVersionID_ToCompare}
                                 options={versionOptions}
                                 onChange={e => setForm(prev => ({ ...prev, DM_ManualVersionID_ToCompare: e.value }))}
                                 placeholder="Select a Version"
-                                style={{width:"250px"}}
                                 scrollHeight="400px"
                                 className="version-dropdown"
                                 panelClassName="version-dropdown-panel"
@@ -90,8 +89,12 @@ const CompareVersion: React.FC<ManualFormProps> = ({ onSubmit, closeForm, select
                     </div>
                 </div>
                 <div className="form-actions">
-                    <button type="button" className="btn btn-primary" onClick={() => handleCompare(false)}>Compare</button>
-                    <button type="button" className="btn btn-secondary" onClick={() => handleCompare(true)}>Compare 1</button>
+                    <button type="button" className="btn btn-primary" onClick={() => handleCompare(false)}>
+                        <i className="pi pi-arrows-h" /> Compare Versions
+                    </button>
+                    <button type="button" className="btn btn-secondary" onClick={() => handleCompare(true)}>
+                        <i className="pi pi-file" /> View Version
+                    </button>
                     <button type="button" className="btn btn-cancel" onClick={closeForm}>Cancel</button>
                 </div>
             </form>

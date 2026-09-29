@@ -5,8 +5,8 @@ import { Skeleton } from 'primereact/skeleton';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
-import { Tag } from 'primereact/tag';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
+import AddEditOtherDocument, { OtherDocumentTypeOption } from '../../OtherDocument/AddEditOtherDocument';
 import './OtherDocumentList.scss';
 
 interface OtherDocument {
@@ -15,61 +15,85 @@ interface OtherDocument {
     documentType: string;
     uploadBy: string;
     uploadDate: string;
+    vesselID?: number;
 }
 
 interface OtherDocumentListProps {
-    vesselId: number | null;
+    vesselId: number;
+    vesselName: string;
 }
 
-const OtherDocumentList: React.FC<OtherDocumentListProps> = ({ vesselId }) => {
+const OtherDocumentList: React.FC<OtherDocumentListProps> = ({ vesselId, vesselName }) => {
     const [documents, setDocuments] = useState<OtherDocument[]>([]);
     const [loading, setLoading] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [selectedType, setSelectedType] = useState<string>('');
+    const [documentTypes, setDocumentTypes] = useState<OtherDocumentTypeOption[]>([
+        { label: 'All Types', value: '' }
+    ]);
+    const [showNewDocumentDialog, setShowNewDocumentDialog] = useState(false);
+    useEffect(() => {
+        const fetchDocumentTypes = async () => {
+            try {
+                const types = await dmsLifecycleService.apiCall('OtherDocument/GetTypes', 'get', {
+                    vesselId: vesselId ?? 0,
+                    vslID: vesselId ?? 0,
+                    vesselID: vesselId ?? 0
+                });
+                const mappedTypes = (Array.isArray(types) ? types : []).map((item: any) => ({
+                    label: item.documentType || item.DocumentType || 'Unknown',
+                    value: item.documentType || item.DocumentType || '',
+                    docTypeId: Number(item.otherDocument_TypeID ?? item.OtherDocument_TypeID ?? 0)
+                }));
 
-    const documentTypes = [
-        { label: 'All Types', value: '' },
-        { label: 'Manual', value: 'Manual' },
-        { label: 'Log', value: 'Log' },
-        { label: 'Plan', value: 'Plan' }
-    ];
+                setDocumentTypes([{ label: 'All Types', value: '' }, ...mappedTypes]);
+            } catch {
+                setDocumentTypes([{ label: 'All Types', value: '' }]);
+            }
+        };
 
-    // useEffect(() => {
-    //     if (vesselId) {
-    //         setLoading(true);
-    //         dmsLifecycleService.getApiCall(`OtherDocument/GetDocumentsByVessel/${vesselId}`)
-    //             .then((data: OtherDocument[]) => {
-    //                 setDocuments(data);
-    //                 setLoading(false);
-    //             })
-    //             .catch(() => {
-    //                 setDocuments([]);
-    //                 setLoading(false);
-    //             });
-    //     } else {
-    //         setDocuments([]);
-    //     }
-    // }, [vesselId]);
-
-     useEffect(() => {
-        setLoading(true);
-      
-            const dummyData: OtherDocument[] = [
-                { documentID: 1, title: 'Safety Manual', documentType: 'Manual', uploadBy: 'John Doe (C/E)', uploadDate: '2023-01-15' },
-                { documentID: 2, title: 'Engine Room Log', documentType: 'Log', uploadBy: 'Jane Smith (MAS)', uploadDate: '2023-02-20' },
-                { documentID: 3, title: 'Cargo Plan', documentType: 'Plan', uploadBy: 'Alice Johnson (2/E)', uploadDate: '2023-03-10' },
-            ];
-            setDocuments(dummyData);
-       
-        setLoading(false);
+        fetchDocumentTypes();
     }, [vesselId]);
+
+    useEffect(() => {
+        const fetchDocuments = async () => {
+            setLoading(true);
+
+            try {
+                const response = await dmsLifecycleService.apiCall('OtherDocument/GetDocuments', 'get', {
+                    vesselId: vesselId ?? 0,
+                    documentType: selectedType || undefined
+                });
+
+                const rows = Array.isArray(response) ? response : Array.isArray(response?.data) ? response.data : [];
+
+                const mappedRows = rows.map((item: any) => ({
+                    documentID: item.otherDocumentMasterID ?? item.OtherDocumentMasterID ?? 0,
+                    title: item.documentTitle ?? item.DocumentTitle ?? 'Untitled document',
+                    documentType: item.documentType ?? item.DocumentType ?? 'Unknown',
+                    uploadBy: item.uploadedBy ?? item.UploadedBy ?? 'Unknown',
+                    uploadDate: item.uploadedOn ?? item.UploadedOn ?? new Date().toISOString(),
+                    vesselID: item.vesselID ?? item.VesselID ?? item.vslID ?? item.VslID ?? vesselId ?? 0
+                }));
+
+                setDocuments(mappedRows);
+            } catch {
+                setDocuments([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDocuments();
+    }, [vesselId, selectedType, reloadKey]);
 
     const handleViewDocument = (documentId: number) => {
         console.log('Viewing document:', documentId);
     };
 
     const handleNewDocument = () => {
-        console.log('New document button clicked');
+        setShowNewDocumentDialog(true);
     };
 
     const dateTemplate = (rowData: OtherDocument) => {
@@ -128,7 +152,7 @@ const OtherDocumentList: React.FC<OtherDocumentListProps> = ({ vesselId }) => {
         <div className="document-list-container">
             <div className="document-list-header">
                 <div className="header-title">
-                    <h2><i className="pi pi-file-o"></i> Other Documents</h2>
+                    <h2><i className="pi pi-file-o"></i> {vesselName} Documents</h2>
                     <span className="document-count">{filteredDocuments.length} document{filteredDocuments.length !== 1 ? 's' : ''}</span>
                 </div>
                 <Button 
@@ -180,6 +204,17 @@ const OtherDocumentList: React.FC<OtherDocumentListProps> = ({ vesselId }) => {
                     <Column body={actionBodyTemplate} header="Actions" style={{ width: '140px' }} />
                 </DataTable>
             </div>
+
+            <AddEditOtherDocument
+                visible={showNewDocumentDialog}
+                vesselId={vesselId}
+                documentTypes={documentTypes}
+                onHide={() => setShowNewDocumentDialog(false)}
+                onSaved={() => {
+                    setShowNewDocumentDialog(false);
+                    setReloadKey(previousKey => previousKey + 1);
+                }}
+            />
         </div>
     );
 };

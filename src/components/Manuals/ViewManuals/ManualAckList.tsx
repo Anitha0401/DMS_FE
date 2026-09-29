@@ -35,29 +35,44 @@ const ManualAckList: React.FC<ackProps> = ({dm_ManualID, closeForm}) => {
                     setAckManualData([]);
                 });
     }, [dm_ManualID]);
+
+    const formatDate = (date: Date | string) => {
+        if (!date) return '-';
+        return new Date(date).toLocaleString();
+    };
     
     return (
-        <div className="manual-details">
+        <div className="manual-details manual-ack-page">
+            <div className="ack-page-header">
+                <div>
+                    <span className="ack-page-kicker">User Acknowledgements</span>
+                    <p>Review the vessels and users who have acknowledged this manual.</p>
+                </div>
+                <div className="ack-total">
+                    <strong>{ackManualData.length}</strong>
+                    <span>Records</span>
+                </div>
+            </div>
             <DataTable
                 value={ackManualData}
                 paginator
                 rows={10}  
-                 emptyMessage={
-                    <span style={{ display: 'block', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: '1.1rem' }}>
-                       'No data found.'
+                emptyMessage={
+                    <span className="ack-empty-message">
+                        No data found.
                     </span>
                 }
-                className="manual-list p-datatable-gridlines"
-                style={{ width: '100%' }}>
+                className="manual-list ack-table"
+                style={{ width: '100%' }}
+                tableStyle={{ minWidth: '980px' }}>
                 <Column field="vslCode" header="Vessel Code" style={{width: '150px'}} />
                 <Column field="vslName" header="Vessel Name" style={{width: '150px'}} />
                 <Column field="userID" header="User ID" style={{width: '150px'}} />
                 <Column field="userName" header="User Name" style={{width: '150px'}} />
                 <Column field="userRank" header="User Rank" style={{width: '150px'}} />
                 <Column field="version" header="Version" style={{width: '150px'}} />
-                <Column field="dateRead" header="Date Read" style={{width: '150px'}} />
+                <Column field="dateRead" header="Date Read" style={{width: '180px'}} body={(rowData) => formatDate(rowData.dateRead)} />
                 <Column field="comments" header="Comments" style={{width: '150px'}} />
-                <Column field="vesselID" header="Vessel ID" style={{width: '150px'}} />
             </DataTable>
             </div>
     );

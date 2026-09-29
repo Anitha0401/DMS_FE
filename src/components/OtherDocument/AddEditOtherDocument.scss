@@ -38,6 +38,14 @@
         max-height: 95vh;
         overflow-y: auto;
 
+        > .circular-editor-grid {
+            display: grid;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0;
+            grid-template-columns: minmax(0, 1fr) !important;
+        }
+
         &::-webkit-scrollbar {
             width: 8px;
         }
@@ -193,38 +201,6 @@
                     align-items: center;
                     gap: 0.25rem;
                     overflow: hidden;
-                }
-            }
-
-            .allowed-user-rank-select {
-                width: 100%;
-                height: auto;
-                min-height: 2.7rem;
-                padding-left: 0.5rem;
-                align-items: center;
-
-                .p-multiselect-label {
-                    min-height: 2.55rem;
-                    height: auto;
-                    flex-wrap: wrap;
-                    gap: 0.35rem;
-                    padding-top: 0.3rem;
-                    padding-bottom: 0.3rem;
-                    white-space: normal;
-                }
-
-                .p-multiselect-token {
-                    max-width: 100%;
-                    margin: 0;
-                    border-radius: 999px;
-                    background: color-mix(in srgb, var(--primary-color) 12%, white);
-                    color: var(--text-primary);
-                    font-size: 0.82rem;
-                }
-
-                .p-multiselect-trigger {
-                    width: 2.5rem;
-                    flex: 0 0 2.5rem;
                 }
             }
 
@@ -429,14 +405,18 @@
 
     .circular-editor-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1.9fr) minmax(320px, 0.8fr);
+        grid-template-columns: minmax(0, 1fr);
         align-items: stretch;
         gap: 0.75rem;
+        width: 100%;
+        box-sizing: border-box;
 
         > .circular-details-section {
             grid-column: 1;
             grid-row: 1;
             min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
             height: 100%;
         }
 
@@ -444,13 +424,8 @@
             grid-column: 1;
             grid-row: 2;
             min-width: 0;
-            height: 100%;
-        }
-
-        > .vessel-selection-section {
-            grid-column: 2;
-            grid-row: 1 / span 2;
-            min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
             height: 100%;
         }
 
@@ -497,99 +472,6 @@
                 }
             }
         }
-    }
-
-    @media (max-width: 900px) {
-        .circular-editor-grid {
-            grid-template-columns: 1fr;
-
-            > .circular-details-section,
-            > .attachments-section,
-            > .vessel-selection-section {
-                grid-column: 1;
-                grid-row: auto;
-            }
-        }
-    }
-}
-
-.allowed-user-rank-panel {
-    overflow: hidden;
-    border: 1px solid var(--surface-border);
-    border-radius: 10px;
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
-
-    .p-multiselect-header {
-        gap: 0.65rem;
-        padding: 0.65rem 0.75rem;
-        background: var(--bg-secondary);
-        border-bottom: 1px solid var(--surface-border);
-
-        .p-multiselect-filter-container .p-inputtext {
-            height: 2.4rem;
-            border-radius: 7px;
-        }
-    }
-
-    .p-multiselect-items-wrapper {
-        max-height: 18rem;
-    }
-
-    .p-multiselect-items {
-        padding: 0.35rem;
-    }
-
-    .p-multiselect-item {
-        display: flex;
-        min-height: 2.8rem;
-        align-items: center;
-        gap: 0.65rem;
-        margin-bottom: 0.15rem;
-        padding: 0.55rem 0.65rem;
-        border-radius: 7px;
-        transition: background-color 0.15s ease;
-
-        &:hover {
-            background: var(--surface-hover);
-        }
-
-        &.p-highlight {
-            background: color-mix(in srgb, var(--primary-color) 10%, white);
-            color: var(--text-primary);
-        }
-
-        .p-checkbox {
-            flex: 0 0 auto;
-        }
-    }
-
-    .allowed-user-rank-option {
-        display: flex;
-        min-width: 0;
-        flex: 1;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-    }
-
-    .rank-option-name {
-        overflow: hidden;
-        color: var(--text-primary);
-        font-size: 0.95rem;
-        font-weight: 600;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .rank-option-department {
-        flex: 0 0 auto;
-        padding: 0.2rem 0.5rem;
-        border: 1px solid var(--surface-border);
-        border-radius: 999px;
-        background: var(--bg-secondary);
-        color: var(--text-secondary);
-        font-size: 0.72rem;
-        font-weight: 600;
     }
 }
 

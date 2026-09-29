@@ -47,7 +47,7 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
                     setManualData(undefined);
                     setLoading(false);
                 });
-    }, []);
+    }, [dmManualVersionID]);
 
     const formatDate = (dateStr: string | undefined) => {
         if (!dateStr) return '';
@@ -60,9 +60,18 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
     return (
          <div className="manual-details-container">
             <div className="manual-details-header">
-                <h3>{manualData?.manualName || 'Manual Details'}</h3>
+                <div className="manual-title-block">
+                    <h3>{manualData?.manualName || 'Manual Details'}</h3>
+                </div>
+                <span className={`manual-status status-${manualData?.statusString?.toLowerCase()}`}>
+                    {manualData?.statusString || 'Unknown'}
+                </span>
             </div>
-            <div className="manual-details-grid">
+            <section className="manual-details-section metadata-section">
+                <div className="section-heading">
+                    <span className="section-title">Document information</span>
+                </div>
+                <div className="manual-details-grid identity-grid">
                 <div className="manual-details-item">
                     <span className="label">Category</span>
                     <span className="value">{manualData?.categoryName}</span>
@@ -83,6 +92,13 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
                     <span className="label">Version</span>
                     <span className="value">{manualData?.version}</span>
                 </div>
+                </div>
+            </section>
+            <section className="manual-details-section metadata-section">
+                <div className="section-heading">
+                    <span className="section-title">Publication &amp; Revision History</span>
+                </div>
+                <div className="manual-details-grid">
                 <div className="manual-details-item">
                     <span className="label">Can Export</span>
                     <span className="value">{manualData?.canExport ? 'Yes' : 'No'}</span>
@@ -123,20 +139,27 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
                     <span className="label">Last Modified Date</span>
                     <span className="value">{formatDate(manualData?.lastModifiedDate)}</span>
                 </div>
+                </div>
+            </section>
+            <div className="manual-details-section comment-section">
+                <div className="section-heading">
+                    <span className="section-title">Comment</span>
+                </div>
+                <div className="manual-details-comments">
+                    {manualData?.comments || 'No comment provided.'}
+                </div>
             </div>
-            <div className="manual-details-section">
-                <span className="label">Comment</span>
-                <div className="manual-details-comments">{manualData?.comments}</div>
-            </div>
-            <div className="manual-details-section">
-                <span className="label">Context</span>
-                <div className="manual-details-contents" style={{ height: 'calc(100% - 500px)', margin:'0px', padding: '2px', overflowY: 'hidden'}}>
+            <section className="manual-details-section content-section">
+                <div className="section-heading">
+                    <span className="section-title">Content</span>
+                </div>
+                <div className="manual-details-contents">
                       <JoditEditor
                         value={manualData?.textContents ?? ""}
                         config={{
                             readonly: true,
                             toolbar: false,
-                            height: '550px',
+                            height: '100%',
                             showXPathInStatusbar: false,
                             showCharsCounter: false,
                             showWordsCounter: false,
@@ -151,7 +174,7 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
                         }}
                     />
                 </div>
-            </div>
+            </section>
         </div>
     );
 };

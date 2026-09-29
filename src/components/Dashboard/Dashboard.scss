@@ -241,87 +241,143 @@
 .dashboard-main {
   animation: fadeIn 0.7s ease-out;
   width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
   margin: 0;
   padding: 0;
+  min-height: 100%;
+  padding: 1rem 1.25rem 1.25rem;
+  background: var(--bg-primary, #f6f8fb);
+  margin-top: 0;
+}
+
+.dashboard-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  h1 {
+    margin: 0.25rem 0;
+    color: #172033;
+    font-size: clamp(1.5rem, 2vw, 2rem);
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: #697586;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.dashboard-eyebrow {
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 // Tab View Styling
 .dashboard-tabs {
-  background: transparent;
-
-   .tab-header {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-weight: 500;
-        
-        i {
-            font-size: 1.3rem !important;
-        }
-        
-        span {
-            font-size: 1rem;
-        }
-    }
+  overflow: hidden;
+  border: 1px solid #e4e9f0;
+  border-radius: 10px;
+  background: var(--bg-secondary, #fff);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 
   .p-tabview-nav {
-    background: #5a5a5a; 
-    padding: 0.5rem;
-    gap: 0.5rem;
-    margin: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #e4e9f0;
+    background: var(--bg-secondary, #fff);
   }
-  
-  .p-tabview-nav-link {
-      background: transparent;
-      border: none;
-      color: white;
-      padding: 1rem 1.75rem;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
 
-      &:hover {
-        background: var(--bg-primary);
-        color: var(--text-primary);
-      }
-    }
+  .p-tabview-nav li .p-tabview-nav-link {
+    padding: 0.85rem 1rem;
+    color: #697586;
+    border: 0;
+    border-radius: 8px;
+    transition: 0.2s ease;
+  }
 
-    .p-highlight .p-tabview-nav-link {
-      background: var(--primary-color);
-      color: white;
-      box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
-
-      &:hover {
-        background: var(--primary-color);
-        opacity: 0.95;
-      }
-    }
+  .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: #2563eb;
+    background: #eff6ff;
+  }
 
   .p-tabview-panels {
-    background: transparent;
-    border: none;
-    padding: 0 !important;
-    margin: 0 !important;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-  }
-  
-  .p-tabview-panel {
-    padding: 0;
+    padding: 1rem;
+    padding-top: 0;
   }
 }
 
-.tab-header-with-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  .p-badge {
-    font-size: 0.7rem;
+@media (max-width: 640px) {
+  .dashboard-main {
+    padding: 0.75rem;
   }
+
+  .dashboard-heading {
+    align-items: flex-start;
+    flex-direction: column;
+
+    .header-actions {
+      width: 100%;
+    }
+  }
+}
+
+.tab-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+
+    i {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 640px) {
+  .dashboard-heading {
+    align-items: flex-start;
+    flex-direction: column;
+
+    .header-actions {
+      width: 100%;
+    }
+
+    .theme-selector {
+      flex: 1;
+    }
+  }
+
+    .dashboard-main {
+        padding: 0.75rem;
+    }
+
+    .dashboard-tabs .p-tabview-nav {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    .dashboard-tabs .p-tabview-panels {
+        padding: 0.75rem;
+    }
 }
 
 // Quick Actions

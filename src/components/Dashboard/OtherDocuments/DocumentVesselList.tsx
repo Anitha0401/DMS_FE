@@ -7,7 +7,7 @@ import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './DocumentVesselList.scss';
 
 interface VesselListProps {
-    onSelectionChange?: (selected: number[]) => void;
+    onSelectionChange?: (selected: Vessel[]) => void;
 }
 
 export interface Vessel {

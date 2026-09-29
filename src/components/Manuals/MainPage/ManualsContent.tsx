@@ -474,9 +474,10 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         )}
         {visibleAddEditDialog && (
            <Dialog header={headerText}
+            className="manual-edit-dialog"
             visible={visibleAddEditDialog}
-            style={{ width: '60%', height: '160vh' }}
-            contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
+            style={{ width: '60%', height: '220vh' }}
+            contentStyle={{ padding: '0.1rem', backgroundColor: '#e5eefbff' }}
             headerStyle={{ backgroundColor: '#d2e3f9ff', borderBottom: '3px solid blue' , height: '40px'}}
             onHide={() => { if (!visibleAddEditDialog) return; setVisibleAddEditDialog(false); }}>
                 <AddEditManual

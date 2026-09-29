@@ -144,7 +144,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
             icon: 'pi pi-check',
             command: () => { 
                 setVisibleVslAckDialog(true); 
-                setHeaderText('View User Ack: ' + selectedNodeLabel); 
+                setHeaderText('Acknowledgement tracking: ' + selectedNodeLabel); 
                 setSelectedAction('View'); }
         }
     ];
@@ -461,7 +461,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                 </div>
             </div>
             <div className="tree-view-container" style={{ padding: 0, margin: 0 }}>
-                <ConfirmDialog />
+                <ConfirmDialog className="manual-delete-confirm" />
                 <ContextMenu 
                     model={contextMenuItems}
                     ref={cm} 
@@ -505,9 +505,10 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
             </div>
             <Dialog 
                 header={headerText}
+                className="manual-edit-dialog"
                 visible={visibleAddEditDialog}
-                style={{ width: '60%', height: '160vh' }}
-                contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
+                style={{ width: '60%', height: '220vh' }}
+                contentStyle={{ padding: '0.1rem', backgroundColor: '#e5eefbff' }}
                 headerStyle={{ backgroundColor: '#d2e3f9ff', borderBottom: '3px solid blue'  , height: '50px'}}
                 onHide={() => { if (!visibleAddEditDialog) return; setVisibleAddEditDialog(false); }}>
                 <AddEditManual
@@ -520,6 +521,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
             </Dialog>
 
             <Dialog header={headerText}
+                className="manual-rights-dialog"
                 visible={visibleVesselDetailsDialog}
                 style={{ width: '65%', maxHeight: '90vh', minWidth: '90vh' }}
                 contentStyle={{ height: '100%', padding: '0.5rem', backgroundColor: '#e5eefbff' }}

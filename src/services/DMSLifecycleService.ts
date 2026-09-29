@@ -64,7 +64,15 @@ const dmsLifecycleService = {
                     });
      
     },
-    apiCall: async (endpoint: string, method: 'get' | 'post' | 'delete' = 'get', data?: any, config?: any) => {
+    putApiCall: async (endpoint: string, data?: any) => {
+        return await dmsLifecycleService.apiCall(endpoint, 'put', data, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+     
+    },
+    apiCall: async (endpoint: string, method: 'get' | 'post' | 'put' | 'delete' = 'get', data?: any, config?: any) => {
         try {
             const url = `${API_URL}/${endpoint}`;
             
@@ -78,6 +86,8 @@ const dmsLifecycleService = {
                 response = await axiosInstance.get(url, config);
             } else if (method === 'delete') {
                 response = await axiosInstance.delete(url, config);
+            } else if (method === 'put') {
+                response = await axiosInstance.put(url, data, config);
             } else {
                 response = await axiosInstance.post(url, data, config);
             }
