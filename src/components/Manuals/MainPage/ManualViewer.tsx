@@ -78,12 +78,7 @@ const ManualViewer: React.FC<ManualViewerProps> = ({ calledMode, userId }) => {
 
     return (
         <div className='main-page-wrapper'>
-          <PageHeader
-                title="COMPANY - Document Management System"
-                subtitle="Test User Name"
-                subContent=""
-                rightContent=""
-            />
+          <PageHeader title="Manuals" />
             <div className="manual-viewer-container">
                 {/* Left Sidebar - Manual List */}
                 <div className="manual-sidebar">

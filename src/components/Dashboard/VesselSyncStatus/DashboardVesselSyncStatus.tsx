@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Button } from 'primereact/button';
+import VesselSyncDetails from './VesselSyncDetails';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './DashboardVesselSyncStatus.scss';
 
@@ -156,6 +158,8 @@ const normalizeStatusCollection = (payload: any): Record<string, any> => {
 const DashboardVesselSyncStatus: React.FC = () => {
     const [vessels, setVessels] = useState<VesselSyncRecord[]>([]);
     const [loading, setLoading] = useState(true);
+    // Vessel whose sync details are open (button in each row).
+    const [detailsVessel, setDetailsVessel] = useState<VesselSyncRecord | null>(null);
 
     useEffect(() => {
         const fetchSyncStatus = async () => {
@@ -243,6 +247,17 @@ const DashboardVesselSyncStatus: React.FC = () => {
         <span className="sync-date-text">{row.lastSyncAt || 'No sync recorded'}</span>
     );
 
+    const actionsBody = (row: VesselSyncRecord) => (
+        <Button
+            type="button"
+            label="View synced"
+            icon="pi pi-list"
+            className="p-button-sm p-button-outlined vs-view-btn"
+            onClick={() => setDetailsVessel(row)}
+            aria-label={`View what has been synced to ${row.vslName}`}
+        />
+    );
+
     return (
         <div className="vessel-sync-dashboard">
             <div className="vessel-sync-header">
@@ -274,7 +289,15 @@ const DashboardVesselSyncStatus: React.FC = () => {
                 <Column field="vslType" header="Type" sortable />
                 <Column field="syncStatus" header="Sync Status" body={statusBody} sortable />
                 <Column field="lastSyncAt" header="Last Sync" body={lastSyncBody} sortable />
+                <Column header="" body={actionsBody} style={{ width: '150px', textAlign: 'right' }} />
             </DataTable>
+
+            <VesselSyncDetails
+                visible={!!detailsVessel}
+                vesselId={detailsVessel?.vesselID ?? 0}
+                vesselName={detailsVessel?.vslName ?? ''}
+                onHide={() => setDetailsVessel(null)}
+            />
         </div>
     );
 };

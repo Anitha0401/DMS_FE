@@ -28,7 +28,8 @@ const NotificationListCicrular: React.FC<NotificationProps> = ({ userId }) => {
         dmsLifecycleService.getApiCall(`Circular/GetCircularsNotifications?limit=10`)
             .then((data: any) => {
                 if (data && Array.isArray(data)) {
-                    setNotifications(data);
+                    // The API sends cirNotificationId; the list uses id.
+                    setNotifications(data.map((n: any) => ({ ...n, id: n.id ?? n.cirNotificationId, isRead: !!n.isRead })));
                 } else {
                     setNotifications([]);
                 }
@@ -43,10 +44,7 @@ const NotificationListCicrular: React.FC<NotificationProps> = ({ userId }) => {
     };
 
     const markAsRead = (notificationId: number) => {
-        dmsLifecycleService.postApiCall(`DMS/MarkNotificationRead`, { 
-            notificationId: notificationId,
-            userId: userId 
-        })
+        dmsLifecycleService.postApiCall(`Circular/MarkNotificationRead`, { notificationId })
         .then(() => {
             setNotifications(prev => 
                 prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n)

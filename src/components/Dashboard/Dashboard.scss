@@ -1407,3 +1407,65 @@
     }
   }
 }
+/* ---- Review fixes ---- */
+/* Numbers are not links: no underline. Captions readable (contrast >= 4.5:1). */
+.stat-number,
+a.stat-number {
+  text-decoration: none !important;
+}
+
+.stat-footer .stat-description,
+.stat-description {
+  color: var(--text-secondary) !important;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+/* The page header now carries the title, theme and user menu. */
+.dashboard-main {
+  padding-top: 1rem;
+}
+
+/* =====================================================================
+   Compact dashboard: less space around and between the sections.
+   ===================================================================== */
+main.dashboard-main {
+  padding: 8px 10px 10px !important;
+}
+
+.dashboard-tabs .p-tabview-nav {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.dashboard-tabs .p-tabview-panels {
+  padding: 0 8px 8px !important;
+}
+
+.dashboard-container {
+  padding: 8px 0 0 !important;
+  min-height: 0;
+}
+
+.dashboard-stats {
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.stat-card .stat-content {
+  padding: 12px;
+}
+
+.dashboard-content-circulars,
+.dashboard-content-manuals {
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.dashboard-card .card-header {
+  padding: 0.75rem 1rem;
+}
+
+.quick-actions-grid {
+  gap: 10px;
+}

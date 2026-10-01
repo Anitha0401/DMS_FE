@@ -172,16 +172,18 @@ const OtherDocumentList: React.FC<OtherDocumentListProps> = ({ vesselId, vesselN
                             onChange={(e) => setGlobalFilterValue(e.target.value)}
                             placeholder={`Search Document...`}
                             className="search-input"
+                            style={{ width: '370px' }}
                         />
                     </span>
                 </div>
-                
+                <label style={{ fontWeight: 'bold' }}>Type: </label>
                 <Dropdown
                     value={selectedType}
                     options={documentTypes}
                     onChange={(e) => setSelectedType(e.value)}
                     placeholder="Filter by Type"
                     className="type-filter"
+                    style={{ width: '370px' }}
                 />
             </div>
 
@@ -197,17 +199,18 @@ const OtherDocumentList: React.FC<OtherDocumentListProps> = ({ vesselId, vesselN
                     scrollable
                     scrollHeight="flex"
                 >
-                    <Column field="title" header="Document Title" sortable style={{ minWidth: '250px' }} />
-                    <Column field="documentType" header="Type" sortable style={{ width: '120px' }} />
-                    <Column field="uploadDate" header="Upload Date" body={dateTemplate} sortable style={{ width: '150px' }} />
-                    <Column field="uploadBy" header="Uploaded By" sortable style={{ width: '180px' }} />
-                    <Column body={actionBodyTemplate} header="Actions" style={{ width: '140px' }} />
+                    <Column field="documentType" header="Type" sortable style={{ width: '270px' }} />
+                    <Column field="uploadDate" header="Upload Date" body={dateTemplate} sortable style={{ width: '140px' }} />
+                    <Column field="uploadBy" header="Uploaded By" sortable style={{ width: '140px' }} />
+                    <Column field="title" header="Document Title" sortable style={{ minWidth: '230px' }} />
+                    <Column body={actionBodyTemplate} header="Actions" style={{ width: '120px' }} />
                 </DataTable>
             </div>
 
             <AddEditOtherDocument
                 visible={showNewDocumentDialog}
                 vesselId={vesselId}
+                vesselName={vesselName}
                 documentTypes={documentTypes}
                 onHide={() => setShowNewDocumentDialog(false)}
                 onSaved={() => {

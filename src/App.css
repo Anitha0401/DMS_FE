@@ -347,3 +347,11 @@ input:focus-visible,
     }
   }
 }
+/* Clear (X) icon of dropdowns and multi-selects: centre it vertically inside the box.
+   The theme's negative top margin is lost, so the X sat at the bottom edge. */
+.p-dropdown .p-dropdown-clear-icon,
+.p-multiselect .p-multiselect-clear-icon {
+  top: 50% !important;
+  margin-top: 0 !important;
+  transform: translateY(-50%);
+}

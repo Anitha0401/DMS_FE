@@ -1,6 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dropdown } from 'primereact/dropdown';
-import { useTheme } from '../../../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import MetricCard from './MetricCard';
@@ -24,14 +22,13 @@ const DashboardManual: React.FC<DashboardProps> = ({ userId }) => {
     const [totalDocuments, setTotalDocuments] = useState(0);
     
     const navigate = useNavigate();
-    const { theme, setTheme, themeOptions } = useTheme();
 
     const setUserActionCounts = useCallback(() => {
         dmsLifecycleService.getApiCall(`DMS/GetDashboardManualCounts?userId=${userId}`)
             .then((data: any) => {
                 if (data) {
                     setNewCnt(data.newCnt || 0);
-                    setToApprovalCnt(data.toApprovalCnt || 0);
+                    setToApprovalCnt(data.toApproveCnt || 0); // API field is toApproveCnt
                     setReleasedCnt(data.releasedCnt || 0);
                     setToAckCnt(data.toAckCnt || 0);
                     setUserToApproveCnt(data.userToApproveCnt || 0);
@@ -75,7 +72,7 @@ const DashboardManual: React.FC<DashboardProps> = ({ userId }) => {
             icon: "pi pi-plus-circle", 
             css: "info", 
             color: "blue", 
-            action: () => navigate('/manualView?mode=new') 
+            action: () => navigate('/manuals?mode=new') 
         },
         { 
             number: favouriteCnt, 
@@ -84,7 +81,7 @@ const DashboardManual: React.FC<DashboardProps> = ({ userId }) => {
             icon: "pi pi-star-fill", 
             css: "success", 
             color: "green", 
-            action: () => navigate('/manualView?mode=userfavorites') 
+            action: () => navigate('/manuals?mode=userfavorites') 
         },
         { 
             number: toAckCnt, 
@@ -93,7 +90,7 @@ const DashboardManual: React.FC<DashboardProps> = ({ userId }) => {
             icon: "pi pi-thumbs-up", 
             css: "info", 
             color: "blue", 
-            action: () => navigate('/manualView?mode=vsltoack') 
+            action: () => navigate('/manuals?mode=vsltoack') 
         },
     ];
 
@@ -104,7 +101,7 @@ const DashboardManual: React.FC<DashboardProps> = ({ userId }) => {
             subtext: "documents need approval", 
             icon: "pi pi-check-circle", 
             css: "approval",
-            action: () => navigate('/manualView?mode=pendingapproval') 
+            action: () => navigate('/manuals?mode=pendingapproval') 
         },
         { 
             count: userToReviewCnt, 
@@ -112,7 +109,7 @@ const DashboardManual: React.FC<DashboardProps> = ({ userId }) => {
             subtext: "documents under review", 
             icon: "pi pi-eye", 
             css: "review",
-            action: () => navigate('/manualView?mode=underreview') 
+            action: () => navigate('/manuals?mode=underreview') 
         },
         { 
             count: userToAckCnt, 
@@ -120,7 +117,7 @@ const DashboardManual: React.FC<DashboardProps> = ({ userId }) => {
             subtext: "documents need acknowledgment", 
             icon: "pi pi-verified", 
             css: "acknowledge",
-            action: () => navigate('/manualView?mode=usertoack') 
+            action: () => navigate('/manuals?mode=usertoack') 
         }
     ];
 

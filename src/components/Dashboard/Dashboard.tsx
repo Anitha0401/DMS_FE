@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Dropdown } from 'primereact/dropdown';
 import { TabView, TabPanel } from 'primereact/tabview';
-import { useTheme } from '../../contexts/ThemeContext';
+import PageHeader from '../PageHeader';
 import DashboardManual from './Manuals/DashboardManual';
 import DashboardCirculars from './Circulars/DashboardCirculars';
 import DashboardOtherDocuments from './OtherDocuments/DashboardOtherDocument';
@@ -25,7 +24,6 @@ const tabNames = ['manuals', 'circulars', 'otherdocuments', 'vesselsyncstatus'];
 const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const location = useLocation();
-    const { theme, setTheme, themeOptions } = useTheme();
 
     useEffect(() => {
         const requestedTab =
@@ -46,30 +44,9 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
     };
 
     return (
+        <>
+        <PageHeader title="Dashboard" />
         <main className="dashboard-main">
-            <div className="dashboard-heading">
-                <h1>Document Management Dashboard</h1>
-
-                <div className="header-actions">
-                    <Dropdown
-                        value={theme}
-                        options={themeOptions}
-                        onChange={(event) => setTheme(event.value)}
-                        optionLabel="label"
-                        optionValue="value"
-                        className="theme-selector"
-                        placeholder="Select Theme"
-                    />
-                    <button
-                        type="button"
-                        className="refresh-btn"
-                        onClick={() => window.location.reload()}
-                    >
-                        <i className="pi pi-refresh" />
-                        Refresh
-                    </button>
-                </div>
-            </div>
 
             <TabView
                 activeIndex={activeIndex}
@@ -121,6 +98,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
                 </TabPanel>
             </TabView>
         </main>
+        </>
     );
 };
 

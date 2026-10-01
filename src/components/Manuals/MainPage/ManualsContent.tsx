@@ -19,6 +19,7 @@ import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './ManualsContent.scss';
 import ViewCompareManualDetails from '../CompareVersion/ViewCompareManualDetails';
 import ManualVersionHistory from './ManualVersionHistory';
+import { formatDate } from '../../utils/formatDate';
 
 export interface ManualDetailsProps {
     userId: string;
@@ -90,7 +91,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                     setManualText(manualResponse);
                 })
                 .catch((err) => {
-                    setManualText(err.message || 'Error fetching data');
+                    setManualText('<p><em>Could not load this manual. Please try again.</em></p>');
                 });
         };
        
@@ -255,10 +256,11 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                     <button
                         type="button"
                         className="info-icon-btn"
-                        title="Manual Info"
+                        title="Manual details"
+                        aria-label="Manual details"
                         onClick={() => setVisibleManualDetailsDialog(true)}
                     >
-                        <img src="/info.jpg" alt="Info" />
+                        <i className="pi pi-info-circle" aria-hidden="true" />
                     </button>
                     <ContextMenu model={contextMenuItems} ref={menu} style={{ minWidth: '150px' }} />
                     <button
@@ -331,7 +333,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             </span>
                             <span className="update-date">
                                 <i className="pi pi-calendar"></i>
-                                Last Updated:  {manualInfo.selectedManualNodeObj.data?.lastUpdated || 'N/A'}
+                                Last updated: {formatDate(manualInfo.selectedManualNodeObj.data?.lastUpdated)}
                             </span>
                         </div>
                     }
@@ -380,15 +382,6 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                         disabled = {isManualReleased || manualInfo.selectedManualNodeObj?.data?.dM_StatusID === 100}
                     >
                         Approve
-                    </button>
-                    <button
-                        className="manual-action-btn"
-                        onClick={() => alert('Send Message clicked!')}
-                        type="button"
-                        style={{ width:'140px'}}
-                        disabled = {manualInfo.selectedManualNodeObj?.data?.dM_StatusID === 100}
-                    >
-                        Send Message
                     </button>
                 </div>
             </div>

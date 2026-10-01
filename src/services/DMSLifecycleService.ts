@@ -1,102 +1,78 @@
-import axios from 'axios';
-import Cookies from 'js-cookie';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { API_URL } from '../config/appConfig';
+import authService from './authService';
 
-const API_URL = 'https://localhost:7151/api'; // window.location.origin + '/dms/api'; // Use the current origin as the base URL
-const axiosInstance = axios.create();
+/**
+ * Every API call goes through this service.
+ *  - base URL comes from REACT_APP_API_URL (no more hard-coded https://localhost:7151)
+ *  - sends the logged-in user's token
+ *  - a 401 logs the user out (the app then shows the login page)
+ */
+const axiosInstance = axios.create({ timeout: 60_000 });
 
-// Add a request interceptor to include the anti-forgery XSRF-TOKEN in the headers
-axiosInstance.interceptors.request.use(
-    (config) => {
-        const token = Cookies.get('XSRF-TOKEN'); // Retrieve the token from cookies
-        if (token) {
-            config.headers['RequestVerificationToken'] = token; // add the token to the headers
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+axiosInstance.interceptors.request.use((config) => {
+    const token = authService.token();
+    if (token) config.headers['Authorization'] = `Bearer ${token}`;
+    return config;
+});
 
-// Add a response interceptor to handle token expiration
 axiosInstance.interceptors.response.use(
     (response) => response,
-    async (error) => {
-        const originalRequest = error.config;
-        if (error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            try {
-                // Attempt to refresh the token
-                await dmsLifecycleService.getToken(); // Assuming this refreshes the token
-                // The request interceptor will add the new token
-                return axiosInstance(originalRequest);
-            } catch (refreshError) {
-                // If token refresh fails, redirect to login
-                window.location.href = '/login'; 
-                return Promise.reject(refreshError);
-            }
-        }
+    (error: AxiosError) => {
+        // error.response is undefined for network errors and timeouts: never read .status directly.
+        if (error.response?.status === 401) authService.logout();
         return Promise.reject(error);
     }
 );
 
 const dmsLifecycleService = {
-    getToken: async () => {
-        try {
-            const response = await axios.get(`${API_URL}/gettoken`);
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching token:', error);
-            throw error; // Re-throw the error for further handling
-        }
-    },
-    getApiCall: async (endpoint: string) => {
-         return await dmsLifecycleService.apiCall(endpoint, 'get');
-    },
-    deleteApiCall: async (endpoint: string, data?: any) => {
-         return await dmsLifecycleService.apiCall(endpoint, 'delete', data);
-    },
-    postApiCall: async (endpoint: string, data?: any) => {
-        return await dmsLifecycleService.apiCall(endpoint, 'post', data, {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-     
-    },
-    putApiCall: async (endpoint: string, data?: any) => {
-        return await dmsLifecycleService.apiCall(endpoint, 'put', data, {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-     
-    },
-    apiCall: async (endpoint: string, method: 'get' | 'post' | 'put' | 'delete' = 'get', data?: any, config?: any) => {
-        try {
-            const url = `${API_URL}/${endpoint}`;
-            
-            // If the method is 'get', we don't send data in the body, but as query parameters
-            if (method === 'get' && data) {
-                config = { ...config, params: data };
-            }
+    getApiCall: async (endpoint: string) => dmsLifecycleService.apiCall(endpoint, 'get'),
 
+    deleteApiCall: async (endpoint: string, data?: any) => dmsLifecycleService.apiCall(endpoint, 'delete', data),
+
+    postApiCall: async (endpoint: string, data?: any) =>
+        dmsLifecycleService.apiCall(endpoint, 'post', data, { headers: { 'Content-Type': 'application/json' } }),
+
+    putApiCall: async (endpoint: string, data?: any) =>
+        dmsLifecycleService.apiCall(endpoint, 'put', data, { headers: { 'Content-Type': 'application/json' } }),
+
+    apiCall: async (
+        endpoint: string,
+        method: 'get' | 'post' | 'put' | 'delete' = 'get',
+        data?: any,
+        config?: AxiosRequestConfig
+    ) => {
+        const url = `${API_URL}/${endpoint}`;
+        if (method === 'get' && data) config = { ...config, params: data };
+
+        try {
             let response;
-            if (method === 'get') {
-                response = await axiosInstance.get(url, config);
-            } else if (method === 'delete') {
-                response = await axiosInstance.delete(url, config);
-            } else if (method === 'put') {
-                response = await axiosInstance.put(url, data, config);
-            } else {
-                response = await axiosInstance.post(url, data, config);
-            }
-            
+            if (method === 'get') response = await axiosInstance.get(url, config);
+            else if (method === 'delete') response = await axiosInstance.delete(url, { ...config, data });
+            else if (method === 'put') response = await axiosInstance.put(url, data, config);
+            else response = await axiosInstance.post(url, data, config);
             return response.data;
         } catch (error) {
             console.error(`Error in API call to ${endpoint}:`, error);
             throw error;
         }
-    }
+    },
 };
+
+/** A readable message from an API error (ProblemDetails, the API's error JSON, or plain text). */
+export const errorMessage = (error: unknown, fallback = 'Something went wrong.'): string => {
+    const e = error as AxiosError<any>;
+    const data = e?.response?.data;
+    if (!e?.response) return 'Cannot reach the server. Check your connection.';
+    if (typeof data === 'string' && data.trim()) return data;
+    // ASP.NET validation errors: { title: "One or more validation errors occurred.", errors: { Field: ["..."] } }
+    if (data?.errors && typeof data.errors === 'object') {
+        const details = Object.entries(data.errors as Record<string, unknown>)
+            .flatMap(([field, msgs]) => (Array.isArray(msgs) ? msgs : [msgs]).map((m) => `${field.replace(/^\$\./, '')}: ${m}`))
+            .slice(0, 5);
+        if (details.length) return details.join('\n');
+    }
+    return data?.MetaData?.ErrorMessage || data?.metaData?.errorMessage || data?.detail || data?.title || data?.message || data?.error || fallback;
+};
+
 export default dmsLifecycleService;

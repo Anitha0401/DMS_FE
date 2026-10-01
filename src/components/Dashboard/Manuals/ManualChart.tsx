@@ -34,19 +34,11 @@ const ManualChart: React.FC<ChartProps> = ({ newCnt, toApprovalCnt, releasedCnt,
             {
                 label: 'Document Count',
                 data: [newCnt, toApprovalCnt, releasedCnt, toAckCnt],
-                backgroundColor: [
-                    'rgba(0, 114, 188, 0.8)',
-                    'rgba(23, 162, 184, 0.8)',
-                    'rgba(255, 193, 7, 0.8)',
-                    'rgba(40, 167, 69, 0.8)'
-                ],
-                borderColor: [
-                    '#0072bc',
-                    '#17a2b8',
-                    '#ffc107',
-                    '#28a745'
-                ],
-                borderWidth: 2,
+                // One colour: the bars differ by category, not by meaning.
+                backgroundColor: 'rgba(0, 114, 188, 0.85)',
+                hoverBackgroundColor: '#0072bc',
+                borderWidth: 0,
+                maxBarThickness: 64,
                 borderRadius: 6,
                 borderSkipped: false,
             }
@@ -97,7 +89,7 @@ const ManualChart: React.FC<ChartProps> = ({ newCnt, toApprovalCnt, releasedCnt,
                     }
                 },
                 title: {
-                    display: true,
+                    display: false,
                     text: `Total Documents: ${totalDocuments}`,
                     color: chartColors.textColor,
                     font: {

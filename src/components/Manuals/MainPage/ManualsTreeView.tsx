@@ -19,9 +19,12 @@ import AddEditManual from '../AddEditManual/AddEditManual';
 import VesselDetails from '../../VesselDetails/VesselDetails';
 import ManualDetails from '../ViewManuals/ManualDetails';
 import ManualAckList from '../ViewManuals/ManualAckList';
+import notify from '../../../services/notify';
 
 export interface ManualsTreeViewProps {
     userId: string;
+    /** Dashboard/menu filter (?mode=). Matches are selectable; their parents are shown disabled. */
+    calledMode?: string;
 }
 
 interface TreeNodeData extends TreeNode {
@@ -33,7 +36,7 @@ interface TreeNodeData extends TreeNode {
     };
 }
 
-const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) => {
+const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledMode }, ref) => {
     const dispatch = useDispatch();
     const appInfo = useSelector((state: RootState) => state.appInfo);
     const [nodes, setNodes] = useState<TreeNodeData[]>([]);
@@ -155,7 +158,8 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
         };
 
         fetchData();
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [calledMode]);
 
     const refreshTree = () => {
         setSelectedAction('Refresh')
@@ -183,9 +187,21 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
 
     const LoadTreeNodeData = async () => {
         try {
-            const data: TreeNodeData[] = await dmsLifecycleService.getApiCall(`DMS/GetTreeViewManualList?userId=${userId}`);
+            const modeQuery = calledMode ? `&calledMode=${encodeURIComponent(calledMode)}` : '';
+            const data: TreeNodeData[] = (await dmsLifecycleService.getApiCall(`DMS/GetTreeViewManualList?userId=${userId}${modeQuery}`)) || [];
             setAllNodes(data);
             setNodes(data);
+            setSearchValue('');
+
+            if (calledMode) {
+                // Filtered: open every branch so all matches are visible, and select the first match.
+                setExpandedKeys(allBranchKeys(data));
+                const first = firstSelectable(data);
+                setSelectedNodeKey(first ? first.key : null);
+                setSelectedNodeLabel(first ? first.label : null);
+                dispatch(setSelectedManualNodeObj(first));
+                return;
+            }
             
             if (selectedAction === 'AddSubLevel' || selectedAction === 'AddSameLevel' || selectedAction === 'Edit' || selectedAction === 'Refresh') {
                 return;
@@ -207,6 +223,27 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
         }
     }
 
+    /** Keys of every node that has children (for expanding a filtered tree). */
+    function allBranchKeys(list: any[], keys: { [key: string]: boolean } = {}) {
+        for (const node of list) {
+            if (node.children && node.children.length) {
+                keys[node.key] = true;
+                allBranchKeys(node.children, keys);
+            }
+        }
+        return keys;
+    }
+
+    /** First node the user may select (parents shown only for context have selectable = false). */
+    function firstSelectable(list: any[]): any {
+        for (const node of list) {
+            if (node.selectable !== false) return node;
+            const child = node.children ? firstSelectable(node.children) : null;
+            if (child) return child;
+        }
+        return null;
+    }
+
     function getFirstNodeKey(nodes: TreeNodeData[]) {
         if (!nodes || nodes.length === 0) return null;
         let node: any = nodes[0];
@@ -214,6 +251,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
     }
     
     const onContextMenu = (event: any) => {
+        if (event.node.selectable === false) return; // context-only parent: no actions
         setContextMenuSelectionKey(event.node.key);
         setSelectedNodeKey(event.node.key);
         setSelectedNodeLabel(event.node.label);
@@ -222,9 +260,21 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
     };
 
     const onSelectionChange = (e: any) => {
+        const target = findNodeQuiet(nodes, e.value);
+        if (target && target.selectable === false) return; // parents shown only for context cannot be opened
         setSelectedNodeKey(e.value);
         const selectedNode = findNodeByKey(nodes, e.value);
         setSelectedNodeLabel(selectedNode ? selectedNode.label : null);
+    };
+
+    /** Find a node without changing the selected manual. */
+    const findNodeQuiet = (nodeList: any[], key: any): any => {
+        for (const node of nodeList) {
+            if (node.key === key) return node;
+            const child = node.children ? findNodeQuiet(node.children, key) : null;
+            if (child) return child;
+        }
+        return null;
     };
 
     const findNodeByKey = (nodeList: any, key: any) => {
@@ -281,6 +331,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
     };
 
     const onNodeSelect = (event: any) => {
+        if (event.node.selectable === false) return;
         setSelectedNodeKey(event.node.key);
         setSelectedNodeLabel(event.node.label);
     };
@@ -369,9 +420,9 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                     err.response?.data?.message ||
                     err.response?.data?.error ||
                     'Something went wrong.';
-                alert(msg);
+                notify.error(msg, 'Delete failed');
             } else {
-                alert('Error deleting node: ' + err.message);
+                notify.error(err.message, 'Delete failed');
             }
         }
     };
@@ -402,9 +453,9 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                     err.response?.data?.message ||
                     err.response?.data?.error ||
                     'Something went wrong.';
-                alert(msg);
+                notify.error(msg, 'Delete failed');
             } else {
-                alert('Error deleting node: ' + err.message);
+                notify.error(err.message, 'Delete failed');
             }
         }
     };
@@ -493,6 +544,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId }, ref) 
                     onToggle={(e) => setExpandedKeys(e.value)}
                     contextMenuSelectionKey={contextMenuSelectionKey ?? undefined}
                     onContextMenu={onContextMenu}
+                    emptyMessage={calledMode ? 'No manuals match this filter.' : 'No manuals found.'}
                     className="custom-tree"
                     style={{ 
                     border: 'none', 

@@ -680,3 +680,131 @@
     gap: 0.5rem;
   }
 }
+/* ---- Review fixes: usable on tablets and phones ----
+   Below 900px the tree and the content stack; the tree keeps a real height
+   (it previously collapsed to 0 and the page could not be used). */
+@media (max-width: 900px) {
+  .main-page-content {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .tree-section {
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+  }
+
+  .tree-container,
+  .tree-maincontainer {
+    min-height: 260px;
+    max-height: 45vh;
+    height: auto !important;
+    overflow: auto;
+  }
+
+  .tree-view-container {
+    height: auto !important;
+    max-height: calc(45vh - 56px);
+  }
+
+  .content-section {
+    width: 100% !important;
+  }
+}
+
+/* ---- Filtered tree (dashboard / menu links) ---- */
+.tree-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #e8f1fb;
+  color: #0b3d6b;
+  font-size: 0.875rem;
+
+  i { margin-right: 4px; }
+
+  button {
+    border: 0;
+    background: transparent;
+    color: #0b5ea8;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+}
+
+/* Parents shown only so a filtered match keeps its place in the tree: visible, not selectable. */
+.custom-tree .tree-node-context > .p-treenode-content {
+  opacity: 0.55;
+  cursor: default;
+  font-style: italic;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.custom-tree .tree-node-context > .p-treenode-content:hover {
+  background: transparent !important;
+}
+
+.menu-section .menu-link.active {
+  background: var(--bg-secondary);
+  color: var(--primary-color, #0072bc);
+  font-weight: 600;
+}
+
+/* Manual list shown in place of the tree (Settings > Manual links open as > List grid) */
+.manual-link-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+
+  .link-list-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px !important;
+    border-bottom: 1px solid var(--border-color);
+
+    .link-list-search-box {
+      position: relative;
+      flex: 1;
+
+      > i {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary, #5b6573);
+        pointer-events: none;
+      }
+    }
+    .p-inputtext { width: 100%; padding-left: 2rem !important; height: 36px; }
+  }
+
+  .link-list-count {
+    font-size: 0.8rem;
+    color: var(--text-secondary, #5b6573);
+    white-space: nowrap;
+  }
+
+  .link-list-table {
+    flex: 1;
+    min-height: 0;
+    font-size: 0.875rem;
+
+    .p-datatable-thead > tr > th { padding: 6px 8px; }
+    .p-datatable-tbody > tr > td { padding: 6px 8px; vertical-align: top; }
+    .p-datatable-tbody > tr { cursor: pointer; }
+  }
+
+  .link-list-manual { display: flex; flex-direction: column; gap: 2px; }
+  .link-list-name { font-weight: 600; line-height: 1.3; }
+  .link-list-category { font-size: 0.75rem; color: var(--text-secondary, #5b6573); }
+}

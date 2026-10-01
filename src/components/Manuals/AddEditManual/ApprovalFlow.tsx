@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './ApprovalFlow.scss'; 
+import DOMPurify from 'dompurify';
 
 
 export interface ApprovalFlowProps {
@@ -32,7 +33,7 @@ const ApprovalFlow: React.FC<ApprovalFlowProps> = ({ currentFlow }) => {
           <div className="circle">{index + 1}</div>
           <div
             className="label"
-            dangerouslySetInnerHTML={{ __html: (flow.flowDesc || '').replace(/\r?\n/g, '<br />') }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize((flow.flowDesc || '').replace(/\r?\n/g, '<br />')) }}
           />
           {index < approvalFlowList.length - 1 && <div className="line" />}
         </div>

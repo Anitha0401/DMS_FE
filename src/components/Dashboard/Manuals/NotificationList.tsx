@@ -28,7 +28,8 @@ const NotificationList: React.FC<NotificationProps> = ({ userId }) => {
         dmsLifecycleService.getApiCall(`DMS/GetManualNotifications?limit=10`)
             .then((data: any) => {
                 if (data && Array.isArray(data)) {
-                    setNotifications(data);
+                    // The API sends manualNotificationId; the list uses id.
+                    setNotifications(data.map((n: any) => ({ ...n, id: n.id ?? n.manualNotificationId, isRead: !!n.isRead })));
                 } else {
                     setNotifications([]);
                 }
@@ -43,10 +44,7 @@ const NotificationList: React.FC<NotificationProps> = ({ userId }) => {
     };
 
     const markAsRead = (notificationId: number) => {
-        dmsLifecycleService.postApiCall(`DMS/MarkNotificationRead`, { 
-            notificationId: notificationId,
-            userId: userId 
-        })
+        dmsLifecycleService.postApiCall(`DMS/MarkNotificationRead`, { notificationId })
         .then(() => {
             setNotifications(prev => 
                 prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n)

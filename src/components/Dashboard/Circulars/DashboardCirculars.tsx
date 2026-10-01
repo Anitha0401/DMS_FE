@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Dropdown } from 'primereact/dropdown';
-import { useTheme } from '../../../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import MetricCard from './MetricCardCicrular';
@@ -18,7 +16,6 @@ const DashboardCirculars: React.FC<DashboardProps> = ({ userId }) => {
     const [totalAlerts, setTotalAlerts] = useState(0);
     
     const navigate = useNavigate();
-    const { theme, setTheme, themeOptions } = useTheme();
 
     const handleBrowseCirculars = () => {
         navigate('/main');

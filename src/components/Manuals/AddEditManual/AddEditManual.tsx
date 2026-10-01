@@ -89,8 +89,8 @@ const AddEditManual: React.FC<ManualFormProps> = ({ initialData, onSubmit, close
     };
 
     const contextMenuItems = [
-        { label: 'PDF', icon: 'pi pi-file-pdf', command: () => alert('Import PDF') },
-        { label: 'Word', icon: 'pi pi-file-word', command: () => alert('Import Word') }
+        { label: 'PDF', icon: 'pi pi-file-pdf', disabled: true },
+        { label: 'Word', icon: 'pi pi-file-word', disabled: true }
     ];
 
     useEffect(() => {

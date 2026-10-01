@@ -613,3 +613,381 @@
     padding: 0.75rem 1rem !important;
 }
 
+
+/* =====================================================================
+   Circular / alert editor (redesign). Own class names so the Other
+   Document dialog, which reuses .add-edit-circular-dialog, is unaffected.
+   ===================================================================== */
+.cir-editor-dialog {
+    &.p-dialog {
+        display: flex;
+        flex-direction: column;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .p-dialog-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+
+        .dialog-header-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.15rem;
+            font-weight: 600;
+
+            i { color: var(--primary-color); font-size: 1.15rem; }
+        }
+    }
+
+    .p-dialog-content {
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 0;
+        display: flex;
+        background: var(--bg-secondary);
+    }
+}
+
+.cir-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+    color: var(--text-primary);
+
+    .required { color: #dc2626; }
+    .cir-muted { color: var(--text-secondary); font-size: 0.8rem; font-weight: 400; }
+    .cir-error { color: #dc2626; font-size: 0.8rem; }
+
+    .cir-form-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 16px 20px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+        gap: 16px;
+        align-items: start;
+    }
+
+    .cir-col {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    .cir-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 16px;
+        min-width: 0;
+
+        h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+
+            > i { color: var(--primary-color); }
+        }
+
+        .cir-h-note { margin-left: auto; }
+    }
+
+    .cir-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 16px;
+    }
+
+    .cir-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+
+        &.span-2 { grid-column: 1 / -1; }
+
+        > label { font-size: 0.85rem; font-weight: 600; }
+
+        .p-inputtext, .p-dropdown, .p-calendar, .p-multiselect { width: 100%; }
+        .p-inputtext, .p-dropdown, .p-multiselect { min-height: 40px; }
+    }
+
+    .p-inputtextarea { width: 100%; min-height: 110px; padding: 10px 12px; }
+
+    /* Consistent 40px controls with inner padding (global styles strip it). */
+    .cir-field > .p-inputtext,
+    .cir-vessels-search .p-inputtext {
+        height: 40px;
+        padding: 0 12px;
+        font-size: 0.95rem;
+    }
+    .cir-vessels-search .p-inputtext { padding-left: 2.2rem; }
+
+    .cir-field .p-dropdown {
+        height: 40px;
+        align-items: center;
+
+        .p-dropdown-label {
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 0.95rem;
+        }
+    }
+
+    .cir-field .p-calendar {
+        height: 40px;
+
+        .p-inputtext { padding: 0 12px; font-size: 0.95rem; }
+        .p-datepicker-trigger { width: 44px; }
+    }
+
+    .cir-field .p-multiselect {
+        min-height: 40px;
+        align-items: center;
+
+        .p-multiselect-label {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 6px 10px;
+            font-size: 0.95rem;
+        }
+
+        .p-multiselect-token {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+            padding: 2px 6px 2px 10px;
+            border-radius: 999px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+    }
+
+    /* Priority */
+    .cir-priority {
+        display: flex;
+
+        .p-button {
+            flex: 1 1 0;
+            justify-content: center;
+            height: 40px;
+            padding: 0 8px;
+            font-size: 0.9rem;
+        }
+
+        &.p-invalid .p-button { border-color: #dc2626; }
+    }
+
+    .cir-priority-option::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    .cir-priority-option.p-1::before { background: #dc2626; }
+    .cir-priority-option.p-2::before { background: #ea8a0c; }
+    .cir-priority-option.p-3::before { background: #16a34a; }
+
+    /* Attachment */
+    .cir-file-input { display: none; }
+
+    .cir-dropzone {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 22px 16px;
+        border: 2px dashed var(--border-color);
+        border-radius: 10px;
+        text-align: center;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+
+        i { font-size: 1.6rem; color: var(--primary-color); }
+        strong { color: var(--primary-color); }
+
+        &:hover, &:focus-visible, &.drag-over {
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.06);
+            outline: none;
+        }
+
+        &.has-error { border-color: #dc2626; }
+    }
+
+    .cir-file {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: var(--bg-secondary);
+    }
+
+    .cir-file-icon { font-size: 1.8rem; color: var(--primary-color); }
+
+    .cir-file-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    /* The full file name wraps instead of being cut off. */
+    .cir-file-name {
+        font-weight: 600;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+
+    .cir-file-actions { display: flex; gap: 2px; }
+
+    /* Acknowledgement */
+    .cir-switch {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 14px;
+        cursor: pointer;
+
+        > span { display: flex; flex-direction: column; gap: 2px; }
+    }
+
+    /* Vessels */
+    .cir-vessels { display: flex; flex-direction: column; gap: 10px; }
+
+    .cir-vessels-search {
+        position: relative;
+
+        > i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .p-inputtext { width: 100%; height: 38px; padding-left: 2.2rem; }
+    }
+
+    .cir-vessels-types { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .cir-chip {
+        padding: 4px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--text-primary);
+        font-size: 0.8rem;
+        cursor: pointer;
+
+        &.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+        }
+    }
+
+    .cir-vessels-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.85rem;
+    }
+
+    .cir-link {
+        margin-left: 8px;
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--primary-color);
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+
+    .cir-check {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .cir-vessels-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .cir-vessel-row {
+        padding: 7px 6px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+
+        &:hover { background: var(--bg-secondary); }
+        &.checked { background: rgba(59, 130, 246, 0.07); }
+    }
+
+    .cir-vessel-name { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+    .cir-vessel-type { color: var(--text-secondary); font-size: 0.78rem; white-space: nowrap; }
+    .cir-vessels-empty { padding: 16px 6px; color: var(--text-secondary); text-align: center; }
+
+    /* Footer stays visible while the form scrolls. */
+    .cir-form-footer {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 20px;
+        border-top: 1px solid var(--border-color);
+        background: var(--bg-primary);
+    }
+
+    .cir-form-buttons {
+        display: flex;
+        gap: 8px;
+
+        .p-button {
+            width: auto;
+            height: 40px;
+            padding: 0 18px;
+            gap: 8px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+    }
+}
+
+@media (max-width: 900px) {
+    .cir-form {
+        .cir-form-body { grid-template-columns: 1fr; padding: 12px; }
+        .cir-grid { grid-template-columns: 1fr; }
+    }
+}

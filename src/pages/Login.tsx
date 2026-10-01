@@ -1,91 +1,80 @@
 import React, { useState } from 'react';
 import './Login.scss';
+import { COMPANY_NAME } from '../config/appConfig';
 
 interface LoginProps {
-    onLogin: (userId: string, password: string) => void;
+    onLogin: (userId: string, password: string) => void | Promise<void>;
     isToShowAlert: boolean;
+    alertText?: string;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin, isToShowAlert }) => {
+const Login: React.FC<LoginProps> = ({ onLogin, isToShowAlert, alertText }) => {
     const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [busy, setBusy] = useState(false);
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitted(true);
-        if (!userId || !password) {
-            return;
-        }
-        if (onLogin) {
-            onLogin(userId, password);
+        if (!userId || !password) return;
+        setBusy(true);
+        try {
+            await onLogin(userId, password);
+        } finally {
+            setBusy(false);
         }
     };
 
-    return (<>
-        <div className='containers loginDiv'>
-            <div className='headerAlignCenter'>
-                <h2>Company Name</h2>
-            </div>
-            {isToShowAlert && (
-            <div className='alert loginShowAlert alert-danger'>
-                Invalid UserID or Password!
-            </div>
-            )}
-            <form name="form" className="form-horizontal rounded py-2 loginForm">
-                <h2 className="dmTextAlignCenter">Login</h2>
-                <div className="form-group pdg-btm-10">
-                    <label className="control-label col-sm-4" htmlFor="userID">
-                        &nbsp;User ID:
-                    </label>
-                    <div className="col-sm-12">
-                        <input
-                            type="text"
-                            className={
-                                "form-control" + (submitted && !userId ? " is-invalid" : "")
-                            }
-                            id="userID"
-                            placeholder="Enter User ID"
-                            name="userID"
-                            onChange={e => setUserId(e.target.value)}
-                            required
-                        />
-                        {submitted && !userId && (
-                            <div className="invalid-feedback">User ID is required</div>
-                        )}
+    return (
+        <main className="login-page">
+            <form className="login-card" onSubmit={handleSubmit} noValidate>
+                <div className="login-brand">
+                    <img src="/logo.png" alt="" />
+                    <div>
+                        <div className="login-company">{COMPANY_NAME}</div>
+                        <div className="login-product">Document Management System</div>
                     </div>
                 </div>
-                <div className="form-group">
-                    <label className="control-label col-sm-4" htmlFor="pwd">
-                        &nbsp;Password:
-                    </label>
-                    <div className="col-sm-12">
-                        <input
-                            type="password"
-                            className={
-                                "form-control" + (submitted && !password ? " is-invalid" : "")
-                            }
-                            autoComplete="password"
-                            id="pwd"
-                            placeholder="Enter password"
-                            name="passWord"
-                            onChange={e => setPassword(e.target.value)}
-                            required
-                        />
-                        {submitted && !password && (
-                            <div className="invalid-feedback">password is required</div>
-                        )}
+
+                <h1 className="login-title">Sign in</h1>
+
+                {isToShowAlert && (
+                    <div className="login-alert" role="alert">
+                        <i className="pi pi-exclamation-circle" /> {alertText ?? 'Invalid user ID or password.'}
                     </div>
-                </div>
-                <div className="form-group">
-                    <div className="col-sm-12" style={{ textAlign: 'center' }}>
-                        <button className="btn btn-info mgn-top-10" onClick={(e) => handleSubmit(e)}>
-                            Login
-                        </button>
-                    </div>
-                </div>
+                )}
+
+                <label htmlFor="userID">User ID</label>
+                <input
+                    id="userID"
+                    name="userID"
+                    type="text"
+                    autoComplete="username"
+                    className={'form-control' + (submitted && !userId ? ' is-invalid' : '')}
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
+                    autoFocus
+                />
+                {submitted && !userId && <div className="invalid-feedback">User ID is required</div>}
+
+                <label htmlFor="pwd">Password</label>
+                <input
+                    id="pwd"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    className={'form-control' + (submitted && !password ? ' is-invalid' : '')}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                {submitted && !password && <div className="invalid-feedback">Password is required</div>}
+
+                <button type="submit" className="login-button" disabled={busy}>
+                    {busy ? 'Signing in…' : 'Sign in'}
+                </button>
             </form>
-        </div></>
+        </main>
     );
 };
 

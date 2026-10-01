@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import HtmlDiff from '../../utils/HtmlDiff';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './CompareVersionDetails.scss';
+import DOMPurify from 'dompurify';
   
 type ManualFormProps = {
     closeForm: () => void;
@@ -67,13 +68,13 @@ const ViewCompareManualDetails: React.FC<ManualFormProps> = ({ closeForm, manual
                             <h3 style={{ fontSize: '1.25rem', color: '#24292e', borderBottom: '1px solid #e1e4e8', paddingBottom: '8px' }}>
                                 Current Version : {currentVersion}
                             </h3>
-                            <div className="diff-content" dangerouslySetInnerHTML={{ __html: currentText }} />
+                            <div className="diff-content" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentText) }} />
                         </div>
                         <div className='diffPanel' style={{ borderRight: '1px solid #e1e4e8' }}>
                             <h3 style={{ fontSize: '1.25rem', color: '#24292e', borderBottom: '1px solid #e1e4e8', paddingBottom: '8px' }}>
                                 Compare Version : {compareVersion}
                             </h3>
-                            <div className="diff-content" dangerouslySetInnerHTML={{ __html: compareText }} />
+                            <div className="diff-content" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(compareText) }} />
                         </div>
                     </div>
                 )}

@@ -1,11 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Dialog } from 'primereact/dialog';
+import { useSearchParams } from 'react-router-dom';
 import ManualsTreeView from './ManualsTreeView';
 import ManualsContent from './ManualsContent';
 import PageHeader from '../../PageHeader';
-import UserManualList from '../ViewManuals/UserManualList';
+import ManualLinkList from './ManualLinkList';
+import { useManualLinkView } from '../../../config/manualLinkView';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './ManualMainPage.scss';
+
+/** Manual links. Keys are the ?mode= values (dashboard links use the same ones). */
+export const MANUAL_FILTERS: Record<string, { label: string }> = {
+    new: { label: 'New documents' },
+    userfavorites: { label: 'My favourites' },
+    vsltoack: { label: 'Vessel acknowledgement required' },
+    usertoack: { label: 'Pending my acknowledgement' },
+    pendingapproval: { label: 'Pending my approval' },
+    underreview: { label: 'Pending my review' },
+};
 
 export interface ManualDetailsProps {
     userId: string;
@@ -13,10 +24,16 @@ export interface ManualDetailsProps {
 
 const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
-    const [showUserManualDialog, setShowUserManualDialog] = useState(false); 
-    const [dbInfoAction, setDbInfoAction] = useState('');
-    const [usersAction, setUsersAction] = useState('');
-    const [usersActionHeader, setUsersActionHeader] = useState('');
+    // Tree filter from a dashboard link (/manuals?mode=new) or a menu link below the tree.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const filterMode = (searchParams.get('mode') || '').toLowerCase();
+    const filter = MANUAL_FILTERS[filterMode];
+    const filterLabel = filter?.label;
+    // Settings (gear icon in the header): filter the tree, or show the matching manuals as a list in place of the tree.
+    const [linkView] = useManualLinkView();
+    const treeFilterMode = filter && linkView === 'tree' ? filterMode : undefined;
+    const showList = !!filter && linkView === 'grid';
+    const [listRefreshKey, setListRefreshKey] = useState(0);
     const [approvalCnt, setApprovalCnt] = useState(0); 
     const [reviewCnt, setReviewCnt] = useState(0);
     const [ackCnt, setAckCnt] = useState(0);
@@ -46,31 +63,20 @@ const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
 
     useEffect(() => {   
         setUserActionCounts();
-
-        dmsLifecycleService.getApiCall(`Login/dbinfo`)
-            .then((data: any) => {
-                if (data) {
-                   let dbShort = data.database ? data.database.substring(0, 7).toLowerCase() : '';
-                   let dbInfo = "Prod Env";
-                   if (dbShort === "testdms") dbInfo = "Dev Env";
-                   else if (dbShort === "testdms") dbInfo = "QA Env";
-                   else if (dbShort === "testdms") dbInfo = "Dev Env";
-                   else if (dbShort === "testdms") dbInfo = "UAT Env";
-                   setDbInfoAction(dbInfo);
-                }
-            })
-            .catch(() => {});
     }, [userId]);
 
-    const usersManualAction = (e: React.MouseEvent<HTMLAnchorElement>, callMode: string, headerText: string) => {
-        e.preventDefault(); 
-        setUsersAction(callMode);
-        setUsersActionHeader(headerText);
-        setShowUserManualDialog(true);
-    }
+    /** Tree setting: show only the manuals behind the link (parents visible but disabled).
+     *  List setting: show the manuals behind the link as a list instead of the tree. */
+    const usersManualAction = (e: React.MouseEvent<HTMLAnchorElement>, mode: string) => {
+        e.preventDefault();
+        setSearchParams(mode === filterMode ? {} : { mode });
+    };
+
+    const clearFilter = () => setSearchParams({});
 
     const LoadTreeNodeData = () => {
         setUserActionCounts();
+        setListRefreshKey((k) => k + 1); // reload the list after an edit (list setting)
 
         if (treeViewRef.current && typeof treeViewRef.current.refreshTree === 'function') {
             treeViewRef.current.refreshTree();
@@ -79,34 +85,40 @@ const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
 
     return (
         <div className='main-page-wrapper'>
-            <PageHeader
-                title="COMPANY - Document Management System"
-                subtitle="Test User Name"
-                rightContent={dbInfoAction}
-            />
+            <PageHeader title="Manuals" />
             <div className="main-page-content">
                 <div className="tree-section">
+                    {filter && (
+                        <div className="tree-filter-bar" role="status">
+                            <span><i className="pi pi-filter" /> Showing: <strong>{filterLabel}</strong></span>
+                            <button type="button" onClick={clearFilter}>Show all manuals</button>
+                        </div>
+                    )}
                     <div className="tree-container">
-                        <ManualsTreeView ref={treeViewRef} userId={userId} />
+                        {showList ? (
+                            <ManualLinkList key={`${filterMode}-${listRefreshKey}`} userId={userId} calledMode={filterMode} />
+                        ) : (
+                            <ManualsTreeView ref={treeViewRef} userId={userId} calledMode={treeFilterMode} />
+                        )}
                     </div>
                     <div className="menu-section">
-                        <a href="#" className="menu-link" onClick={(e) => usersManualAction(e, "PendingMyApproval", "Approval Pending")}>
+                        <a href="#" className={`menu-link${filterMode === 'pendingapproval' ? ' active' : ''}`} onClick={(e) => usersManualAction(e, "pendingapproval")}>
                             <i className="pi pi-clock"></i>
                             <span>Pending My Approval ({approvalCnt})</span>
                         </a>
-                        <a href="#" className="menu-link" onClick={(e) => usersManualAction(e, "PendingMyReview", "Review Pending")}>
+                        <a href="#" className={`menu-link${filterMode === 'underreview' ? ' active' : ''}`} onClick={(e) => usersManualAction(e, "underreview")}>
                             <i className="pi pi-eye"></i>
                             <span>Pending My Review ({reviewCnt})</span>
                         </a>
-                        <a href="#" className="menu-link" onClick={(e) => usersManualAction(e, "PendingMyAcknowledgement", "Acknowledgement Pending")}>
+                        <a href="#" className={`menu-link${filterMode === 'usertoack' ? ' active' : ''}`} onClick={(e) => usersManualAction(e, "usertoack")}>
                             <i className="pi pi-thumbs-up"></i>
                             <span>Pending My Acknowledgement ({ackCnt})</span>
                         </a>
-                        <a href="#" className="menu-link" onClick={(e) => usersManualAction(e, "NewDocuments", "New Documents")}>
+                        <a href="#" className={`menu-link${filterMode === 'new' ? ' active' : ''}`} onClick={(e) => usersManualAction(e, "new")}>
                             <i className="pi pi-plus-circle"></i>
                             <span>New Documents ({newCnt})</span>
                         </a>
-                        <a href="#" className="menu-link" onClick={(e) => usersManualAction(e, "Favourites", "My Favourites")}>
+                        <a href="#" className={`menu-link${filterMode === 'userfavorites' ? ' active' : ''}`} onClick={(e) => usersManualAction(e, "userfavorites")}>
                             <i className="pi pi-star-fill"></i>
                             <span>My Favourites ({favouriteCnt})</span>
                         </a>
@@ -117,28 +129,6 @@ const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
                     <ManualsContent userId={userId} onRefreshTree={LoadTreeNodeData} />
                 </div>
             </div>
-            {showUserManualDialog && (
-                <Dialog 
-                    header={usersActionHeader + " - Manual List "}
-                    visible={showUserManualDialog}
-                    style={{ width: '90%', maxWidth: '1800px' }}
-                    contentStyle={{ 
-                        padding: '0.5rem', 
-                        backgroundColor: 'var(--bg-secondary)', 
-                        height: '80vh', 
-                        overflowY: 'hidden' 
-                    }}
-                    headerStyle={{ 
-                        backgroundColor: 'var(--bg-primary)', 
-                        borderBottom: '3px solid var(--primary-color)', 
-                        height: '80px',
-                        color: 'var(--text-primary)'
-                    }}
-                    onHide={() => { if (!showUserManualDialog) return; setShowUserManualDialog(false); }}
-                >
-                     <UserManualList userId={userId} callMode={usersAction} />
-                </Dialog>
-            )}
         </div>
     );
 };

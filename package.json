@@ -3,36 +3,18 @@
   "version": "0.1.0",
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.6.4",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/diff": "^7.0.2",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.126",
-    "@types/react": "^19.1.9",
-    "@types/react-dom": "^19.1.7",
-    "@types/react-redux": "^7.1.34",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
     "chart.js": "^4.5.1",
-    "css-loader": "^7.1.2",
     "diff": "^8.0.2",
-    "file-saver": "^2.0.5",
+    "dompurify": "^3.2.6",
     "font-awesome": "^4.7.0",
-    "history": "^5.3.0",
-    "html-docx-js": "^0.3.1",
-    "html-docx-js-typescript": "^0.1.5",
     "htmldiff-js": "^1.0.5",
     "jodit-react": "^5.2.19",
-    "jodit-react-ts": "^0.9.0",
-    "js-cookie": "^3.0.5",
     "jspdf": "^3.0.3",
-    "mammoth": "^1.10.0",
     "pdfjs-dist": "^5.4.149",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.7",
-    "quill": "^2.0.3",
     "react": "^19.1.1",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.1.1",
@@ -46,7 +28,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "typecheck": "tsc --noEmit"
   },
   "eslintConfig": {
     "extends": [
@@ -72,10 +55,17 @@
     ]
   },
   "devDependencies": {
-    "@types/file-saver": "^2.0.7",
-    "@types/html-docx-js": "^0.3.4",
-    "@types/js-cookie": "^3.0.6",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/diff": "^7.0.2",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.126",
     "@types/pdfjs-dist": "^2.10.377",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "@types/react-redux": "^7.1.34",
     "sass": "^1.89.2"
   }
 }
