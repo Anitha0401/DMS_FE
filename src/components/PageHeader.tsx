@@ -22,6 +22,14 @@ type PageHeaderProps = {
   showDashboardButton?: boolean;
 };
 
+/** one word -> first two letters. */
+const initials = (name?: string) => {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
 /** One header for every page: logo, page title, navigation, page actions, user menu. */
 const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions, showDashboardButton }) => {
   const { theme, setTheme, themeOptions } = useTheme();
@@ -52,15 +60,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions, sho
 
       <div className="header-right">
         {actions && <div className="header-actions">{actions}</div>}
-        <Dropdown
-          value={theme}
-          options={themeOptions}
-          onChange={(e) => setTheme(e.value)}
-          optionLabel="label"
-          optionValue="value"
-          className="theme-selector"
-          aria-label="Theme"
-        />
         <button
           type="button"
           className="header-settings"
@@ -72,6 +71,19 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions, sho
         </button>
         <OverlayPanel ref={settingsRef} className="header-settings-panel">
           <h3>Settings</h3>
+          <div className="setting-row">
+            <span className="setting-label" id="theme-label">Theme</span>
+            <Dropdown
+              value={theme}
+              options={themeOptions}
+              onChange={(e) => setTheme(e.value)}
+              optionLabel="label"
+              optionValue="value"
+              className="theme-selector"
+              aria-labelledby="theme-label"
+              appendTo="self"
+            />
+          </div>
           <div className="setting-row">
             <span className="setting-label" id="manual-link-view-label">Manual links open as</span>
             <SelectButton
@@ -88,12 +100,19 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions, sho
           </div>
         </OverlayPanel>
         <div className="header-user">
+          <span className="header-avatar" aria-hidden="true">{initials(user?.userName)}</span>
           <span className="header-user-name">
-            <i className="pi pi-user" /> {user?.userName ?? ''}
+            {user?.userName ?? ''}
             {ENV_LABEL && <span className="env-badge">{ENV_LABEL}</span>}
           </span>
-          <button type="button" className="header-logout" onClick={() => authService.logout()}>
-            Log out
+          <button
+            type="button"
+            className="header-logout"
+            onClick={() => authService.logout()}
+            title="Log out"
+          >
+            <i className="pi pi-sign-out" aria-hidden="true" />
+            <span className="header-logout-text">Log out</span>
           </button>
         </div>
       </div>

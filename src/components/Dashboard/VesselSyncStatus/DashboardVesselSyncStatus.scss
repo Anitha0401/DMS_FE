@@ -1,103 +1,206 @@
-.vessel-sync-dashboard {
-    width: 100%;
-    background: var(--bg-primary, #f8fafc);
-    border-radius: 12px;
-    padding: 1rem;
+/* =====================================================================
+   Sync monitor (Dashboard > Vessel Sync Status)
+   ===================================================================== */
+.sync-monitor {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 20px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    color: var(--text-primary);
 
-    .vessel-sync-header {
+    .sm-muted { color: var(--text-secondary); font-size: 0.85rem; }
+
+    .sm-head {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
-        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-color);
 
-        h2 {
-            margin: 0;
-            font-size: 1.6rem;
-            color: var(--text-primary, #172033);
-        }
-
-        p {
-            margin: 0.25rem 0 0;
-            color: var(--text-secondary, #697586);
-        }
+        h2 { margin: 0; font-size: 1.25rem; font-weight: 700; }
     }
 
-    .sync-summary {
+    .sm-crumb {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+
+        span { margin-left: 4px; }
+    }
+
+    .sm-head-actions { display: flex; align-items: center; gap: 12px; }
+
+    .sm-refresh.p-button {
+        height: 36px;
+        padding: 0 14px;
+        gap: 6px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+    }
+
+    .sm-notice {
         display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        font-size: 1.15rem;
-        color: var(--text-primary, #172033);
+        align-items: flex-start;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        font-size: 0.88rem;
 
-        span {
-            background: rgba(37, 99, 235, 0.08);
-            color: var(--primary-color, #2563eb);
-            border-radius: 999px;
-            padding: 0.35rem 0.7rem;
-            font-weight: 600;
-        }
+        i { margin-top: 2px; color: var(--primary-color); }
+        &.error, &.error i { color: #b91c1c; }
+        code { font-size: 0.85em; }
     }
 
-    .sync-status-badge {
+    /* Stat tiles */
+    .sm-tiles {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .sm-tile {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 14px 16px;
+        border-radius: 10px;
+        background: #f5f4f1;
+
+        span { font-size: 0.88rem; color: var(--text-secondary); }
+        strong { font-size: 1.6rem; font-weight: 700; line-height: 1; color: var(--text-primary); }
+        strong.good { color: #3f7d1c; }
+        strong.bad { color: #b42318; }
+        strong.warn { color: #b8650f; }
+    }
+
+    /* Table */
+    .sm-table-wrap { overflow-x: auto; }
+
+    .sm-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.92rem;
+
+        th {
+            padding: 8px 10px 8px 0;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 10px 14px 0;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        th:nth-child(1) { width: 20%; }
+        th:nth-child(2) { width: 13%; }
+        th:nth-child(3) { width: 12%; }
+        th:nth-child(4) { width: 32%; }
+        th:nth-child(5) { width: 15%; }
+        th:nth-child(6) { width: 8%; }
+
+        tbody tr:hover td { background: rgba(0, 0, 0, 0.015); }
+    }
+
+    .sm-vessel { font-weight: 500; }
+    .sm-sub { margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary); }
+
+    .sm-empty {
+        padding: 24px 0;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
+    .sm-link {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        min-width: 90px;
+        gap: 8px;
+        white-space: nowrap;
+
+        .sm-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #9ca3af;
+        }
+
+        &.online .sm-dot { background: #5b9a24; }
+        &.offline .sm-dot { background: #e04848; }
+        &.unknown { color: var(--text-secondary); }
+    }
+
+    /* Pending package bar */
+    .sm-bar {
+        position: relative;
+        height: 7px;
+        max-width: 280px;
         border-radius: 999px;
-        padding: 0.35rem 0.7rem;
-        font-size: 0.8rem;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-        text-transform: none;
+        background: #e6e2dc;
+        overflow: hidden;
 
-        &.status-synced {
-            background: rgba(34, 197, 94, 0.12);
-            color: #15803d;
+        > span {
+            display: block;
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.4s ease;
         }
 
-        &.status-pending {
-            background: rgba(245, 158, 11, 0.12);
-            color: #b45309;
-        }
-
-        &.status-failed {
-            background: rgba(239, 68, 68, 0.12);
-            color: #b91c1c;
-        }
-
-        &.status-unknown {
-            background: rgba(148, 163, 184, 0.12);
-            color: #475569;
-        }
+        &.done > span { background: #5b9a24; }
+        &.busy > span { background: #1f63b5; }
+        &.failed > span { background: #e04848; }
+        &.idle > span { background: transparent; }
     }
 
-    .sync-date-text {
-        color: var(--text-secondary, #697586);
-        font-size: 0.85rem;
+    /* Priority */
+    .sm-pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        white-space: nowrap;
+
+        &.medium { background: #fdecd4; color: #8a4b08; }
+        &.high { background: #fde4e4; color: #9f1d1d; }
     }
 
-    .p-datatable .p-datatable-thead > tr > th {
-        background: var(--bg-secondary, #ffffff);
-        color: var(--text-primary, #172033);
+    .sm-actions { text-align: right; }
+
+    .sm-foot {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
     }
 
-    .p-datatable .p-datatable-tbody > tr > td {
-        color: var(--text-primary, #172033);
-        vertical-align: middle;
+    .sm-contact.p-button {
+        height: 38px;
+        padding: 0 18px;
+        gap: 8px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 1100px) {
+        .sm-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 700px) {
+        .sm-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 }
 
-/* ---------- "View synced" button and the per-vessel details dialog ---------- */
-.vessel-sync-dashboard .vs-view-btn.p-button {
-    height: 32px;
-    padding: 0 12px;
-    gap: 6px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-}
-
+/* ---------- Per-vessel details dialog ---------- */
 .vs-dialog {
     &.p-dialog {
         display: flex;
@@ -254,4 +357,84 @@
     }
 
     .p-tabview-ink-bar { display: none; }
+}
+
+/* ---------- Sync setup (key and resync) in the details dialog ---------- */
+.vs-dialog .vs-setup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-secondary);
+
+    .vs-setup-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .vs-setup-text {
+        flex: 1 1 260px;
+        min-width: 0;
+        font-size: 0.9rem;
+
+        strong { display: block; margin-bottom: 2px; }
+        span { color: var(--text-secondary); font-size: 0.85rem; }
+    }
+
+    .vs-setup-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .p-button { height: 34px; padding: 0 12px; font-size: 0.85rem; gap: 6px; }
+    }
+
+    .vs-key {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+        color: #78350f;
+        font-size: 0.85rem;
+
+        .vs-key-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            code {
+                flex: 1 1 auto;
+                min-width: 0;
+                padding: 6px 8px;
+                border-radius: 6px;
+                background: #ffffff;
+                border: 1px solid #fcd34d;
+                font-size: 0.9rem;
+                overflow-wrap: anywhere;
+                user-select: all;
+            }
+
+            .p-button { flex: none; gap: 6px; }
+        }
+    }
+
+    .vs-confirm {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 0.88rem;
+
+        > span { flex: 1 1 240px; }
+        .p-button { height: 32px; padding: 0 12px; font-size: 0.85rem; }
+    }
+
+    .vs-setup-error { color: #dc2626; font-size: 0.85rem; }
 }

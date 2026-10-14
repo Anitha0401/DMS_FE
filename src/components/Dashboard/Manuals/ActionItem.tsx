@@ -14,21 +14,18 @@ const ActionItem: React.FC<ActionItemProps> = ({count,  text, subtext, icon, css
     const cardClass = `action-icon ${css}`
 
     return (
-        <div className={`action-item ${count > 0 ? 'has-action' : ''}`}>
+        <div
+            className={`action-item is-clickable ${count > 0 ? 'has-action' : ''}`}
+            onClick={action}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); action(); } }}
+        >
             <div className={cardClass}>
                 <i className={icon}></i>
             </div>
             <div className="action-content">
-                <div
-                    className="action-title"
-                    onClick={action}
-                    style={{ 
-                        cursor: 'pointer',
-                        textDecoration: 'underline'
-                    }}
-                >
-                    {text}
-                </div>
+                <div className="action-title">{text}</div>
                 <div className="action-count">{count} {subtext}</div>
             </div>
             {count > 0 && <div className="action-badge">{count}</div>}
@@ -36,4 +33,4 @@ const ActionItem: React.FC<ActionItemProps> = ({count,  text, subtext, icon, css
     );
 };
 
-export default ActionItem;
+export default ActionItem;

@@ -16,22 +16,19 @@ const MetricCardCicrular: React.FC<MetricCardProps> = ({ number, label, subtext,
     const iconClass = `${icon} icon-${color}`;
 
     return (
-        <div className={cardClass}>
+        <div
+            className={`${cardClass}${action ? ' is-clickable' : ''}`}
+            onClick={action}
+            role={action ? 'button' : undefined}
+            tabIndex={action ? 0 : undefined}
+            onKeyDown={action ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); action(); } } : undefined}
+        >
             <div className="stat-content">
                 <div className="stat-icon">
                     <i className={iconClass}></i>
                 </div>
                 <div className="stat-details">
-                    <div
-                        className="stat-number"
-                        onClick={action}
-                        style={{ 
-                            cursor: 'pointer',
-                            textDecoration: 'underline'
-                        }}
-                    >
-                        {number}
-                    </div>
+                    <div className="stat-number">{number}</div>
                     <div className="stat-label">{label}</div>
                 </div>
             </div>
@@ -43,4 +40,4 @@ const MetricCardCicrular: React.FC<MetricCardProps> = ({ number, label, subtext,
     );
 };
 
-export default MetricCardCicrular;
+export default MetricCardCicrular;

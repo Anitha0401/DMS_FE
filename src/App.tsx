@@ -16,6 +16,7 @@ import authService, { AuthUser } from './services/authService';
 import { registerToast } from './services/notify';
 import { login as loginAction, logout as logoutAction } from './store/slices/userSlice';
 import "./App.css";
+import "./styles/refresh.scss";
 
 /** Old dashboard links (/manualView?mode=new) now open the Manuals page with a filtered tree. */
 const ManualViewRedirect: React.FC = () => {

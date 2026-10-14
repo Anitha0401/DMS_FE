@@ -1,0 +1,520 @@
+/* =====================================================================
+   Layout refresh (Oct 2026)
+   Same structure as before (header + dashboard tabs + pages); this file
+   only restyles it: spacing, surfaces, tabs, cards, and theme-aware
+   PrimeReact controls so dark mode no longer shows white boxes.
+   Loaded last from App.tsx, so it wins over the older page styles.
+   Remove the import in App.tsx to go back to the previous look.
+   ===================================================================== */
+
+:root {
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --page-max: 1600px;
+  --page-pad-x: 24px;
+  --card-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --card-shadow-hover: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme='dark'] {
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --card-shadow-hover: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------
+   Theme-aware PrimeReact controls (the bootstrap4-light theme is always
+   light; these follow the selected theme instead).
+   --------------------------------------------------------------------- */
+[data-theme] {
+  .p-dropdown,
+  .p-multiselect,
+  .p-inputtext,
+  .p-calendar .p-inputtext,
+  .p-inputtextarea {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+  }
+
+  /* The label inside a dropdown is also a .p-inputtext: no border of its own. */
+  .p-dropdown .p-dropdown-label.p-inputtext {
+    border: 0;
+    background: transparent;
+  }
+
+  .p-dropdown .p-dropdown-label,
+  .p-multiselect .p-multiselect-label,
+  .p-dropdown .p-dropdown-trigger,
+  .p-multiselect .p-multiselect-trigger {
+    color: var(--text-primary);
+  }
+
+  .p-dropdown .p-dropdown-label.p-placeholder,
+  .p-inputtext::placeholder {
+    color: var(--text-muted);
+  }
+
+  .p-dropdown:not(.p-disabled):hover,
+  .p-multiselect:not(.p-disabled):hover,
+  .p-inputtext:enabled:hover {
+    border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border-color));
+  }
+
+  .p-dropdown-panel,
+  .p-multiselect-panel,
+  .p-overlaypanel,
+  .p-contextmenu,
+  .p-menu {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16);
+  }
+
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item,
+  .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    margin: 0 4px;
+  }
+
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+    background: var(--primary-color);
+    color: #fff;
+  }
+
+  .p-overlaypanel::before,
+  .p-overlaypanel::after {
+    border-bottom-color: var(--bg-secondary);
+  }
+
+  .p-tree,
+  .p-datatable .p-datatable-tbody > tr,
+  .p-datatable .p-datatable-thead > tr > th,
+  .p-paginator {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+  }
+
+  .p-tree .p-tree-container .p-treenode .p-treenode-content {
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+  }
+
+  .p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight {
+    background: var(--primary-color);
+    color: #fff;
+  }
+
+  .p-dialog .p-dialog-header,
+  .p-dialog .p-dialog-footer {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  .p-dialog .p-dialog-content {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+  }
+}
+
+/* Buttons: same radius as inputs. */
+.p-button {
+  border-radius: var(--radius-sm);
+}
+
+/* ---------------------------------------------------------------------
+   Page shell
+   --------------------------------------------------------------------- */
+main.dashboard-main {
+  max-width: var(--page-max);
+  margin: 0 auto !important;
+  padding: 12px var(--page-pad-x) 32px !important;
+  background: transparent !important;
+  overflow: visible;
+  animation: none;
+}
+
+/* Circulars page: content lines up with the header's left edge.
+   (Manuals keeps its tighter padding so its toolbar stays on one row.) */
+@media (min-width: 1025px) {
+  .circulars-split-container {
+    padding: 16px var(--page-pad-x) !important;
+    gap: 16px !important;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Dashboard tabs: underline tabs on the page, no boxed frame.
+   --------------------------------------------------------------------- */
+.dashboard-tabs.p-tabview {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+
+  .p-tabview-nav-container,
+  .p-tabview-nav-content {
+    background: transparent;
+  }
+
+  .p-tabview-nav {
+    gap: 4px;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0;
+    border-bottom: 1px solid var(--border-color) !important;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .p-tabview-nav li {
+    margin: 0;
+  }
+
+  .p-tabview-nav li .p-tabview-nav-link {
+    margin: 0 0 -1px;
+    padding: 12px 14px !important;
+    border: 0 !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: none !important;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--border-color) !important;
+  }
+
+  .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: var(--primary-color) !important;
+    border-bottom-color: var(--primary-color) !important;
+    font-weight: 600;
+  }
+
+  .p-tabview-ink-bar {
+    display: none;
+  }
+
+  .p-tabview-panels {
+    padding: 16px 0 0 !important;
+    background: transparent !important;
+    color: var(--text-primary);
+  }
+}
+
+.tab-header i {
+  font-size: 0.95rem;
+}
+
+.dashboard-wrapper {
+  min-height: 0;
+  background: transparent;
+}
+
+.dashboard-container {
+  max-width: none;
+  padding: 0 !important;
+}
+
+/* ---------------------------------------------------------------------
+   Cards
+   --------------------------------------------------------------------- */
+.dashboard-card,
+.stat-card {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+.dashboard-card .card-header {
+  padding: 14px 18px !important;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  min-height: 56px;
+
+  h3 {
+    font-size: 1rem !important;
+    font-weight: 650 !important;
+    letter-spacing: -0.005em;
+    gap: 8px;
+    line-height: 1.3;
+  }
+}
+
+.dashboard-stats {
+  gap: 16px !important;
+  margin-bottom: 16px !important;
+}
+
+.dashboard-content-manuals,
+.dashboard-content-circulars {
+  gap: 16px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Circulars dashboard: 4 columns only when there is room. */
+.dashboard-content-circulars {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+}
+
+/* Metric cards: icon + number on top, label, short description below. */
+.stat-card {
+  display: flex !important;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px !important;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease !important;
+
+  &::before {
+    display: none !important;
+  }
+
+  .stat-content {
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .stat-icon {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: var(--radius-md) !important;
+
+    i {
+      font-size: 1.15rem !important;
+      color: #fff;
+    }
+  }
+
+  .stat-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-number {
+    font-size: 1.65rem !important;
+    font-weight: 700;
+    line-height: 1.1 !important;
+    margin: 0 !important;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-label {
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    line-height: 1.3;
+    color: var(--text-secondary) !important;
+  }
+
+  .stat-footer {
+    padding: 10px 0 0 !important;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .stat-description {
+    font-size: 0.78rem !important;
+    color: var(--text-muted) !important;
+  }
+
+  &.is-clickable {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-1px) !important;
+      border-color: color-mix(in srgb, var(--primary-color) 40%, var(--border-color)) !important;
+      box-shadow: var(--card-shadow-hover) !important;
+    }
+  }
+}
+
+/* Older rules centre the card content; keep it left-aligned. */
+.stat-card {
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+
+  .stat-content {
+    justify-content: flex-start !important;
+  }
+}
+
+/* Circulars/Alerts chart cards: same card look and header as the other cards. */
+.circulars-chart-container {
+  padding: 0 !important;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--card-shadow) !important;
+  overflow: hidden;
+  color: var(--text-primary);
+
+  > :not(.chart-header) {
+    margin: 0 18px 18px;
+  }
+
+  .chart-header {
+    padding: 12px 18px;
+    margin-bottom: 16px !important;
+    min-height: 56px;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+
+    h4 {
+      font-size: 1rem;
+      font-weight: 650;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .p-selectbutton .p-button {
+      padding: 0.2rem 0.6rem !important;
+      min-height: 30px !important;
+
+      i { font-size: 0.85rem !important; }
+    }
+  }
+}
+
+/* Segmented buttons follow the theme. */
+[data-theme] .p-selectbutton .p-button {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+
+  &:not(.p-highlight):hover {
+    background: color-mix(in srgb, var(--primary-color) 8%, var(--bg-secondary));
+    color: var(--text-primary);
+  }
+
+  &.p-highlight {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+  }
+}
+
+/* Action Required rows: whole row is the link. */
+.action-items {
+  padding: 8px !important;
+}
+
+.action-item {
+  padding: 10px !important;
+  border-radius: var(--radius-sm);
+  border-bottom: 0 !important;
+  background: transparent !important;
+  gap: 2px;
+
+  & + .action-item {
+    margin-top: 2px;
+  }
+
+  .action-icon {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: var(--radius-sm) !important;
+  }
+
+  .action-content .action-title {
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    margin: 0 0 2px !important;
+  }
+
+  .action-content .action-count {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  &.is-clickable {
+    cursor: pointer;
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary-color) 6%, transparent) !important;
+
+      .action-title {
+        color: var(--primary-color) !important;
+      }
+    }
+  }
+}
+
+.is-clickable:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary-color) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  :root {
+    --page-pad-x: 16px;
+  }
+
+  .dashboard-content-manuals {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --page-pad-x: 12px;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .stat-card {
+    padding: 12px !important;
+    gap: 8px;
+
+    .stat-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .stat-icon {
+      width: 34px !important;
+      height: 34px !important;
+
+      i { font-size: 1rem !important; }
+    }
+
+    .stat-number { font-size: 1.4rem !important; }
+    .stat-footer { display: none; }
+  }
+
+  .dashboard-tabs.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 10px 10px !important;
+    font-size: 0.85rem;
+  }
+}
