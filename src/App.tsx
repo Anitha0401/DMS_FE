@@ -12,6 +12,10 @@ import LandingPage from './pages/LandingPage';
 import ManualMainPage from './components/Manuals/MainPage/ManualMainPage';
 import Dashboard from './components/Dashboard/Dashboard';
 import CircularsList from './components/Circulars/CircularsList';
+import InboxPage from './components/Features/InboxPage';
+import SuggestionsPage from './components/Features/SuggestionsPage';
+import CertificatesPage from './components/Features/CertificatesPage';
+import SearchPage from './components/Features/SearchPage';
 import authService, { AuthUser } from './services/authService';
 import { registerToast } from './services/notify';
 import { login as loginAction, logout as logoutAction } from './store/slices/userSlice';
@@ -28,7 +32,7 @@ const ManualViewRedirect: React.FC = () => {
 const CircularViewerWrapper: React.FC<{ userId: string }> = ({ userId }) => {
   const [searchParams] = useSearchParams();
   const calledMode = searchParams.get('cirmode') || 'all';
-  return <CircularsList userId={userId} calledMode={calledMode} />;
+  return <CircularsList userId={userId} calledMode={calledMode} focusId={searchParams.get('id')} />;
 };
 
 /** The logged-in user comes from the login token (no more hard-coded TestUser13). */
@@ -84,6 +88,12 @@ const App: React.FC = () => {
               <Route path="/manuals" element={<ManualMainPage userId={user.userId} />} />
               <Route path="/manualView" element={<ManualViewRedirect />} />
               <Route path="/circulars" element={<CircularViewerWrapper userId={user.userId} />} />
+              <Route path="/inbox" element={<InboxPage />} />
+              <Route path="/suggestions" element={<SuggestionsPage />} />
+              {/* Folders are part of Other Documents (Dashboard > Other Documents). */}
+              <Route path="/folders" element={<Navigate to="/dashboard" replace state={{ activeTab: 'otherdocuments' }} />} />
+              <Route path="/certificates" element={<CertificatesPage />} />
+              <Route path="/search" element={<SearchPage />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           )}

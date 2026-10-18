@@ -6,6 +6,7 @@ import DashboardManual from './Manuals/DashboardManual';
 import DashboardCirculars from './Circulars/DashboardCirculars';
 import DashboardOtherDocuments from './OtherDocuments/DashboardOtherDocument';
 import DashboardVesselSyncStatus from './VesselSyncStatus/DashboardVesselSyncStatus';
+import PendingAckTab from '../Features/PendingAckTab';
 import './Dashboard.scss';
 
 export interface DashboardProps {
@@ -17,9 +18,10 @@ const tabMapping: Record<string, number> = {
     circulars: 1,
     otherdocuments: 2,
     vesselsyncstatus: 3,
+    pendingacks: 4,
 };
 
-const tabNames = ['manuals', 'circulars', 'otherdocuments', 'vesselsyncstatus'];
+const tabNames = ['manuals', 'circulars', 'otherdocuments', 'vesselsyncstatus', 'pendingacks'];
 
 const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -95,6 +97,17 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
                     }
                 >
                     <DashboardVesselSyncStatus />
+                </TabPanel>
+
+                <TabPanel
+                    header={
+                        <div className="tab-header">
+                            <i className="pi pi-check-square" />
+                            <span>Pending Acknowledgements</span>
+                        </div>
+                    }
+                >
+                    <PendingAckTab />
                 </TabPanel>
             </TabView>
         </main>

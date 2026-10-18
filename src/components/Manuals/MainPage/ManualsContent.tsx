@@ -20,6 +20,7 @@ import './ManualsContent.scss';
 import ViewCompareManualDetails from '../CompareVersion/ViewCompareManualDetails';
 import ManualVersionHistory from './ManualVersionHistory';
 import { formatDate } from '../../utils/formatDate';
+import { ManualRelatedCirculars } from '../../Features/CircularExtrasPanel';
 
 export interface ManualDetailsProps {
     userId: string;
@@ -301,6 +302,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                     />
                 </div>
             </div>
+            {manualID > 0 && <ManualRelatedCirculars manualId={manualID} />}
             <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{flexDirection: 'row'}}>
                     { manualInfo.selectedManualNodeObj &&

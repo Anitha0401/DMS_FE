@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import React, { useRef, useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { SelectButton } from 'primereact/selectbutton';
@@ -8,6 +8,7 @@ import authService from '../services/authService';
 import { COMPANY_NAME, ENV_LABEL } from '../config/appConfig';
 import { MANUAL_LINK_VIEW_OPTIONS, useManualLinkView } from '../config/manualLinkView';
 import './PageHeader.scss';
+import './Features/Features.scss';
 
 type PageHeaderProps = {
   title: string;
@@ -38,6 +39,12 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions, sho
   const showDashboardLink = showDashboardButton ?? !pathname.toLowerCase().startsWith('/dashboard');
   const [manualLinkView, setManualLinkView] = useManualLinkView();
   const settingsRef = useRef<OverlayPanel>(null);
+  const navigate = useNavigate();
+  const [searchText, setSearchText] = useState('');
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchText.trim().length >= 2) navigate(`/search?q=${encodeURIComponent(searchText.trim())}`);
+  };
 
   return (
     <header className="header-bar">
@@ -50,13 +57,19 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions, sho
         </div>
       </div>
 
-      {showDashboardLink && (
-        <nav className="header-nav" aria-label="Main">
+      <nav className="header-nav" aria-label="Main">
+        {showDashboardLink && (
           <NavLink to="/dashboard" className="header-nav-link">
             <i className="pi pi-arrow-left" /> Go to Dashboard
           </NavLink>
-        </nav>
-      )}
+        )}
+        <span className="header-feature-links">
+          <NavLink to="/suggestions" className="header-nav-link"><i className="pi pi-comments" /> Suggestions</NavLink>
+        </span>
+        <form className="header-search" role="search" onSubmit={submitSearch}>
+          <input type="search" value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Search…" aria-label="Search" />
+        </form>
+      </nav>
 
       <div className="header-right">
         {actions && <div className="header-actions">{actions}</div>}

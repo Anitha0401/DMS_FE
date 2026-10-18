@@ -27,6 +27,8 @@ const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     // Tree filter from a dashboard link (/manuals?mode=new) or a menu link below the tree.
     const [searchParams, setSearchParams] = useSearchParams();
     const filterMode = (searchParams.get('mode') || '').toLowerCase();
+    // A manual to open (?id=), from the inbox, a search or a circular's links.
+    const focusManualId = searchParams.get('id') || undefined;
     const filter = MANUAL_FILTERS[filterMode];
     const filterLabel = filter?.label;
     // Settings (gear icon in the header): filter the tree, or show the matching manuals as a list in place of the tree.
@@ -98,7 +100,7 @@ const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
                         {showList ? (
                             <ManualLinkList key={`${filterMode}-${listRefreshKey}`} userId={userId} calledMode={filterMode} />
                         ) : (
-                            <ManualsTreeView ref={treeViewRef} userId={userId} calledMode={treeFilterMode} />
+                            <ManualsTreeView ref={treeViewRef} userId={userId} calledMode={treeFilterMode} focusManualId={focusManualId} />
                         )}
                     </div>
                     <div className="menu-section">

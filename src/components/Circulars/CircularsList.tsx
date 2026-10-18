@@ -23,6 +23,7 @@ import CircularsLogDetails from './CircularsLogDetails';
 import { formatDate } from '../utils/formatDate';
 import notify from '../../services/notify';
 import { errorMessage } from '../../services/DMSLifecycleService';
+import CircularExtrasPanel from '../Features/CircularExtrasPanel';
 
 interface Circular {
     ciR_CategoryID: number;
@@ -57,6 +58,8 @@ interface AckList {
 interface CircularsListProps {
     userId: string;
     calledMode?: string;
+    /** Circular to select when the list has loaded (?id= in the address). */
+    focusId?: string | null;
 }
 
 interface TreeNodeData extends TreeNode {
@@ -69,7 +72,7 @@ const formatDisplayDate = (value: string | Date | null | undefined): string => {
     return formatDate(value);
 };
 
-const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => {
+const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode, focusId }) => {
     const dispatch = useDispatch();
     const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([]);
     const [mode, setMode] = useState<string>('');
@@ -175,7 +178,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
         fetchCirculars();
         LoadTreeNodeData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userId, calledMode]);
+    }, [userId, calledMode, focusId]);
 
     const fetchCirculars = async () => {
         setLoading(true);
@@ -183,6 +186,9 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
             // All categories are loaded once; the category dropdown filters in the browser.
             const data: Circular[] = await dmsLifecycleService.getApiCall(`Circular/GetCIRMasterList?userId=${userId}&categoryId=-1&circularType=${calledMode}`);
             setCirculars(data || []);
+            // Opened from the inbox, a search or a manual (?id=): select that circular.
+            const focused = focusId ? (data || []).find((c) => String(c.ciR_MasterID) === String(focusId)) : undefined;
+            if (focused) setSelectedCircular(focused);
         } catch (err) {
             setCirculars([]);
             notify.error(errorMessage(err), `Could not load ${mode ? mode.toLowerCase() : 'circulars'}`);
@@ -700,6 +706,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode }) => 
                                         <p>{selectedCircular.remarks}</p>
                                     </div>
                                 )}
+                                <CircularExtrasPanel circularId={selectedCircular.ciR_MasterID} />
                                 {/* Acknowledgement counts on one line */}
                                 <div className="circular-summary-line" aria-label="Acknowledgement counts">
                                     <span className="summary-chip ack">

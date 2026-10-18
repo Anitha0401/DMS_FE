@@ -25,6 +25,8 @@ export interface ManualsTreeViewProps {
     userId: string;
     /** Dashboard/menu filter (?mode=). Matches are selectable; their parents are shown disabled. */
     calledMode?: string;
+    /** Manual to select and show when the tree has loaded (?id= in the address). */
+    focusManualId?: string;
 }
 
 interface TreeNodeData extends TreeNode {
@@ -36,7 +38,7 @@ interface TreeNodeData extends TreeNode {
     };
 }
 
-const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledMode }, ref) => {
+const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledMode, focusManualId }, ref) => {
     const dispatch = useDispatch();
     const appInfo = useSelector((state: RootState) => state.appInfo);
     const [nodes, setNodes] = useState<TreeNodeData[]>([]);
@@ -159,7 +161,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
 
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [calledMode]);
+    }, [calledMode, focusManualId]);
 
     const refreshTree = () => {
         setSelectedAction('Refresh')
@@ -206,6 +208,9 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
             if (selectedAction === 'AddSubLevel' || selectedAction === 'AddSameLevel' || selectedAction === 'Edit' || selectedAction === 'Refresh') {
                 return;
             }
+            else if (focusManualId && focusOn(data, String(focusManualId))) {
+                return;
+            }
             else {
                 const firstNode = getFirstNodeKey(data);
                 if (firstNode && firstNode.key) {
@@ -221,6 +226,32 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
         } finally {
             setLoading(false);
         }
+    }
+
+    /** Selects the manual with this key and opens the branches above it. False when it is not in the tree. */
+    function focusOn(list: any[], key: string): boolean {
+        const path: string[] = [];
+        const find = (nodesList: any[]): any => {
+            for (const node of nodesList) {
+                if (String(node.key) === key) return node;
+                if (node.children && node.children.length) {
+                    path.push(String(node.key));
+                    const hit = find(node.children);
+                    if (hit) return hit;
+                    path.pop();
+                }
+            }
+            return null;
+        };
+        const node = find(list);
+        if (!node) return false;
+        const keys: { [k: string]: boolean } = {};
+        path.forEach((k) => { keys[k] = true; });
+        setExpandedKeys(keys);
+        setSelectedNodeKey(node.key);
+        setSelectedNodeLabel(node.label);
+        dispatch(setSelectedManualNodeObj(node));
+        return true;
     }
 
     /** Keys of every node that has children (for expanding a filtered tree). */
