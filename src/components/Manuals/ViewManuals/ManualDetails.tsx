@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import JoditEditor from 'jodit-react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import './ManualDetails.scss';
 import { useTheme } from '../../../contexts/ThemeContext';
@@ -38,7 +39,7 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
    const { theme } = useTheme(); 
     
     useEffect(() => {
-        dmsLifecycleService.getApiCall(`DMS/GetManualDetailsByVersionId/${dmManualVersionID}`)
+        dmsLifecycleService.getApiCall(`Manuals/GetManualDetailsByVersionId/${dmManualVersionID}`)
                 .then((data: any) => {
                     setManualData(data);
                     setLoading(false);
@@ -155,7 +156,7 @@ const ManualDetails: React.FC<ManualDetailsProps> = ({ dmManualVersionID, closeF
                 </div>
                 <div className="manual-details-contents">
                       <JoditEditor
-                        value={manualData?.textContents ?? ""}
+                        value={sanitizeHtml(manualData?.textContents)}
                         config={{
                             readonly: true,
                             toolbar: false,

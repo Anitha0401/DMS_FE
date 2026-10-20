@@ -24,7 +24,7 @@ const DashboardManual: React.FC<DashboardProps> = ({ userId }) => {
     const navigate = useNavigate();
 
     const setUserActionCounts = useCallback(() => {
-        dmsLifecycleService.getApiCall(`DMS/GetDashboardManualCounts?userId=${userId}`)
+        dmsLifecycleService.getApiCall(`Manuals/GetDashboardManualCounts?userId=${userId}`)
             .then((data: any) => {
                 if (data) {
                     setNewCnt(data.newCnt || 0);

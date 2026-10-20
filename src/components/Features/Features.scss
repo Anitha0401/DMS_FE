@@ -204,20 +204,8 @@
   margin-left: 4px;
 }
 
-.header-search {
-  display: flex;
-  align-items: center;
-
-  input {
-    width: 190px;
-    padding: 5px 10px;
-    border-radius: 16px;
-    border: 1px solid var(--border-color, #d1d5db);
-    background: var(--bg-primary, #fff);
-    color: var(--text-primary, #111827);
-    font-size: 0.85rem;
-  }
-}
+/* The header search box is styled in PageHeader.scss only: a second rule here reset its left
+   padding, so the magnifier sat on top of the placeholder. */
 
 /* Tree card heading (folder view inside the Other Documents tab). */
 .folder-tree-card__head {

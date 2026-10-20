@@ -27,7 +27,7 @@ const CompareVersion: React.FC<ManualFormProps> = ({ onSubmit, closeForm, select
    const [error, setError] = useState<string>('');
 
     useEffect(() => {
-        dmsLifecycleService.getApiCall(`DMS/GetManualVersionList?dm_ManualID=${selectedManualID}`)
+        dmsLifecycleService.getApiCall(`Manuals/GetManualVersionList?dm_ManualID=${selectedManualID}`)
             .then(data => {
                 const options = data.map((cat: any) => ({
                     label: cat.version,
@@ -37,7 +37,7 @@ const CompareVersion: React.FC<ManualFormProps> = ({ onSubmit, closeForm, select
             })
             .catch(() => setVersionOptions([]));
 
-          dmsLifecycleService.getApiCall(`DMS/GetManualSimpleDetails/${selectedManualID}`)
+          dmsLifecycleService.getApiCall(`Manuals/GetManualSimpleDetails/${selectedManualID}`)
             .then(data => {
                 setManualName(data.manualName);
                 setCurrentVersion(data.version);

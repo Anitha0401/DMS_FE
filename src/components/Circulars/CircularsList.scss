@@ -905,3 +905,22 @@
         color: var(--text-secondary);
     }
 }
+
+/* "Download attachment" in the selected circular's details */
+.cir-attachment-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.6rem;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-color, #1d4ed8);
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: rgba(29, 78, 216, 0.06); }
+    &:disabled { opacity: 0.6; cursor: default; }
+}

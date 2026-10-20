@@ -302,7 +302,7 @@ export const itemLink = (itemType: string, itemId: number): { pathname: string; 
         case 'Suggestion':
             return { pathname: '/suggestions', search: `?id=${itemId}` };
         default:
-            return { pathname: '/dashboard', state: { activeTab: 'otherdocuments' } };
+            return { pathname: '/otherdocuments' };
     }
 };
 
@@ -343,22 +343,22 @@ const featureApi = {
     },
 
     circular: {
-        get: (id: number): Promise<CircularExtras> => api.getApiCall(`CircularExtras/${id}`),
+        get: (id: number): Promise<CircularExtras> => api.getApiCall(`Circular/${id}/Extras`),
         save: (id: number, ackDueDays: number | null, validUntil: string | null) =>
-            api.putApiCall(`CircularExtras/${id}`, { ackDueDays, validUntil }),
+            api.putApiCall(`Circular/${id}/Extras`, { ackDueDays, validUntil }),
         addLink: (id: number, manualId: number, linkType: string, remarks?: string, manualVersionId?: number | null) =>
-            api.postApiCall(`CircularExtras/${id}/Links`, { manualId, manualVersionId: manualVersionId ?? null, linkType, remarks: remarks || null }),
-        removeLink: (linkId: number) => api.deleteApiCall(`CircularExtras/Links/${linkId}`),
+            api.postApiCall(`Circular/${id}/Links`, { manualId, manualVersionId: manualVersionId ?? null, linkType, remarks: remarks || null }),
+        removeLink: (linkId: number) => api.deleteApiCall(`Circular/Links/${linkId}`),
         cancel: (id: number, supersededById: number | null, reason: string) =>
-            api.postApiCall(`CircularExtras/${id}/Cancel`, { supersededById, reason }),
-        forManual: (manualId: number): Promise<CircularManualLink[]> => api.getApiCall(`CircularExtras/Manual/${manualId}/Circulars`),
-        closeLinks: (manualId: number) => api.postApiCall(`CircularExtras/Manual/${manualId}/CloseLinks`),
+            api.postApiCall(`Circular/${id}/Cancel`, { supersededById, reason }),
+        forManual: (manualId: number): Promise<CircularManualLink[]> => api.getApiCall(`Circular/Manual/${manualId}/Circulars`),
+        closeLinks: (manualId: number) => api.postApiCall(`Circular/Manual/${manualId}/CloseLinks`),
         manual: (manualId: number): Promise<{ dM_ManualID: number; ackDueDays?: number | null }> =>
-            api.getApiCall(`CircularExtras/Manual/${manualId}`),
+            api.getApiCall(`Circular/Manual/${manualId}/Extras`),
         saveManual: (manualId: number, ackDueDays: number | null) =>
-            api.putApiCall(`CircularExtras/Manual/${manualId}`, { dM_ManualID: manualId, ackDueDays }),
-        categories: (): Promise<CircularCategorySetting[]> => api.getApiCall('CircularExtras/Categories'),
-        saveCategory: (c: CircularCategorySetting) => api.putApiCall(`CircularExtras/Categories/${c.ciR_CategoryID}`, c),
+            api.putApiCall(`Circular/Manual/${manualId}/Extras`, { dM_ManualID: manualId, ackDueDays }),
+        categories: (): Promise<CircularCategorySetting[]> => api.getApiCall('Circular/CategorySettings'),
+        saveCategory: (c: CircularCategorySetting) => api.putApiCall(`Circular/CategorySettings/${c.ciR_CategoryID}`, c),
     },
 
     suggestions: {

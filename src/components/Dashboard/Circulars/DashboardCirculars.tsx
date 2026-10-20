@@ -24,7 +24,6 @@ const DashboardCirculars: React.FC<DashboardProps> = ({ userId }) => {
     const setUserActionCounts = () => {
         dmsLifecycleService.getApiCall(`Circular/GetDashboardCircularCounts`)
             .then((data: any) => {
-                console.log('Dashboard counts data:', data);
                 if (data) {
                     setTotalCirculars(data.totalCirculars || 0);
                     setTotalAlerts(data.totalAlerts || 0);

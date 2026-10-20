@@ -42,7 +42,7 @@ const UserManualList: React.FC<UserManualProps> = ({callMode, userId}) => {
     
     useEffect(() => {
         try {
-            dmsLifecycleService.getApiCall(`DMS/GetUserManualListForCalledMode?userID=${userId}&calledMode=${callMode}`)
+            dmsLifecycleService.getApiCall(`Manuals/GetUserManualListForCalledMode?userID=${userId}&calledMode=${callMode}`)
                 .then((data: any) => {
                    setUsersManualData(data);
                    setIsLoading(false);

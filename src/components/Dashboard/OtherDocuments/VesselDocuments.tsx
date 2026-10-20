@@ -8,8 +8,8 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { SelectButton } from 'primereact/selectbutton';
-import featureApi, { CertificateType, FileItem, FolderDocument, FolderItem, formatSize, openApiFile } from '../../../services/featureApi';
-import { errorMessage } from '../../../services/DMSLifecycleService';
+import featureApi, { FileItem, FolderDocument, FolderItem, formatSize, openApiFile } from '../../../services/featureApi';
+import dmsLifecycleService, { errorMessage } from '../../../services/DMSLifecycleService';
 import notify from '../../../services/notify';
 import { formatDate } from '../../utils/formatDate';
 
@@ -27,6 +27,11 @@ const NEW_FOLDER = -999;
 const NO_FOLDER = 0;
 
 type Source = 'all' | 'vessel' | 'office';
+
+interface OtherDocumentType {
+    otherDocument_TypeID: number;
+    documentType: string;
+}
 
 const sourceOf = (d: FolderDocument): { key: Exclude<Source, 'all'> | 'sent'; label: string; css: string } =>
     d.isOfficeOnly ? { key: 'office', label: 'Office only', css: 'muted' }
@@ -373,7 +378,8 @@ const NewDocumentDialog: React.FC<{
     onHide: () => void;
     onSaved: (folderId: number | null) => void;
 }> = ({ vesselId, vesselName, folders, paths, defaultFolderId, onHide, onSaved }) => {
-    const [types, setTypes] = useState<CertificateType[]>([]);
+    const [types, setTypes] = useState<OtherDocumentType[]>([]);
+    const [typesLoading, setTypesLoading] = useState(true);
     const [folderId, setFolderId] = useState<number | null>(defaultFolderId);
     const [newFolderName, setNewFolderName] = useState('');
     const [newFolderParent, setNewFolderParent] = useState<number | null>(null);
@@ -386,7 +392,25 @@ const NewDocumentDialog: React.FC<{
     const [files, setFiles] = useState<File[]>([]);
     const [busy, setBusy] = useState(false);
 
-    useEffect(() => { featureApi.certificates.types().then(setTypes).catch(() => setTypes([])); }, []);
+    useEffect(() => {
+        let cancelled = false;
+        setTypesLoading(true);
+        dmsLifecycleService.apiCall<OtherDocumentType[]>('OtherDocument/GetTypes', 'get', {
+            vesselId,
+            vslID: vesselId,
+            vesselID: vesselId
+        }).then((data) => {
+            if (!cancelled) setTypes(Array.isArray(data) ? data : []);
+        }).catch((err) => {
+            if (!cancelled) {
+                setTypes([]);
+                notify.error(errorMessage(err), 'Could not load document types');
+            }
+        }).finally(() => {
+            if (!cancelled) setTypesLoading(false);
+        });
+        return () => { cancelled = true; };
+    }, [vesselId]);
 
     const writable = folders.filter((f) => f.canEdit);
     const folderOptions = [
@@ -452,7 +476,7 @@ const NewDocumentDialog: React.FC<{
                 <div className="field">
                     <label>Document type</label>
                     <Dropdown value={typeId} options={types} optionLabel="documentType" optionValue="otherDocument_TypeID" filter
-                        onChange={(e) => setTypeId(e.value)} placeholder="Choose the type" />
+                        onChange={(e) => setTypeId(e.value)} placeholder={typesLoading ? 'Loading types…' : 'Choose the type'} disabled={typesLoading} />
                 </div>
                 <div className="field">
                     <label htmlFor="nd-no">Document number</label>

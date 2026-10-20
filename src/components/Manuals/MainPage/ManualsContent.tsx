@@ -10,6 +10,7 @@ import { downloadAsWord } from '../../utils/DownloadManuals';
 import { downloadAsPDF } from '../../utils/DownloadManuals';
 import { useTheme } from '../../../contexts/ThemeContext';
 import JoditEditor from 'jodit-react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import CompareVersion from '../CompareVersion/CompareVersion';
 import CompareVersionDetails from '../CompareVersion/CompareVersionDetails';
 import ManualDetails from '../ViewManuals/ManualDetails';
@@ -70,7 +71,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         if(manualInfo.selectedManualNodeObj)
         {
             setManualID(manualInfo.selectedManualNodeObj.key ? Number(manualInfo.selectedManualNodeObj.key) : -1);
-            setHeaderText(manualInfo.selectedManualNodeObj ? manualInfo.selectedManualNodeObj.label : '');
+            setHeaderText(manualInfo.selectedManualNodeObj.label ?? '');
             setIsFavourite(manualInfo.selectedManualNodeObj.data.isFavourite ? manualInfo.selectedManualNodeObj.data.isFavourite === 1 ? true : false : false);
 
             setIsManualReleased(false);
@@ -87,9 +88,12 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     }, [isChecked, manualInfo.selectedManualNodeObj]);
 
     const fetchData = async() => {
-          dmsLifecycleService.getApiCall(`DMS/GetManualContent?dm_ManualID=${manualInfo.selectedManualNodeObj.key}&IncludeSubManuals=${isChecked}`)
+          const manualKey = manualInfo.selectedManualNodeObj?.key;
+          if (manualKey == null) return;
+          dmsLifecycleService.getApiCall(`Manuals/GetManualContent?dm_ManualID=${manualKey}&IncludeSubManuals=${isChecked}`)
                 .then((manualResponse) => {
-                    setManualText(manualResponse);
+                    // Shown in the editor as HTML: anything that could run code is removed first.
+                    setManualText(sanitizeHtml(manualResponse));
                 })
                 .catch((err) => {
                     setManualText('<p><em>Could not load this manual. Please try again.</em></p>');
@@ -111,7 +115,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
     const updateManuals = async (data: any) => {
         try {
-            await dmsLifecycleService.postApiCall('DMS/EditManual', data);
+            await dmsLifecycleService.postApiCall('Manuals/EditManual', data);
 
            setVisibleAddEditDialog(false);
            fetchData();
@@ -123,7 +127,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
     const ApproveManuals = async (data: any) => {
         try {
-            await dmsLifecycleService.postApiCall('DMS/ApproveManual', data);
+            await dmsLifecycleService.postApiCall('Manuals/ApproveManual', data);
 
            setVisibleApproveManualDialog(false);
            fetchData();
@@ -135,7 +139,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
 
     const SendBackManuals = async (data: any) => {
         try {
-            await dmsLifecycleService.postApiCall('DMS/SendBackManual', data);
+            await dmsLifecycleService.postApiCall('Manuals/SendBackManual', data);
 
            setVisibleApproveManualDialog(false);
            fetchData();
@@ -198,7 +202,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
     };
 
     const accept = () => {
-        dmsLifecycleService.postApiCall(`DMS/AddToFavourite?dm_ManualID=${manualID}&userId=${userId}`)
+        dmsLifecycleService.postApiCall(`Manuals/AddToFavourite?dm_ManualID=${manualID}&userId=${userId}`)
             .then(() => {
                 toast.current.show({
                     severity: 'info',
@@ -458,7 +462,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                 contentStyle={{ padding: '0.5rem', backgroundColor: '#e5eefbff' }}
                 onHide={() => { if (!visibleApproveManualDialog) return; setVisibleApproveManualDialog(false); }}>
                 <ApproveManual 
-                    manualName={manualInfo.selectedManualNodeObj?.label}
+                    manualName={manualInfo.selectedManualNodeObj?.label ?? ''}
                     version={manualInfo.selectedManualNodeObj?.data?.manualVersion}
                     status={manualInfo.selectedManualNodeObj?.data?.statusString}
                     onApprove={(comment) => { ApproveManuals({ dM_ManualID: manualInfo.selectedManualNodeObj?.key, dM_ManualVersionID: manualInfo.selectedManualNodeObj?.data?.dM_ManualVersionID, userID: userId, comments: comment }); }}

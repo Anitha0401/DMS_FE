@@ -95,7 +95,74 @@
 
   &.active {
     color: var(--primary-color, #0072bc);
+    background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+    font-weight: 600;
   }
+}
+
+/* Search box: Enter opens the Search page. */
+.header-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 1 260px;
+  min-width: 140px;
+
+  i {
+    position: absolute;
+    left: 10px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    height: 34px;
+    padding: 0 10px 0 30px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+
+    &::placeholder { color: var(--text-muted); }
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 20%, transparent);
+    }
+  }
+}
+
+.header-user-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 6px 2px 2px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover, &:focus-visible {
+    background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  }
+}
+
+.header-user-caret {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.header-user-menu {
+  .header-user-menu-name .p-menuitem-text {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .header-user-menu-name { opacity: 1; }
 }
 
 .header-right {
@@ -241,6 +308,21 @@
   }
 }
 
+/* Narrower desktops: navigation as icons (the label is the tooltip). */
+/* Laptop widths (e.g. 1366px): keep the link names, make the links and the search box a little narrower. */
+@media (max-width: 1500px) {
+  .header-nav-link { padding: 6px 6px; gap: 5px; }
+  .header-search { flex-basis: 170px; min-width: 130px; }
+  /* Long page titles ("Pending acknowledgements") are cut with "…" so the search box stays on the first row. */
+  .header-title { max-width: 190px; white-space: nowrap; }
+}
+
+/* Narrower than that: icons only (each link keeps its name as a tooltip). */
+@media (max-width: 1300px) {
+  .header-nav-text { display: none; }
+  .header-nav-link { padding: 6px 8px; }
+}
+
 /* Tablet: tighter padding. */
 @media (max-width: 1024px) {
   .header-bar { padding: 8px 16px; }
@@ -272,5 +354,9 @@
     order: 4;
     width: 100%;
     padding-right: 0;
+  }
+  .header-search {
+    order: 5;
+    flex: 1 1 100%;
   }
 }

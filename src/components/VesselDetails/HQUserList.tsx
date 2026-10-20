@@ -77,7 +77,7 @@ const HQUserList: React.FC<HQUserListProps> = ({ hqUser, selectedHQUserList, onS
     const handleSelectionChange = (e: any) => {
         if (isViewMode) return;
         setSelectedHqUsers(e.value);
-        onSelectionChange && onSelectionChange(e.value);
+        onSelectionChange?.(e.value);
     };
 
     const onSearchChange = (e: any) => {

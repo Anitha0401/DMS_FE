@@ -52,7 +52,7 @@ const VesselRankList: React.FC<VesselRankListProps> = ({ vslRank, selectedVessel
     const handleSelectionChange = (e: any) => {
         if (isViewMode) return;
         setSelectedVslRank(e.value);
-        onSelectionChange && onSelectionChange(e.value);
+        onSelectionChange?.(e.value);
     };
 
     const onSearchChange = (e: any) => {

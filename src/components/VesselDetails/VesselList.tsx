@@ -57,7 +57,7 @@ const VesselList: React.FC<VesselListProps> = ({ vessels, selectedVesselIdList, 
     const handleSelectionChange = (e: any) => {
         if (isViewMode) return;
         setSelectedVessels(e.value);
-        onSelectionChange && onSelectionChange(e.value);
+        onSelectionChange?.(e.value);
     };
     
     const onSearchChange = (e: any) => {

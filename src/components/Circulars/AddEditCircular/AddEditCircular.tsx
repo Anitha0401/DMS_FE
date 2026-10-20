@@ -10,6 +10,7 @@ import { SelectButton } from 'primereact/selectbutton';
 import { Checkbox } from 'primereact/checkbox';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import { Vessel } from '../../VesselDetails/VesselDetails';
+import { canOpenInBrowser } from '../../utils/sanitize';
 import './AddEditCircular.scss';
 
 interface AddEditCircularProps {
@@ -158,6 +159,13 @@ const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const ACCEPTED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx'];
 
 const fileExtension = (name: string) => (name.split('.').pop() || '').toLowerCase();
+const fileContentTypes: Record<string, string> = {
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xls: 'application/vnd.ms-excel',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+};
 
 const fileIcon = (name: string) => {
     const ext = fileExtension(name);
@@ -180,9 +188,10 @@ interface VesselPickerProps {
     vessels: Vessel[];
     selectedIds: number[];
     onChange: (ids: number[]) => void;
+    disabled: boolean;
 }
 
-const VesselPicker: React.FC<VesselPickerProps> = ({ vessels, selectedIds, onChange }) => {
+const VesselPicker: React.FC<VesselPickerProps> = ({ vessels, selectedIds, onChange, disabled }) => {
     const [search, setSearch] = useState('');
     const [type, setType] = useState<string>('all');
 
@@ -216,10 +225,10 @@ const VesselPicker: React.FC<VesselPickerProps> = ({ vessels, selectedIds, onCha
     };
 
     return (
-        <div className="cir-vessels">
+        <div className={`cir-vessels${disabled ? ' disabled' : ''}`} aria-disabled={disabled}>
             <div className="cir-vessels-search">
                 <i className="pi pi-search" />
-                <InputText value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search vessels" aria-label="Search vessels" />
+                <InputText value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search vessels" aria-label="Search vessels" disabled={disabled} />
             </div>
             {types.length > 1 && (
                 <div className="cir-vessels-types" role="group" aria-label="Vessel type">
@@ -229,6 +238,7 @@ const VesselPicker: React.FC<VesselPickerProps> = ({ vessels, selectedIds, onCha
                             type="button"
                             className={`cir-chip${type === t ? ' active' : ''}`}
                             onClick={() => setType(t)}
+                            disabled={disabled}
                         >
                             {t === 'all' ? 'All types' : t}
                         </button>
@@ -237,13 +247,13 @@ const VesselPicker: React.FC<VesselPickerProps> = ({ vessels, selectedIds, onCha
             )}
             <div className="cir-vessels-head">
                 <label className="cir-check">
-                    <Checkbox checked={allVisibleSelected} onChange={toggleAllVisible} disabled={visible.length === 0} />
+                    <Checkbox checked={allVisibleSelected} onChange={toggleAllVisible} disabled={disabled || visible.length === 0} />
                     <span>Select all shown</span>
                 </label>
                 <span className="cir-muted">
                     {selectedIds.length} of {vessels.length} selected
                     {selectedIds.length > 0 && (
-                        <button type="button" className="cir-link" onClick={() => onChange([])}>Clear</button>
+                        <button type="button" className="cir-link" onClick={() => onChange([])} disabled={disabled}>Clear</button>
                     )}
                 </span>
             </div>
@@ -252,7 +262,7 @@ const VesselPicker: React.FC<VesselPickerProps> = ({ vessels, selectedIds, onCha
                 {visible.map(v => (
                     <li key={v.vesselID}>
                         <label className={`cir-check cir-vessel-row${selected.has(v.vesselID) ? ' checked' : ''}`}>
-                            <Checkbox checked={selected.has(v.vesselID)} onChange={() => toggle(v.vesselID)} />
+                            <Checkbox checked={selected.has(v.vesselID)} onChange={() => toggle(v.vesselID)} disabled={disabled} />
                             <span className="cir-vessel-name">{v.vslName}</span>
                             <span className="cir-vessel-type">{v.vslType}</span>
                         </label>
@@ -294,7 +304,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
 
     useEffect(() => {
         const fetchData = async () => {
-                dmsLifecycleService.getApiCall('DMS/GetManualRightsUsersAsync')
+                dmsLifecycleService.getApiCall('Manuals/GetManualRightsUsersAsync')
                     .then(data => {
                         setVesselList(data.vesselList || []);
                         setAllowedUserOptions(toVesselRankOptions(data.vslRankList));
@@ -317,6 +327,14 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
                 if (selectedAction === 'Edit' && selectedCIR_MasterID > 0) {
                     dmsLifecycleService.getApiCall(`circular/GetCIRDetails/${selectedCIR_MasterID}`)
                         .then((data: any) => {
+                            const allowedUsers = data.allowedUserToAckList ?? data.allowedUsersToAck ?? data.allowedUserToAck;
+                            const allowedUserValues = toAllowedUserValues(allowedUsers);
+                            const vesselIds = toVesselIds(data.vesselIdList ?? data.vesselIDList);
+                            const acknowledgementRequired =
+                                Boolean(data.requireAcknowledgement) ||
+                                allowedUserValues.length > 0 ||
+                                vesselIds.length > 0;
+
                             setFormData({
                                 ciR_MasterID: data.ciR_MasterID ?? selectedCIR_MasterID ?? -1,
                                 ciR_BlobID: data.ciR_BlobID ?? -1,
@@ -324,7 +342,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
                                 ciR_CategoryID: data.ciR_CategoryID ?? -1,
                                 ciR_Number: data.ciR_Number ?? '',
                                 allowedUserToAck: data.allowedUserToAck ?? '',
-                                requireAcknowledgement: data.requireAcknowledgement ?? false,
+                                requireAcknowledgement: acknowledgementRequired,
                                 reference: getReferenceValue(data),
                                 title: data.title ?? '',
                                 status: data.status ?? 'Draft',
@@ -340,12 +358,11 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
                                 blobSize: data.blobSize ?? '0',
                                 blobContents: data.blobContents ?? '',
                                 calledMode: 'Edit',
-                                vesselIdList: toVesselIds(data.vesselIdList ?? data.vesselIDList)
+                                vesselIdList: vesselIds
                             });
-                            const allowedUsers = data.allowedUserToAckList ?? data.allowedUsersToAck ?? data.allowedUserToAck;
-                            setSelectedAllowedUsers(toAllowedUserValues(allowedUsers));
-                            setSelectedVesselIds(toVesselIds(data.vesselIdList ?? data.vesselIDList));
-                            setRequireAcknowledgement(data.requireAcknowledgement ?? false);
+                            setSelectedAllowedUsers(allowedUserValues);
+                            setSelectedVesselIds(vesselIds);
+                            setRequireAcknowledgement(acknowledgementRequired);
                         })
                         .catch(() => {
 
@@ -353,7 +370,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
                 }
                 else if (selectedAction === 'Add') {
                     // For add mode, reset to default or initialData
-                    var cir_MasterID = await dmsLifecycleService.postApiCall(`circular/AddCirMaster?circularType=${circularType}`, {});
+                    const cir_MasterID = await dmsLifecycleService.postApiCall(`circular/AddCirMaster?circularType=${circularType}`, {});
 
                     setFormData({
                         ciR_MasterID: cir_MasterID,
@@ -400,10 +417,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
 
     const handleInputChange = (e: any, name: string) => {
         const val = (e.target && e.target.value !== undefined) ? e.target.value : e.value;
-        let _formData = { ...formData };
-        // @ts-ignore
-        _formData[name] = val;
-        setFormData(_formData);
+        setFormData({ ...formData, [name]: val } as CircularFormData);
     };
 
     const handleCategoryChange = (e: any) => {
@@ -414,7 +428,6 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
         if (categoryID && selectedAction !== 'Edit') {
             dmsLifecycleService.getApiCall(`circular/GetNextCIRNumbersByCategory?categoryID=${categoryID}&cir_MasterID=${formData.ciR_MasterID}`)
                 .then((data: any) => {
-                    console.log('Fetched circular number:', data);
                     setFormData(prev => ({ 
                         ...prev, 
                         ciR_Number: data.cirNumber || '',
@@ -449,8 +462,8 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
                 ...prev,
                 fileName: file.name,
                 blobSize: file.size.toString(),
-                fileType: file.type || ext,
-                originalFileType: file.type || ext,
+                fileType: ext,
+                originalFileType: ext,
                 blobContents: byteArray
             }));
         };
@@ -470,13 +483,45 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    /** Opens the attached file (new upload or the one saved with the circular) in a new tab. */
-    const viewFile = () => {
+    const getAttachmentBlob = () => {
         if (!formData.blobContents) return;
         const bytes = decodeBlobContents(formData.blobContents);
         if (!bytes) return;
-        const url = URL.createObjectURL(new Blob([bytes], { type: formData.fileType && formData.fileType.includes('/') ? formData.fileType : undefined }));
+        const ext = fileExtension(formData.fileName || '');
+        const contentType = fileContentTypes[ext]
+            || (formData.originalFileType?.includes('/') ? formData.originalFileType : undefined)
+            || (formData.fileType?.includes('/') ? formData.fileType : undefined);
+        return new Blob([bytes], { type: contentType });
+    };
+
+    /**
+     * Opens the attached file (new upload or the one saved with the circular) in a new tab. Only PDFs, images and
+     * plain text are opened; anything else (HTML, SVG...) is downloaded, because a page opened from here would run
+     * as part of this site with the user's login.
+     */
+    const viewFile = () => {
+        const blob = getAttachmentBlob();
+        if (!blob || !formData.fileName) return;
+        if (!canOpenInBrowser(blob.type)) {
+            downloadFile();
+            return;
+        }
+        const file = new File([blob], formData.fileName, { type: blob.type });
+        const url = URL.createObjectURL(file);
         window.open(url, '_blank', 'noopener');
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+    };
+
+    const downloadFile = () => {
+        const blob = getAttachmentBlob();
+        if (!blob || !formData.fileName) return;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = formData.fileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
         setTimeout(() => URL.revokeObjectURL(url), 60000);
     };
 
@@ -507,6 +552,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
         if (missing.length > 0) return;
 
         // Send values the API can always read: text never null, numbers never empty text.
+        const ext = fileExtension(formData.fileName || '');
         const dataToSubmit: any = {
             ...formData,
             ciR_BlobID: Number(formData.ciR_BlobID ?? -1),
@@ -519,8 +565,8 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
             createdBy: formData.createdBy ?? '',
             description: formData.description ?? '',
             fileName: formData.fileName ?? '',
-            fileType: formData.fileType ?? '',
-            originalFileType: formData.originalFileType ?? '',
+            fileType: ext || formData.fileType || '',
+            originalFileType: ext || formData.originalFileType || '',
             status: formData.status || 'Draft',
         };
         dataToSubmit.allowedUserToAck = selectedAllowedUsers.join(', ');
@@ -657,7 +703,10 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
                                 </div>
                                 <div className="cir-file-actions">
                                     {formData.blobContents && (
-                                        <Button type="button" icon="pi pi-eye" className="p-button-text p-button-sm" onClick={viewFile} tooltip="Open" tooltipOptions={{ position: 'top' }} aria-label="Open file" />
+                                        <>
+                                            <Button type="button" icon="pi pi-eye" className="p-button-text p-button-sm" onClick={viewFile} tooltip="Open" tooltipOptions={{ position: 'top' }} aria-label="Open file" />
+                                            <Button type="button" icon="pi pi-download" className="p-button-text p-button-sm" onClick={downloadFile} tooltip="Download" tooltipOptions={{ position: 'top' }} aria-label="Download file" />
+                                        </>
                                     )}
                                     <Button type="button" icon="pi pi-refresh" className="p-button-text p-button-sm" onClick={() => fileInputRef.current?.click()} tooltip="Replace" tooltipOptions={{ position: 'top' }} aria-label="Replace file" />
                                     <Button type="button" icon="pi pi-trash" className="p-button-text p-button-danger p-button-sm" onClick={removeFile} tooltip="Remove" tooltipOptions={{ position: 'top' }} aria-label="Remove file" />
@@ -702,6 +751,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
                                 id="allowedUserToAck"
                                 className="allowed-user-rank-select"
                                 panelClassName="allowed-user-rank-panel"
+                                disabled={!requireAcknowledgement}
                                 value={selectedAllowedUsers}
                                 options={allowedUserOptions}
                                 onChange={(e) => setSelectedAllowedUsers(e.value || [])}
@@ -731,7 +781,12 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
 
                     <section className="cir-card cir-card-vessels">
                         <h3><i className="pi pi-send" /> Vessels</h3>
-                        <VesselPicker vessels={vesselList} selectedIds={selectedVesselIds} onChange={setSelectedVesselIds} />
+                        <VesselPicker
+                            vessels={vesselList}
+                            selectedIds={selectedVesselIds}
+                            onChange={setSelectedVesselIds}
+                            disabled={!requireAcknowledgement}
+                        />
                     </section>
                 </div>
             </div>

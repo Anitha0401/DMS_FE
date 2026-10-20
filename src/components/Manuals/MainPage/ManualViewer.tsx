@@ -43,7 +43,7 @@ const ManualViewer: React.FC<ManualViewerProps> = ({ calledMode, userId }) => {
     const fetchManuals = async (calledMode: string) => {
         setLoading(true);
         try {
-            const data: TreeNodeData[] = await dmsLifecycleService.getApiCall(`DMS/GetManualListBasedOnCalledMode?calledMode=${calledMode}&userId=${userId}`);
+            const data: TreeNodeData[] = await dmsLifecycleService.getApiCall(`Manuals/GetManualListBasedOnCalledMode?calledMode=${calledMode}&userId=${userId}`);
             setManuals(data);
             setSelectedManual(data[0]);
             dispatch(setSelectedManualNodeObj(data[0]));

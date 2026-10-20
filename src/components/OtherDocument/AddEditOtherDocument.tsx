@@ -119,7 +119,6 @@ const AddEditOtherDocument: React.FC<AddEditOtherDocumentProps> = ({
                 loadNextNumber(form.documentTypeId);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visible, documentTypes]);
 
     const loadNextNumber = async (documentTypeId: string) => {

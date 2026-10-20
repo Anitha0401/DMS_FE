@@ -355,3 +355,13 @@ input:focus-visible,
   margin-top: 0 !important;
   transform: translateY(-50%);
 }
+
+/* Shown while a page's code is loading (first visit to that page). */
+.page-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50vh;
+  color: var(--text-secondary);
+}

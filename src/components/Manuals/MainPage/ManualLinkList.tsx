@@ -60,7 +60,7 @@ const ManualLinkList: React.FC<ManualLinkListProps> = ({ userId, calledMode }) =
         setLoading(true);
         setSearch('');
         dmsLifecycleService
-            .getApiCall(`DMS/GetTreeViewManualList?userId=${userId}&calledMode=${encodeURIComponent(calledMode)}`)
+            .getApiCall(`Manuals/GetTreeViewManualList?userId=${userId}&calledMode=${encodeURIComponent(calledMode)}`)
             .then((data: ManualNode[]) => {
                 if (cancelled) return;
                 const list = flattenMatches(data);

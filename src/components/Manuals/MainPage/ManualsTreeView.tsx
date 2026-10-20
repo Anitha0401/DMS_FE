@@ -166,7 +166,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
     const refreshTree = () => {
         setSelectedAction('Refresh')
         const fetchData = async () => {
-            setNewNodeKey(appInfo.selectedManualNodeObj ? appInfo.selectedManualNodeObj.key : '');
+            setNewNodeKey(appInfo.selectedManualNodeObj?.key != null ? String(appInfo.selectedManualNodeObj.key) : '');
             await LoadTreeNodeData();
         };
 
@@ -180,7 +180,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
             setSelectedNodeLabel(selectedNode ? selectedNode.label : null);
             setExpandedKeys(prev => ({
                 ...prev,
-                [appInfo.selectedManualNodeObj ? appInfo.selectedManualNodeObj.key : '']: true
+                [String(appInfo.selectedManualNodeObj?.key ?? '')]: true
             }));
             dispatch(setSelectedManualNodeObj(selectedNode));
             setNewNodeKey(null);
@@ -190,7 +190,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
     const LoadTreeNodeData = async () => {
         try {
             const modeQuery = calledMode ? `&calledMode=${encodeURIComponent(calledMode)}` : '';
-            const data: TreeNodeData[] = (await dmsLifecycleService.getApiCall(`DMS/GetTreeViewManualList?userId=${userId}${modeQuery}`)) || [];
+            const data: TreeNodeData[] = (await dmsLifecycleService.getApiCall(`Manuals/GetTreeViewManualList?userId=${userId}${modeQuery}`)) || [];
             setAllNodes(data);
             setNodes(data);
             setSearchValue('');
@@ -277,7 +277,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
 
     function getFirstNodeKey(nodes: TreeNodeData[]) {
         if (!nodes || nodes.length === 0) return null;
-        let node: any = nodes[0];
+        const node: any = nodes[0];
         return node;
     }
     
@@ -309,7 +309,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
     };
 
     const findNodeByKey = (nodeList: any, key: any) => {
-        for (let node of nodeList) {
+        for (const node of nodeList) {
             if (node.key === key) {
                 dispatch(setSelectedManualNodeObj(node));
                 return node;
@@ -389,11 +389,11 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
     
     const updateManuals = async (data: any) => {
         try {
-            var url = '';
+            let url = '';
             if (selectedAction === 'AddSubLevel' || selectedAction === 'AddSameLevel') {
-                url = 'DMS/AddManual';
+                url = 'Manuals/AddManual';
             } else if (selectedAction === 'Edit') {
-                url = 'DMS/EditManual';
+                url = 'Manuals/EditManual';
             }
 
             const response = await dmsLifecycleService.postApiCall(url, data);
@@ -415,7 +415,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
 
     const updateVesselDetails = async (data: any) => {
         try {
-            var url = 'DMS/UpdateManualRights';           
+            const url = 'Manuals/UpdateManualRights';           
             await dmsLifecycleService.postApiCall(url, data);
 
             setVisibleVesselDetailsDialog(false);
@@ -438,7 +438,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
     const callManualDeleteAPI = async (nodeKey: string) => {
         try {
             setSelectedAction('');
-            const response = await dmsLifecycleService.deleteApiCall(`DMS/DeleteManual/${nodeKey}`)
+            const response = await dmsLifecycleService.deleteApiCall(`Manuals/DeleteManual/${nodeKey}`)
 
             if (!response.ok) {
                // throw new Error('Failed to delete');
@@ -471,7 +471,7 @@ const ManualsTreeView = forwardRef<any, ManualsTreeViewProps>(({ userId, calledM
     const callLatestVersionDeleteAPI = async (nodeKey: string) => {
         try {
             setSelectedAction('');
-            const response = await dmsLifecycleService.deleteApiCall(`DMS/DeleteManual/${nodeKey}`);
+            const response = await dmsLifecycleService.deleteApiCall(`Manuals/DeleteManual/${nodeKey}`);
             
             if (!response.ok) {
                // throw new Error('Failed to delete');

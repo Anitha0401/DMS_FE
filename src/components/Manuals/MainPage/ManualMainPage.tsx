@@ -27,8 +27,8 @@ const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     // Tree filter from a dashboard link (/manuals?mode=new) or a menu link below the tree.
     const [searchParams, setSearchParams] = useSearchParams();
     const filterMode = (searchParams.get('mode') || '').toLowerCase();
-    // A manual to open (?id=), from the inbox, a search or a circular's links.
-    const focusManualId = searchParams.get('id') || undefined;
+    // A manual to open (?id=, or ?manual= in older links), from the inbox, search, pending lists or a circular's links.
+    const focusManualId = searchParams.get('id') || searchParams.get('manual') || undefined;
     const filter = MANUAL_FILTERS[filterMode];
     const filterLabel = filter?.label;
     // Settings (gear icon in the header): filter the tree, or show the matching manuals as a list in place of the tree.
@@ -44,7 +44,7 @@ const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
     const treeViewRef = useRef<any>(null);
 
     const setUserActionCounts = () => {
-        dmsLifecycleService.getApiCall(`DMS/GetUserManualCounts?userId=${userId}`)
+        dmsLifecycleService.getApiCall(`Manuals/GetUserManualCounts?userId=${userId}`)
             .then((data: any) => {
                 if (data) {
                     setApprovalCnt(data.approvalCnt || 0);

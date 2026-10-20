@@ -50,7 +50,7 @@ const VesselDetails: React.FC<VesselFormProps> = ({ manualTitle, onSubmit, close
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await dmsLifecycleService.getApiCall('DMS/GetManualRightsUsersAsync');
+                const data = await dmsLifecycleService.getApiCall('Manuals/GetManualRightsUsersAsync');
                 setVesselList(data.vesselList);
                 setVslRank(data.vslRankList);
                 setHqUser(data.hqUserList);
@@ -62,7 +62,7 @@ const VesselDetails: React.FC<VesselFormProps> = ({ manualTitle, onSubmit, close
             
             if ((selectedAction === 'Edit' || selectedAction === 'View') && selectedManualID > 0) {
                 try {
-                    const data: any = await dmsLifecycleService.getApiCall(`DMS/GetSelectedManualRightsList/${selectedManualID}`);
+                    const data: any = await dmsLifecycleService.getApiCall(`Manuals/GetSelectedManualRightsList/${selectedManualID}`);
                  
                     setForm({
                         DM_ManualID: data.dM_ManualID ?? selectedManualID ?? -1,
@@ -72,6 +72,7 @@ const VesselDetails: React.FC<VesselFormProps> = ({ manualTitle, onSubmit, close
                         HQ_UsersIDList: data.hQ_UsersIDList ?? []
                     });
                 } catch {
+                    // Rights could not be loaded: the lists start empty and the user can pick again.
                 }
             }
             else {
