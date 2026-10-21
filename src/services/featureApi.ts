@@ -351,6 +351,8 @@ const featureApi = {
         removeLink: (linkId: number) => api.deleteApiCall(`Circular/Links/${linkId}`),
         cancel: (id: number, supersededById: number | null, reason: string) =>
             api.postApiCall(`Circular/${id}/Cancel`, { supersededById, reason }),
+        /** Draft -> Active: the circular goes to the vessels. */
+        release: (id: number) => api.postApiCall(`Circular/${id}/Release`, {}),
         forManual: (manualId: number): Promise<CircularManualLink[]> => api.getApiCall(`Circular/Manual/${manualId}/Circulars`),
         closeLinks: (manualId: number) => api.postApiCall(`Circular/Manual/${manualId}/CloseLinks`),
         manual: (manualId: number): Promise<{ dM_ManualID: number; ackDueDays?: number | null }> =>

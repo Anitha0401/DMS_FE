@@ -174,7 +174,7 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                         <i className="pi pi-exclamation-triangle" /> Confirmation
                     </div>
                     <div className="confirm-content">
-                        Are you sure you want to add this manual as favourite?
+                        Are you sure you want to {isFavourite ? 'remove this manual from' : 'add this manual to'} favourites?
                     </div>
                     <div className="confirm-actions">
                         <button 
@@ -201,28 +201,30 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
         );
     };
 
-    const accept = () => {
-        dmsLifecycleService.postApiCall(`Manuals/AddToFavourite?dm_ManualID=${manualID}&userId=${userId}`)
-            .then(() => {
-                toast.current.show({
-                    severity: 'info',
-                    summary: 'Confirmed',
-                    detail: 'Manual added to favourites.',
-                    life: 3000,
-                    closable: true
-                });
-                if (onRefreshTree) onRefreshTree(); 
-            })
-            .catch(() => {
-                toast.current.show({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Failed to add manual to favourites.',
-                    life: 3000,
-                    closable: true
-                });
+    const accept = async () => {
+        const removing = isFavourite;
+        const action = removing ? 'RemoveFromFavourite' : 'AddToFavourite';
+        try {
+            await dmsLifecycleService.postApiCall(`Manuals/${action}?dm_ManualID=${manualID}&userId=${userId}`);
+            setIsFavourite(!removing);
+            toast.current.show({
+                severity: 'success',
+                summary: 'Confirmed',
+                detail: removing ? 'Manual removed from favourites.' : 'Manual added to favourites.',
+                life: 3000,
+                closable: true
             });
-    }
+            if (onRefreshTree) onRefreshTree();
+        } catch {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: removing ? 'Failed to remove manual from favourites.' : 'Failed to add manual to favourites.',
+                life: 3000,
+                closable: true
+            });
+        }
+    };
 
     const reject = () => {
         toast.current.show({
@@ -291,8 +293,8 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                     />
                     <Button
                         icon={isFavourite ? "pi pi-star-fill" : "pi pi-star"}
-                        label={isFavourite ? "My Favourite" : "Add to Favourite"}
-                        className="p-button-rounded p-button-warning p-button-lg"
+                        label={isFavourite ? "Remove from Favourite" : "Add to Favourite"}
+                        className={`p-button-rounded p-button-lg ${isFavourite ? 'p-button-danger' : 'p-button-warning'}`}
                         style={{
                             fontSize: '1rem',
                             minWidth: 170,
@@ -300,9 +302,8 @@ const ManualsContent: React.FC<ManualDetailsProps> = ({userId, onRefreshTree})  
                             height: '2.5rem', 
                             lineHeight: '1.2rem'
                         }}
-                        //tooltip={isFavourite ? "Already in Favourites" : "Add to Favourite"}
                         onClick={checkConfirmation}
-                        disabled={isFavourite}
+                        disabled={manualID <= 0}
                     />
                 </div>
             </div>

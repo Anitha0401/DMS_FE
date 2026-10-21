@@ -98,7 +98,12 @@ const ManualMainPage: React.FC<ManualDetailsProps> = ({ userId }) => {
                     )}
                     <div className="tree-container">
                         {showList ? (
-                            <ManualLinkList key={`${filterMode}-${listRefreshKey}`} userId={userId} calledMode={filterMode} />
+                            <ManualLinkList
+                                key={`${filterMode}-${listRefreshKey}`}
+                                userId={userId}
+                                calledMode={filterMode}
+                                onFavoritesChanged={LoadTreeNodeData}
+                            />
                         ) : (
                             <ManualsTreeView ref={treeViewRef} userId={userId} calledMode={treeFilterMode} focusManualId={focusManualId} />
                         )}

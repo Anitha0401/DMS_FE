@@ -383,7 +383,7 @@ const PendingAckPage: React.FC = () => {
                                             <h3>Days to acknowledge</h3>
                                             <p>Default deadlines applied to newly released items.</p>
                                         </div>
-                                        <div className="pa-settings-grid">
+                                        <div className="pa-settings-grid pa-settings-due-grid">
                                             {numberField('defaultAckDueDaysManual', 'Manuals', 'Days after release.')}
                                             {numberField('defaultAckDueDaysCircular', 'Circulars', 'Days after release.')}
                                             {numberField('defaultAckDueDaysAlert', 'Alerts', 'Days after release.')}

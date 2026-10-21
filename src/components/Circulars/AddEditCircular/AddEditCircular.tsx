@@ -8,6 +8,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { InputSwitch } from 'primereact/inputswitch';
 import { SelectButton } from 'primereact/selectbutton';
 import { Checkbox } from 'primereact/checkbox';
+import { Dialog } from 'primereact/dialog';
 import dmsLifecycleService from '../../../services/DMSLifecycleService';
 import { Vessel } from '../../VesselDetails/VesselDetails';
 import { canOpenInBrowser } from '../../utils/sanitize';
@@ -15,7 +16,8 @@ import './AddEditCircular.scss';
 
 interface AddEditCircularProps {
     initialData?: CircularFormData;
-    onSubmit: (data: CircularFormData) => void;
+    /** release: also release the circular to the vessels after saving it ("Save and release"). */
+    onSubmit: (data: CircularFormData, options?: { release?: boolean }) => void;
     onCancel: () => void;
     circularType: string;
     selectedAction: string;
@@ -546,8 +548,22 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
     ].filter(Boolean) as string[];
     const showError = (key: keyof typeof errors) => submitted && errors[key];
 
+    const [confirmRelease, setConfirmRelease] = useState(false);
+    const isDraft = (formData.status || 'Draft') === 'Draft';
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        submitForm(false);
+    };
+
+    /** "Save and release": check the form, then ask before releasing. */
+    const askRelease = () => {
+        setSubmitted(true);
+        if (missing.length > 0) return;
+        setConfirmRelease(true);
+    };
+
+    const submitForm = (release: boolean) => {
         setSubmitted(true);
         if (missing.length > 0) return;
 
@@ -583,7 +599,7 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
         }
 
         savedRef.current = true;
-        onSubmit(dataToSubmit);
+        onSubmit(dataToSubmit, { release });
     };
 
     // The temporary record is removed when the form closes (see the effect above).
@@ -799,9 +815,37 @@ const AddEditCircular: React.FC<AddEditCircularProps> = ({ initialData, onSubmit
                 </span>
                 <div className="cir-form-buttons">
                     <Button type="button" label="Cancel" onClick={handleCancel} className="p-button-text" />
-                    <Button type="submit" label={`Save ${typeLabel}`} icon="pi pi-check" />
+                    <Button type="submit" label={isDraft ? 'Save as draft' : `Save ${typeLabel}`} icon="pi pi-check"
+                        className={isDraft ? 'p-button-outlined' : undefined} />
+                    {isDraft && (
+                        <Button type="button" label="Save and release" icon="pi pi-send" onClick={askRelease}
+                            title={`Save, then send the ${typeLabel} to the vessels`} />
+                    )}
                 </div>
             </div>
+
+            {confirmRelease && (
+                <Dialog header={`Release this ${typeLabel}?`} visible onHide={() => setConfirmRelease(false)} className="feature-dialog"
+                    style={{ width: '520px', maxWidth: '96vw' }} draggable={false}
+                    footer={(
+                        <div className="feature-dialog-footer">
+                            <Button type="button" label="Back" text onClick={() => setConfirmRelease(false)} />
+                            <Button type="button" label="Save and release" icon="pi pi-send"
+                                onClick={() => { setConfirmRelease(false); submitForm(true); }} />
+                        </div>
+                    )}>
+                    <div className="release-note">
+                        <p>The {typeLabel} is saved, then released:</p>
+                        <ul>
+                            <li>its status becomes <strong>Active</strong> and today becomes its released date;</li>
+                            <li>the selected vessels get it with the next sync and see it in their inbox;</li>
+                            <li>the crew must acknowledge it within the set number of days;</li>
+                            <li>manuals it amends show it as an open amendment.</li>
+                        </ul>
+                        <p className="release-warn"><i className="pi pi-info-circle" aria-hidden="true" /> It can no longer go back to draft; after this it can only be cancelled or superseded.</p>
+                    </div>
+                </Dialog>
+            )}
         </form>
     );
 };

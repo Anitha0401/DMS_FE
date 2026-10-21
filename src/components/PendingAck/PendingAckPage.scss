@@ -388,6 +388,18 @@
   gap: 12px;
 }
 
+.pa-settings-due-grid .pa-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 88px;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 4px;
+
+  label { grid-column: 1; grid-row: 1; }
+  .form-control { grid-column: 2; grid-row: 1; }
+  small { grid-column: 1 / -1; }
+}
+
 .pa-field {
   display: flex;
   flex-direction: column;
