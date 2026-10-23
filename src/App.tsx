@@ -15,7 +15,6 @@ const Dashboard = lazy(() => import('./components/Dashboard/Dashboard'));
 const CircularsList = lazy(() => import('./components/Circulars/CircularsList'));
 const InboxPage = lazy(() => import('./components/Features/InboxPage'));
 const SuggestionsPage = lazy(() => import('./components/Features/SuggestionsPage'));
-const CertificatesPage = lazy(() => import('./components/Features/CertificatesPage'));
 const SearchPage = lazy(() => import('./components/Search/SearchPage'));
 const PendingAckPage = lazy(() => import('./components/PendingAck/PendingAckPage'));
 const OtherDocumentsPage = lazy(() => import('./components/Dashboard/OtherDocumentsPage'));
@@ -106,12 +105,13 @@ const App: React.FC = () => {
               <Route path="/manualView" element={<ManualViewRedirect />} />
               <Route path="/circulars" element={<CircularViewerWrapper userId={user.userId} />} />
               <Route path="/inbox" element={<InboxPage />} />
+              {/* Reports open from each area (Manuals / Circulars dashboards, Other documents > All vessels). */}
+              <Route path="/reports" element={<Navigate to="/dashboard" replace />} />
               <Route path="/suggestions" element={<SuggestionsPage />} />
               <Route path="/otherdocuments" element={<OtherDocumentsPage userId={user.userId} />} />
               <Route path="/vessel-sync" element={<VesselSyncPage />} />
               {/* Folders are part of Other Documents. */}
               <Route path="/folders" element={<Navigate to="/otherdocuments" replace />} />
-              <Route path="/certificates" element={<CertificatesPage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/pending" element={<PendingAckPage />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

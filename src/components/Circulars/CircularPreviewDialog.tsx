@@ -7,7 +7,7 @@ import featureApi, { CircularExtras, itemLink } from '../../services/featureApi'
 import notify from '../../services/notify';
 import { canOpenInBrowser } from '../utils/sanitize';
 import { formatDate } from '../utils/formatDate';
-import './Features.scss';
+import '../Features/Features.scss';
 
 /** What GET api/Circular/GetCIRDetails/{id} returns (only the fields shown here). */
 interface CircularDetails {

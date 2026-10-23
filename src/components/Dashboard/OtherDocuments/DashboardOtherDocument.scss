@@ -242,6 +242,15 @@
     .od-vessel__meta { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .od-vessel__chev { color: var(--primary-color); font-size: 0.75rem; }
 
+    /* "All vessels": the fleet-wide documents register and certificate expiry */
+    .od-vessel--all {
+        margin-bottom: 6px;
+        border-bottom: 1px dashed var(--border-color);
+        border-radius: 8px 8px 0 0;
+
+        .od-vessel__name { font-weight: 600; }
+    }
+
     /* ---- Right-hand panel ---- */
     .od-panel {
         display: flex;
@@ -255,6 +264,14 @@
     }
 
     .od-panel--full { padding: 12px; }
+
+    /* All vessels: the reports fill the panel */
+    .od-panel--reports {
+        padding: 12px;
+        background: var(--bg-primary);
+
+        .rp-tabbed { flex: 1; min-height: 0; }
+    }
 
     .od-panel__body { flex: 1; min-height: 0; padding: 12px; overflow: auto; }
 
@@ -434,7 +451,16 @@
         display: flex;
         align-items: center;
         border-radius: 8px;
-        &.is-selected { background: color-mix(in srgb, var(--primary-color) 13%, transparent); }
+        border: 1px solid transparent;
+        background: transparent;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+
+        &:not(.is-selected) { background: transparent; }
+        &.is-selected {
+            border-color: color-mix(in srgb, var(--primary-color) 18%, transparent);
+            background: color-mix(in srgb, var(--primary-color) 10%, var(--bg-secondary));
+            box-shadow: inset 3px 0 var(--primary-color);
+        }
     }
 
     .vd-folder {
@@ -457,10 +483,15 @@
         i { color: var(--primary-color); }
         &:hover { background: color-mix(in srgb, var(--primary-color) 7%, transparent); }
         &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: -2px; }
-        &.is-selected { background: color-mix(in srgb, var(--primary-color) 13%, transparent); font-weight: 650; }
+        &.is-selected {
+            background: transparent;
+            color: var(--text-primary);
+            font-weight: 650;
+        }
     }
 
-    .vd-folder-row .vd-folder.is-selected { background: transparent; }
+    .vd-folder-row .vd-folder.is-selected,
+    .vd-folder-row:not(.is-selected) .vd-folder { background: transparent; }
 
     .vd-folder__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .vd-folder__count { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
@@ -516,8 +547,35 @@
 }
 
 .vd-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
-.vd-file { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
+.vd-file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color, #dbe3ec);
+    border-radius: 8px;
+    background: var(--bg-secondary, #fff);
+
+    & + .vd-file { margin-top: 8px; }
+    > .p-button-link { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    > .vd-muted { flex: 0 0 auto; margin-left: auto; }
+}
 .vd-muted { color: var(--text-muted, #6b7280); }
+.vd-move-current-folder {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #dbe3ec);
+    border-radius: 8px;
+    background: var(--bg-primary, #f8fafc);
+    color: var(--text-primary, #1e293b);
+    overflow-wrap: anywhere;
+
+    i { color: var(--primary-color, #0072bc); }
+}
 
 /* Fixes after preview: folder buttons keep their height, search icons sit inside the box, a calmer table. */
 .other-documents-dashboard {
@@ -537,7 +595,28 @@
     .vd-source .p-button { padding: 0.4rem 0.75rem; font-size: 0.82rem; }
 
     .vd-table {
-        .p-datatable-thead > tr > th { padding: 8px 10px; font-size: 0.78rem; font-weight: 650; color: var(--text-muted); background: transparent; }
+        .p-datatable-thead > tr > th {
+            padding: 8px 10px;
+            font-size: 0.78rem;
+            font-weight: 650;
+            color: var(--text-muted);
+            background: transparent;
+
+            .p-sortable-column-icon {
+                margin-left: 0.35rem;
+                color: var(--text-muted);
+                font-size: 0.7rem;
+                opacity: 0.3;
+                transition: color 0.15s ease, opacity 0.15s ease;
+            }
+
+            &:hover .p-sortable-column-icon { opacity: 0.65; }
+
+            &.p-highlight .p-sortable-column-icon {
+                color: var(--primary-color);
+                opacity: 1;
+            }
+        }
         .p-datatable-tbody > tr > td { padding: 8px 10px; font-size: 0.88rem; vertical-align: middle; }
         .p-button.p-button-link { font-size: 0.88rem; white-space: nowrap; }
     }
@@ -556,6 +635,79 @@
     .p-button .p-button-icon-left { margin-right: 0.5rem; }
 }
 
+.p-confirm-dialog.vd-move-confirm-dialog {
+    width: min(34rem, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
+    overflow: hidden;
+    border: 1px solid var(--border-color, #dbe3ec);
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+
+    .p-dialog-header {
+        padding: 1rem 1.25rem 0.75rem;
+        border-bottom: 1px solid var(--border-color, #dbe3ec);
+        background: var(--bg-secondary, #fff);
+    }
+
+    .p-dialog-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        background: var(--bg-secondary, #fff);
+    }
+
+    .p-confirm-dialog-icon {
+        flex: 0 0 auto;
+        margin-top: 0.1rem;
+        color: var(--warning-color, #d97706);
+    }
+
+    .p-confirm-dialog-message {
+        flex: 1 1 auto;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .vd-move-confirm-message {
+        display: grid;
+        gap: 0.5rem;
+        min-width: 0;
+        line-height: 1.45;
+    }
+
+    .vd-move-confirm-message__title {
+        color: var(--text-primary, #1e293b);
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .vd-move-confirm-message__route {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.55rem;
+        color: var(--text-secondary, #475569);
+        font-size: 0.86rem;
+        overflow-wrap: anywhere;
+
+        > span { min-width: 0; }
+        strong { color: var(--text-primary, #1e293b); }
+        > .pi { color: var(--primary-color, #0072bc); }
+    }
+
+    .p-dialog-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        border-top: 1px solid var(--border-color, #dbe3ec);
+        background: var(--bg-primary, #f8fafc);
+
+        .p-button { margin: 0; }
+    }
+}
+
 .other-documents-dashboard .vd-head__actions .p-button { padding: 0.5rem 1rem; font-size: 0.9rem; white-space: nowrap; }
 .other-documents-dashboard .vd-first-folder {
     display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 6px 10px;
@@ -565,3 +717,26 @@
     &:hover { background: rgba(29, 78, 216, 0.06); }
 }
 .other-documents-dashboard .vd-head__actions .p-button .p-button-icon-left { margin-right: 0.5rem; }
+
+/* "New folder" under the folder list. */
+.other-documents-dashboard .vd-folders__add {
+    flex: none;
+    align-self: stretch;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    margin: 10px 4px 0;
+    padding: 0 12px;
+    font-size: 0.88rem;
+}
+
+/* New document: "Office only" / "Send to <vessel>". */
+.vd-where {
+    display: flex;
+    .p-button { flex: 1; justify-content: center; min-height: 38px; padding: 0 12px; font-weight: 500; }
+}
+.vd-dialog .field .vd-note { margin: 6px 0 0; }
+.vd-note.is-send {
+    background: color-mix(in srgb, #16a34a 12%, transparent);
+    i { color: #15803d; }
+}

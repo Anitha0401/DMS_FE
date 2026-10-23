@@ -51,7 +51,6 @@ describe('item links', () => {
         expect(itemLink('Manual', 12)).toBe('/manuals?id=12');
         expect(itemLink('Circular', 5)).toBe('/circulars?cirmode=circulars&id=5');
         expect(itemLink('alert', 6)).toBe('/circulars?cirmode=alerts&id=6');
-        expect(itemLink('Certificate', 7)).toBe('/certificates?id=7');
         expect(itemLink('Suggestion', 8)).toBe('/suggestions?id=8');
         expect(itemLink('Document', 9)).toBeNull();
     });

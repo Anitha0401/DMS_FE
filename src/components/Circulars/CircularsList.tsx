@@ -24,7 +24,7 @@ import CircularsLogDetails from './CircularsLogDetails';
 import { formatDate } from '../utils/formatDate';
 import notify from '../../services/notify';
 import { errorMessage } from '../../services/DMSLifecycleService';
-import CircularExtrasPanel from '../Features/CircularExtrasPanel';
+import CircularExtrasPanel from './CircularExtrasPanel';
 import featureApi from '../../services/featureApi';
 
 /* ---------- Downloading a circular's attachment ---------- */
@@ -311,6 +311,31 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode, focus
         event.preventDefault();
         setSelectedCircular(circular);
         cm.current?.show(event);
+    };
+
+    const treeNodeTemplate = (node: TreeNode) => {
+        const circular = (node as TreeNodeData).data;
+
+        if (circular?.isCategory) {
+            return (
+                <span className="tree-category-label">
+                    <i className="pi pi-folder" aria-hidden="true" />
+                    <span>{node.label}</span>
+                    {!!node.children?.length && <span className="tree-category-count">{node.children.length}</span>}
+                </span>
+            );
+        }
+
+        if (circular) {
+            return (
+                <span className="tree-circular-label" title={`${circular.ciR_Number} - ${circular.title}`}>
+                    <span className="tree-circular-number">{circular.ciR_Number}</span>
+                    <span className="tree-circular-title">{circular.title}</span>
+                </span>
+            );
+        }
+
+        return <span>{node.label}</span>;
     };
     
     useEffect(() => {
@@ -727,6 +752,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode, focus
             <ContextMenu 
                 model={menuItems} 
                 ref={cm} 
+                className="circular-context-menu"
             />
             <PageHeader
                 title={headerTitle}
@@ -828,6 +854,7 @@ const CircularsList: React.FC<CircularsListProps> = ({ userId, calledMode, focus
                                     cm.current?.hide(e.originalEvent);
                                 }}
                                 className="custom-tree"
+                                nodeTemplate={treeNodeTemplate}
                                 onContextMenu={onTreeContextMenu}
                             />
                             ) : viewMode === 'grid' ? (

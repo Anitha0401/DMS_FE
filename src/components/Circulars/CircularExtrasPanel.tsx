@@ -12,7 +12,7 @@ import notify from '../../services/notify';
 import { formatDate } from '../utils/formatDate';
 import ManualPreviewDialog from './ManualPreviewDialog';
 import CircularPreviewDialog from './CircularPreviewDialog';
-import './Features.scss';
+import '../Features/Features.scss';
 
 /**
  * How a circular relates to a manual. "Supersedes" was merged into "Amends" (the app treated them the same:

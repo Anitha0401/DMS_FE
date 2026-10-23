@@ -21,7 +21,7 @@ import './ManualsContent.scss';
 import ViewCompareManualDetails from '../CompareVersion/ViewCompareManualDetails';
 import ManualVersionHistory from './ManualVersionHistory';
 import { formatDate } from '../../utils/formatDate';
-import { ManualRelatedCirculars } from '../../Features/CircularExtrasPanel';
+import { ManualRelatedCirculars } from '../../Circulars/CircularExtrasPanel';
 
 export interface ManualDetailsProps {
     userId: string;

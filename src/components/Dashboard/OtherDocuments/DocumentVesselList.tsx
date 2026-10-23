@@ -8,6 +8,10 @@ interface VesselListProps {
     /** Called with the chosen vessel (one at a time), or an empty list when none. */
     onSelectionChange?: (selected: Vessel[]) => void;
     selectedVesselId?: number | null;
+    /** "All vessels" (the documents and certificates reports for the whole fleet) is selected. */
+    allSelected?: boolean;
+    /** Shows the "All vessels" entry at the top of the list. */
+    onAllVessels?: () => void;
 }
 
 export interface Vessel {
@@ -18,7 +22,7 @@ export interface Vessel {
 }
 
 /** The vessels as a compact, searchable list on the left of the Other Documents tab. */
-const DocumentVesselList: React.FC<VesselListProps> = ({ onSelectionChange, selectedVesselId }) => {
+const DocumentVesselList: React.FC<VesselListProps> = ({ onSelectionChange, selectedVesselId, allSelected, onAllVessels }) => {
     const [loading, setLoading] = useState(true);
     const [vessels, setVessels] = useState<Vessel[]>([]);
     const [typeOptions, setTypeOptions] = useState<{ label: string; value: string }[]>([]);
@@ -70,6 +74,23 @@ const DocumentVesselList: React.FC<VesselListProps> = ({ onSelectionChange, sele
                     placeholder="All vessel types" showClear className="od-vessels__type" />
             )}
             <ul className="od-vessels__list" role="listbox" aria-label="Vessel list">
+                {onAllVessels && (
+                    <li
+                        role="option"
+                        aria-selected={!!allSelected}
+                        tabIndex={0}
+                        className={`od-vessel od-vessel--all${allSelected ? ' is-selected' : ''}`}
+                        onClick={onAllVessels}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onAllVessels(); } }}
+                    >
+                        <i className="pi pi-globe od-vessel__icon" aria-hidden="true" />
+                        <span className="od-vessel__text">
+                            <span className="od-vessel__name">All vessels</span>
+                            <span className="od-vessel__meta">Documents register · Certificate expiry</span>
+                        </span>
+                        {allSelected && <i className="pi pi-chevron-right od-vessel__chev" aria-hidden="true" />}
+                    </li>
+                )}
                 {loading && [0, 1, 2, 3, 4].map((i) => <li key={i} className="od-vessel"><Skeleton height="2.2rem" /></li>)}
                 {!loading && shown.length === 0 && <li className="od-vessels__empty">No vessel found.</li>}
                 {!loading && shown.map((v) => (

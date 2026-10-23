@@ -13,7 +13,7 @@ const FILTERS: { key: string; label: string; types: string | null }[] = [
     { key: 'all', label: 'All', types: null },
     { key: 'Manual', label: 'Manuals', types: 'Manual' },
     { key: 'Circular', label: 'Circulars & Alerts', types: 'Circular' },
-    { key: 'Document', label: 'Documents & Certificates', types: 'Document' },
+    { key: 'Document', label: 'Documents', types: 'Document' },
     { key: 'Suggestion', label: 'Suggestions', types: 'Suggestion' },
 ];
 
@@ -31,7 +31,7 @@ const Highlighted: React.FC<{ text: string; words: string[] }> = ({ text, words 
 
 /**
  * Global search (GET api/Search): one box over manuals (number, name and text), circulars and alerts, other
- * documents and certificates, and suggestions. Every word of the query must match. Opened from the header search box.
+ * documents, and suggestions. Every word of the query must match. Opened from the header search box.
  */
 const SearchPage: React.FC = () => {
     const [searchParams] = useSearchParams();

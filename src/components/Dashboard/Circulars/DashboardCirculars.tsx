@@ -6,6 +6,8 @@ import NotificationList from './NotificationListCicrular';
 import CircularsChart from './CircularsChart';
 import RecentCircularsList from './RecentCircularsList';
 import './RecentCircularsList.scss';
+import ReportDialog from '../../Reports/ReportDialog';
+import { ReportContextKey } from '../../Reports/reportCatalog';
 
 export interface DashboardProps {
     userId: string;
@@ -15,6 +17,7 @@ const DashboardCirculars: React.FC<DashboardProps> = ({ userId }) => {
     const [totalCirculars, setTotalCirculars] = useState(0);
     const [totalAlerts, setTotalAlerts] = useState(0);
     
+    const [reports, setReports] = useState<ReportContextKey | null>(null);
     const navigate = useNavigate();
 
     const handleBrowseCirculars = () => {
@@ -46,13 +49,13 @@ const DashboardCirculars: React.FC<DashboardProps> = ({ userId }) => {
             action: () => navigate('/circulars?cirmode=circulars') 
         },
         { 
-            number: 0, 
+            number: "Open", 
             label: "View Circulars Report", 
-            subtext: "Generate detailed reports",
+            subtext: "Register and acknowledgements",
             icon: "pi pi-chart-bar",
             css: "info", 
             color: "blue", 
-            action: () => navigate('/circularreports?cirmode=circulars') 
+            action: () => setReports('circulars')
         },
         { 
             number: totalAlerts, 
@@ -64,13 +67,13 @@ const DashboardCirculars: React.FC<DashboardProps> = ({ userId }) => {
             action: () => navigate('/circulars?cirmode=alerts') 
         },
         { 
-            number: 0, 
+            number: "Open", 
             label: "View Alerts Report", 
-            subtext: "Generate detailed reports", 
+            subtext: "Register and acknowledgements", 
             icon: "pi pi-chart-bar", 
             css: "info", 
             color: "blue", 
-            action: () => navigate('/circularreports?cirmode=alerts') 
+            action: () => setReports('alerts')
         },
     ];
 
@@ -108,8 +111,9 @@ const DashboardCirculars: React.FC<DashboardProps> = ({ userId }) => {
                     </div>
                 </div>
             </div>
+            <ReportDialog context={reports} onHide={() => setReports(null)} />
         </div>
     );
 };
 
-export default DashboardCirculars;
+export default DashboardCirculars;

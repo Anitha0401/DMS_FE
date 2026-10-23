@@ -40,12 +40,12 @@ const sourceOf = (d: FolderDocument): { key: Exclude<Source, 'all'> | 'sent'; la
 
 /** "Parent › Child" for each folder. */
 const folderPaths = (folders: FolderItem[]) => {
-    const byId = new Map(folders.map((f) => [f.flD_FolderID, f]));
+    const byId = new Map(folders.map((f) => [f.otherDocument_FolderID, f]));
     const path = (f: FolderItem): string => {
         const parent = f.parentID ? byId.get(f.parentID) : undefined;
         return parent && parent !== f ? `${path(parent)} › ${f.folderName}` : f.folderName;
     };
-    return new Map(folders.map((f) => [f.flD_FolderID, path(f)]));
+    return new Map(folders.map((f) => [f.otherDocument_FolderID, path(f)]));
 };
 
 interface Props {
@@ -65,6 +65,7 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
     const [newDoc, setNewDoc] = useState(false);
     const [moveDoc, setMoveDoc] = useState<FolderDocument | null>(null);
     const [filesOf, setFilesOf] = useState<{ doc: FolderDocument; files: FileItem[] } | null>(null);
+    const [downloadingFileId, setDownloadingFileId] = useState<number | null>(null);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -83,13 +84,13 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
     useEffect(() => { setSelected(ALL); setSearch(''); setSource('all'); load(); }, [load]);
 
     const paths = useMemo(() => folderPaths(folders), [folders]);
-    const folderIds = useMemo(() => new Set(folders.map((f) => f.flD_FolderID)), [folders]);
-    const selectedFolder = useMemo(() => folders.find((f) => String(f.flD_FolderID) === selected) ?? null, [folders, selected]);
-    const inFolder = (d: FolderDocument) => d.flD_FolderID != null && folderIds.has(d.flD_FolderID);
+    const folderIds = useMemo(() => new Set(folders.map((f) => f.otherDocument_FolderID)), [folders]);
+    const selectedFolder = useMemo(() => folders.find((f) => String(f.otherDocument_FolderID) === selected) ?? null, [folders, selected]);
+    const inFolder = (d: FolderDocument) => d.otherDocument_FolderID != null && folderIds.has(d.otherDocument_FolderID);
 
     const counts = useMemo(() => {
         const c = new Map<number, number>();
-        docs.forEach((d) => { if (inFolder(d)) c.set(d.flD_FolderID!, (c.get(d.flD_FolderID!) ?? 0) + 1); });
+        docs.forEach((d) => { if (inFolder(d)) c.set(d.otherDocument_FolderID!, (c.get(d.otherDocument_FolderID!) ?? 0) + 1); });
         return c;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [docs, folderIds]);
@@ -100,7 +101,7 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
     const shown = useMemo(() => {
         const q = search.trim().toLowerCase();
         return docs
-            .filter((d) => selected === ALL || (selected === LOOSE ? !inFolder(d) : String(d.flD_FolderID) === selected))
+            .filter((d) => selected === ALL || (selected === LOOSE ? !inFolder(d) : String(d.otherDocument_FolderID) === selected))
             .filter((d) => source === 'all' || sourceOf(d).key === source)
             .filter((d) => !q || `${d.documentNumber} ${d.documentTitle} ${d.documentType} ${d.uploadedBy}`.toLowerCase().includes(q));
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,10 +110,20 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
     const openFiles = async (d: FolderDocument) => {
         try {
             const files = await featureApi.folders.documentFiles(d.otherDocumentMasterID);
-            if (files.length === 1) await openApiFile(featureApi.folders.documentFileUrl(files[0].id), files[0].fileName);
-            else setFilesOf({ doc: d, files });
+            setFilesOf({ doc: d, files });
         } catch (err) {
             notify.error(errorMessage(err), 'Could not open the document');
+        }
+    };
+
+    const downloadFile = async (file: FileItem) => {
+        setDownloadingFileId(file.id);
+        try {
+            await openApiFile(featureApi.folders.documentFileUrl(file.id), file.fileName, true);
+        } catch (err) {
+            notify.error(errorMessage(err), 'Could not download the file');
+        } finally {
+            setDownloadingFileId(null);
         }
     };
 
@@ -138,7 +149,7 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
         acceptClassName: 'p-button-danger',
         accept: async () => {
             try {
-                await featureApi.folders.remove(f.flD_FolderID);
+                await featureApi.folders.remove(f.otherDocument_FolderID);
                 setSelected(ALL);
                 load();
             } catch (err) {
@@ -156,7 +167,7 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
         });
         const out: { f: FolderItem; depth: number }[] = [];
         const walk = (p: number | null, depth: number) =>
-            (kids.get(p) ?? []).sort((a, b) => a.folderName.localeCompare(b.folderName)).forEach((f) => { out.push({ f, depth }); walk(f.flD_FolderID, depth + 1); });
+            (kids.get(p) ?? []).sort((a, b) => a.folderName.localeCompare(b.folderName)).forEach((f) => { out.push({ f, depth }); walk(f.otherDocument_FolderID, depth + 1); });
         walk(null, 0);
         return out;
     }, [folders, folderIds]);
@@ -181,7 +192,6 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
                     <span><strong>{officeCount}</strong> office only</span>
                 </div>
                 <div className="vd-head__actions">
-                    <Button label="New folder" icon="pi pi-folder-plus" outlined onClick={() => setFolderDialog({})} />
                     <Button label="New document" icon="pi pi-file-plus" onClick={() => setNewDoc(true)} />
                 </div>
             </header>
@@ -189,29 +199,24 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
             <div className="vd-body">
                 <nav className="vd-folders" aria-label="Folders">
                     <div className="vd-folders__title">Folders</div>
-                    <button type="button" className={`vd-folder${selected === ALL ? ' is-selected' : ''}`} onClick={() => setSelected(ALL)}>
+                    <button type="button" className={`vd-folder${selected === ALL ? ' is-selected' : ''}`} aria-pressed={selected === ALL} onClick={() => setSelected(ALL)}>
                         <i className="pi pi-th-large" /><span className="vd-folder__name">All documents</span><span className="vd-folder__count">{docs.length}</span>
                     </button>
-                    <button type="button" className={`vd-folder${selected === LOOSE ? ' is-selected' : ''}`} onClick={() => setSelected(LOOSE)}>
+                    <button type="button" className={`vd-folder${selected === LOOSE ? ' is-selected' : ''}`} aria-pressed={selected === LOOSE} onClick={() => setSelected(LOOSE)}>
                         <i className="pi pi-inbox" /><span className="vd-folder__name">Not in a folder</span><span className="vd-folder__count">{looseCount}</span>
                     </button>
                     <div className="vd-folders__sep" />
-                    {!loading && ordered.length === 0 && (
-                        <div className="vd-folders__empty">
-                            No folders yet.
-                            <button type="button" className="vd-first-folder" onClick={() => setFolderDialog({})}><i className="pi pi-folder-plus" /> Create the first folder</button>
-                        </div>
-                    )}
+                    {!loading && ordered.length === 0 && <div className="vd-folders__empty">No folders yet.</div>}
                     {ordered.map(({ f, depth }) => {
-                        const isSel = selected === String(f.flD_FolderID);
+                        const isSel = selected === String(f.otherDocument_FolderID);
                         return (
-                            <div key={f.flD_FolderID} className={`vd-folder-row${isSel ? ' is-selected' : ''}`}>
-                                <button type="button" className={`vd-folder${isSel ? ' is-selected' : ''}`} style={{ paddingLeft: 10 + depth * 16 }}
-                                    onClick={() => setSelected(String(f.flD_FolderID))} title={paths.get(f.flD_FolderID)}>
+                            <div key={f.otherDocument_FolderID} className={`vd-folder-row${isSel ? ' is-selected' : ''}`}>
+                                <button type="button" className={`vd-folder${isSel ? ' is-selected' : ''}`} aria-pressed={isSel} style={{ paddingLeft: 10 + depth * 16 }}
+                                    onClick={() => setSelected(String(f.otherDocument_FolderID))} title={paths.get(f.otherDocument_FolderID)}>
                                     <i className={isSel ? 'pi pi-folder-open' : 'pi pi-folder'} />
                                     <span className="vd-folder__name">{f.folderName}</span>
                                     {f.vesselID === -1 && <span className="vd-folder__tag" title="Company folder for every vessel">all vessels</span>}
-                                    <span className="vd-folder__count">{counts.get(f.flD_FolderID) ?? 0}</span>
+                                    <span className="vd-folder__count">{counts.get(f.otherDocument_FolderID) ?? 0}</span>
                                 </button>
                                 {isSel && f.canEdit && (
                                     <span className="vd-folder__tools">
@@ -222,6 +227,8 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
                             </div>
                         );
                     })}
+                    <Button className="vd-folders__add" label="New folder" icon="pi pi-folder-plus" outlined size="small"
+                        onClick={() => setFolderDialog({})} />
                 </nav>
 
                 <section className="vd-docs">
@@ -241,12 +248,12 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
                             ? <span>This folder is empty. <Button label="Add a document here" link className="p-0" onClick={() => setNewDoc(true)} /></span>
                             : 'No documents.'}>
                         <Column field="documentNumber" header="No." sortable style={{ width: 110 }} body={(d: FolderDocument) => (
-                            <Button link className="p-0" label={d.documentNumber || '–'} onClick={() => openFiles(d)} disabled={d.fileCount === 0} />
+                            <span>{d.documentNumber || '–'}</span>
                         )} />
                         <Column field="documentTitle" header="Title" sortable />
                         <Column field="documentType" header="Type" sortable style={{ width: 120 }} />
                         {selected === ALL && <Column field="folderName" header="Folder" sortable style={{ width: 170 }} body={(d: FolderDocument) => (inFolder(d)
-                            ? <span className="vd-ellipsis" title={paths.get(d.flD_FolderID!)}><i className="pi pi-folder vd-muted" /> {d.folderName}</span>
+                            ? <span className="vd-ellipsis" title={paths.get(d.otherDocument_FolderID!)}><i className="pi pi-folder vd-muted" /> {d.folderName}</span>
                             : <span className="vd-muted">–</span>)} />}
                         <Column header="Source" style={{ width: 120 }} body={(d: FolderDocument) => {
                             const s = sourceOf(d);
@@ -255,7 +262,10 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
                         <Column field="uploadedOn" header="Added" sortable style={{ width: 130 }} body={(d: FolderDocument) => (
                             <span>{formatDate(d.uploadedOn)}<small className="vd-muted vd-block">{d.uploadedBy}</small></span>
                         )} />
-                        <Column field="fileCount" header="Files" sortable style={{ width: 64 }} />
+                        <Column field="fileCount" header="Files" sortable style={{ width: 80 }} body={(d: FolderDocument) => (
+                            <Button link className="p-0" label={String(d.fileCount)} onClick={() => openFiles(d)}
+                                disabled={d.fileCount === 0} aria-label={`Show ${d.fileCount} files for ${d.documentNumber}`} />
+                        )} />
                         <Column header="" style={{ width: 84 }} body={(d: FolderDocument) => (
                             <span className="vd-row-tools">
                                 <Button icon="pi pi-folder" text rounded size="small" aria-label="Move to folder" tooltip="Move to folder" onClick={() => setMoveDoc(d)} />
@@ -275,18 +285,18 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
 
             {folderDialog && (
                 <FolderFormDialog vesselId={vesselId} vesselName={vesselName} folders={folders} paths={paths} edit={folderDialog.edit}
-                    defaultParent={selectedFolder?.vesselID === vesselId ? selectedFolder.flD_FolderID : null}
+                    defaultParent={null}
                     onHide={() => setFolderDialog(null)}
                     onSaved={async (id) => { setFolderDialog(null); await load(); if (id) setSelected(String(id)); }} />
             )}
             {newDoc && (
                 <NewDocumentDialog vesselId={vesselId} vesselName={vesselName} folders={folders} paths={paths}
-                    defaultFolderId={selectedFolder?.canEdit ? selectedFolder.flD_FolderID : null}
+                    defaultFolderId={selectedFolder?.canEdit ? selectedFolder.otherDocument_FolderID : null}
                     onHide={() => setNewDoc(false)}
                     onSaved={async (folderId) => { setNewDoc(false); await load(); setSelected(folderId ? String(folderId) : LOOSE); }} />
             )}
             {moveDoc && (
-                <MoveDialog doc={moveDoc} folders={folders.filter((f) => f.canEdit)} paths={paths} onHide={() => setMoveDoc(null)}
+                <MoveDialog doc={moveDoc} folders={folders} paths={paths} onHide={() => setMoveDoc(null)}
                     onSaved={() => { setMoveDoc(null); load(); }} />
             )}
             {filesOf && (
@@ -297,6 +307,9 @@ const VesselDocuments: React.FC<Props> = ({ vesselId, vesselName, vesselMeta }) 
                             <Button link label={f.fileName} icon="pi pi-paperclip" className="p-0"
                                 onClick={() => openApiFile(featureApi.folders.documentFileUrl(f.id), f.fileName).catch((e) => notify.error(errorMessage(e)))} />
                             <span className="vd-muted">{formatSize(f.blobSize)}</span>
+                            <Button icon={downloadingFileId === f.id ? 'pi pi-spin pi-spinner' : 'pi pi-download'} text rounded
+                                size="small" aria-label={`Download ${f.fileName}`} tooltip="Download file"
+                                disabled={downloadingFileId !== null} onClick={() => downloadFile(f)} />
                         </div>
                     ))}
                 </Dialog>
@@ -319,18 +332,18 @@ const FolderFormDialog: React.FC<{
     const [name, setName] = useState(edit?.folderName ?? '');
     const [parentId, setParentId] = useState<number | null>(edit ? edit.parentID ?? null : defaultParent);
     const [busy, setBusy] = useState(false);
-    const parents = folders.filter((f) => f.vesselID === vesselId && f.canEdit && f.flD_FolderID !== edit?.flD_FolderID);
+    const parents = folders.filter((f) => f.vesselID === vesselId && f.canEdit && f.otherDocument_FolderID !== edit?.otherDocument_FolderID);
 
     const save = async () => {
         if (!name.trim()) return;
         setBusy(true);
         try {
             if (edit) {
-                await featureApi.folders.update(edit.flD_FolderID, {
+                await featureApi.folders.update(edit.otherDocument_FolderID, {
                     parentId: edit.parentID ?? null, name: name.trim(), scope: edit.scope, vesselId: edit.vesselID,
                     viewRoles: edit.viewRoles ?? null, editRoles: edit.editRoles ?? null,
                 });
-                onSaved(edit.flD_FolderID);
+                onSaved(edit.otherDocument_FolderID);
             } else {
                 const r = await featureApi.folders.create({ parentId, name: name.trim(), scope: 'Vessel', vesselId });
                 onSaved(r?.id);
@@ -354,7 +367,7 @@ const FolderFormDialog: React.FC<{
                     <div className="field full">
                         <label>Inside</label>
                         <Dropdown value={parentId} showClear placeholder="Top level" filter
-                            options={parents.map((f) => ({ label: paths.get(f.flD_FolderID), value: f.flD_FolderID }))}
+                            options={parents.map((f) => ({ label: paths.get(f.otherDocument_FolderID), value: f.otherDocument_FolderID }))}
                             onChange={(e) => setParentId(e.value ?? null)} />
                         <span className="hint">The folder also appears on board after the next sync, so the crew can file documents in it.</span>
                     </div>
@@ -368,7 +381,7 @@ const FolderFormDialog: React.FC<{
     );
 };
 
-/** A new document at the office (office only). Pick its folder, or create a new folder on the spot. */
+/** A new document at the office: office only, or sent to the vessel. Pick its folder, or create a new folder on the spot. */
 const NewDocumentDialog: React.FC<{
     vesselId: number;
     vesselName: string;
@@ -390,6 +403,7 @@ const NewDocumentDialog: React.FC<{
     const [reference, setReference] = useState('');
     const [comments, setComments] = useState('');
     const [files, setFiles] = useState<File[]>([]);
+    const [sendToVessel, setSendToVessel] = useState(false);
     const [busy, setBusy] = useState(false);
 
     useEffect(() => {
@@ -415,7 +429,7 @@ const NewDocumentDialog: React.FC<{
     const writable = folders.filter((f) => f.canEdit);
     const folderOptions = [
         { label: 'Not in a folder', value: NO_FOLDER as number | null },
-        ...writable.map((f) => ({ label: paths.get(f.flD_FolderID) ?? f.folderName, value: f.flD_FolderID as number | null })),
+        ...writable.map((f) => ({ label: paths.get(f.otherDocument_FolderID) ?? f.folderName, value: f.otherDocument_FolderID as number | null })),
         { label: '+ New folder…', value: NEW_FOLDER as number | null },
     ];
     const creatingFolder = folderId === NEW_FOLDER;
@@ -438,9 +452,10 @@ const NewDocumentDialog: React.FC<{
             if (reference.trim()) form.append('reference', reference.trim());
             if (comments.trim()) form.append('comments', comments.trim());
             form.append('vesselId', String(vesselId));
+            form.append('sendToVessel', String(sendToVessel));
             files.forEach((f) => form.append('files', f));
             await featureApi.folders.createDocument(target, form);
-            notify.success('Document saved at the office.');
+            notify.success(sendToVessel ? `Document saved. It goes to ${vesselName} with the next sync.` : 'Document saved at the office.');
             onSaved(target);
         } catch (err) {
             notify.error(errorMessage(err), 'Could not save the document');
@@ -451,10 +466,19 @@ const NewDocumentDialog: React.FC<{
 
     return (
         <Dialog className="vd-dialog" header={`New document – ${vesselName}`} visible onHide={onHide} style={{ width: 720, maxWidth: '96vw' }}>
-            <div className="vd-note">
-                <i className="pi pi-info-circle" /> Saved at the office only. It is <strong>not sent</strong> to {vesselName}.
-            </div>
             <div className="feature-form">
+                <div className="field full">
+                    <label id="nd-where">Where it is kept</label>
+                    <SelectButton aria-labelledby="nd-where" className="vd-where" value={sendToVessel} allowEmpty={false}
+                        options={[{ label: 'Office only', value: false }, { label: `Send to ${vesselName}`, value: true }]}
+                        onChange={(e) => setSendToVessel(e.value === true)} />
+                    <span className={`vd-note${sendToVessel ? ' is-send' : ''}`}>
+                        <i className={sendToVessel ? 'pi pi-send' : 'pi pi-info-circle'} />
+                        {sendToVessel
+                            ? <span>Sent to <strong>{vesselName}</strong> with the next sync; the crew sees it on board.</span>
+                            : <span>Saved at the office only. It is <strong>not sent</strong> to {vesselName}.</span>}
+                    </span>
+                </div>
                 <div className="field full">
                     <label>Folder</label>
                     <Dropdown value={folderId ?? NO_FOLDER} options={folderOptions} onChange={(e) => setFolderId(e.value ? e.value : null)} filter />
@@ -468,7 +492,7 @@ const NewDocumentDialog: React.FC<{
                         <div className="field">
                             <label>Inside</label>
                             <Dropdown value={newFolderParent} showClear placeholder="Top level"
-                                options={writable.filter((f) => f.vesselID === vesselId).map((f) => ({ label: paths.get(f.flD_FolderID), value: f.flD_FolderID }))}
+                                options={writable.filter((f) => f.vesselID === vesselId).map((f) => ({ label: paths.get(f.otherDocument_FolderID), value: f.otherDocument_FolderID }))}
                                 onChange={(e) => setNewFolderParent(e.value ?? null)} />
                         </div>
                     </>
@@ -515,32 +539,75 @@ const NewDocumentDialog: React.FC<{
 /** Files a document in another folder of this vessel, or takes it out of its folder. */
 const MoveDialog: React.FC<{ doc: FolderDocument; folders: FolderItem[]; paths: Map<number, string>; onHide: () => void; onSaved: () => void }> =
     ({ doc, folders, paths, onHide, onSaved }) => {
-        const [folderId, setFolderId] = useState<number | null>(doc.flD_FolderID ?? null);
+        const [folderId, setFolderId] = useState<number | null | undefined>(undefined);
         const [busy, setBusy] = useState(false);
-        const save = async () => {
-            setBusy(true);
-            try {
-                await featureApi.folders.moveDocument(doc.otherDocumentMasterID, folderId);
-                onSaved();
-            } catch (err) {
-                notify.error(errorMessage(err));
-            } finally {
-                setBusy(false);
-            }
+        const currentFolder = doc.otherDocument_FolderID == null
+            ? 'Not in a folder'
+            : paths.get(doc.otherDocument_FolderID) ?? doc.folderName ?? 'Unknown folder';
+        const destinationFolder = folderId == null
+            ? 'Not in a folder'
+            : paths.get(folderId) ?? 'Selected folder';
+        const unchangedDestination = folderId === undefined || folderId === (doc.otherDocument_FolderID ?? null);
+        const save = () => {
+            if (unchangedDestination || busy) return;
+            confirmDialog({
+                header: 'Confirm move',
+                message: (
+                    <div className="vd-move-confirm-message">
+                        <span className="vd-move-confirm-message__title">
+                            Move {doc.documentNumber} – {doc.documentTitle}?
+                        </span>
+                        <span className="vd-move-confirm-message__route">
+                            <span><strong>From</strong> {currentFolder}</span>
+                            <i className="pi pi-arrow-right" aria-hidden="true" />
+                            <span><strong>To</strong> {destinationFolder}</span>
+                        </span>
+                    </div>
+                ),
+                icon: 'pi pi-exclamation-triangle',
+                acceptLabel: 'Move',
+                rejectLabel: 'Cancel',
+                className: 'vd-move-confirm-dialog',
+                accept: async () => {
+                    setBusy(true);
+                    try {
+                        await featureApi.folders.moveDocument(doc.otherDocumentMasterID, folderId);
+                        onSaved();
+                    } catch (err) {
+                        notify.error(errorMessage(err));
+                    } finally {
+                        setBusy(false);
+                    }
+                },
+            });
         };
+        const destinationFolders = folders.filter((folder) =>
+            folder.canEdit && folder.otherDocument_FolderID !== doc.otherDocument_FolderID
+        );
         return (
             <Dialog className="vd-dialog" header={`Move ${doc.documentNumber}`} visible onHide={onHide} style={{ width: 480, maxWidth: '96vw' }}>
                 <div className="feature-form">
                     <div className="field full">
-                        <label>Folder</label>
-                        <Dropdown value={folderId} filter showClear placeholder="Not in a folder"
-                            options={folders.map((f) => ({ label: paths.get(f.flD_FolderID), value: f.flD_FolderID }))}
+                        <label>Current folder</label>
+                        <div className="vd-move-current-folder">
+                            <i className="pi pi-folder" aria-hidden="true" />
+                            <span>{currentFolder}</span>
+                        </div>
+                    </div>
+                    <div className="field full">
+                        <label htmlFor="vd-move-destination">Move to</label>
+                        <Dropdown inputId="vd-move-destination" value={folderId} filter showClear
+                            placeholder="Choose a destination folder"
+                            options={destinationFolders.map((folder) => ({
+                                label: paths.get(folder.otherDocument_FolderID) ?? folder.folderName,
+                                value: folder.otherDocument_FolderID,
+                            }))}
                             onChange={(e) => setFolderId(e.value ?? null)} />
                     </div>
                 </div>
                 <div className="vd-dialog-actions">
                     <Button label="Cancel" text onClick={onHide} />
-                    <Button label="Move" icon="pi pi-check" loading={busy} onClick={save} />
+                    <Button label="Move" icon="pi pi-check" loading={busy} disabled={unchangedDestination || busy} onClick={save} />
                 </div>
             </Dialog>
         );

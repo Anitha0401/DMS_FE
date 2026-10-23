@@ -6,7 +6,7 @@ import { Checkbox } from 'primereact/checkbox';
 import dmsLifecycleService, { errorMessage } from '../../services/DMSLifecycleService';
 import { itemLink } from '../../services/featureApi';
 import { sanitizeHtml } from '../utils/sanitize';
-import './Features.scss';
+import '../Features/Features.scss';
 
 interface ManualPreviewDialogProps {
     manualId: number;

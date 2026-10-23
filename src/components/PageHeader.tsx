@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
-import { Menu } from 'primereact/menu';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { SelectButton } from 'primereact/selectbutton';
 import ChangePasswordDialog from './Account/ChangePasswordDialog';
+import { useInboxCount } from './Features/useInboxCount';
 import { useTheme } from '../contexts/ThemeContext';
 import authService from '../services/authService';
 import { COMPANY_NAME, ENV_LABEL } from '../config/appConfig';
@@ -38,6 +38,7 @@ const NAV_LINKS: { to: string; label: string; icon: string; match: (path: string
   { to: '/vessel-sync', label: 'Vessel sync', icon: 'pi pi-sync', match: (p) => p.startsWith('/vessel-sync') },
   { to: '/pending', label: 'Pending acks', icon: 'pi pi-clock', match: (p) => p.startsWith('/pending') },
   { to: '/suggestions', label: 'Suggestions', icon: 'pi pi-comments', match: (p) => p.startsWith('/suggestions') },
+  { to: '/inbox', label: 'Inbox', icon: 'pi pi-inbox', match: (p) => p.startsWith('/inbox') },
 ];
 
 /** one word -> first two letters. */
@@ -58,8 +59,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions }) =
   const [searchParams] = useSearchParams();
   const [manualLinkView, setManualLinkView] = useManualLinkView();
   const settingsRef = useRef<OverlayPanel>(null);
-  const userMenuRef = useRef<Menu>(null);
+  const userMenuRef = useRef<OverlayPanel>(null);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const unreadInbox = useInboxCount();
 
   // Header search box: Enter opens the Search page. On that page it shows the current query.
   const onSearchPage = path.startsWith('/search');
@@ -75,13 +77,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions }) =
     const types = onSearchPage ? searchParams.get('types') : null;
     navigate(`/search?q=${encodeURIComponent(q)}${types ? `&types=${encodeURIComponent(types)}` : ''}`);
   };
-
-  const userMenu = [
-    { label: user?.userName || user?.userId || '', disabled: true, className: 'header-user-menu-name' },
-    { separator: true },
-    { label: 'Change password', icon: 'pi pi-key', command: () => setChangePasswordOpen(true) },
-    { label: 'Log out', icon: 'pi pi-sign-out', command: () => authService.logout() },
-  ];
 
   return (
     <header className="header-bar">
@@ -103,10 +98,13 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions }) =
               to={link.to}
               className={() => 'header-nav-link' + (active ? ' active' : '')}
               aria-current={active ? 'page' : undefined}
-              title={link.label}
+              title={link.to === '/inbox' && unreadInbox > 0 ? `Inbox – ${unreadInbox} unread` : link.label}
             >
               <i className={link.icon} aria-hidden="true" />
               <span className="header-nav-text">{link.label}</span>
+              {link.to === '/inbox' && unreadInbox > 0 && (
+                <span className="header-badge" aria-label={`${unreadInbox} unread`}>{unreadInbox > 99 ? '99+' : unreadInbox}</span>
+              )}
             </NavLink>
           );
         })}
@@ -170,7 +168,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions }) =
             type="button"
             className="header-user-button"
             onClick={(e) => userMenuRef.current?.toggle(e)}
-            aria-haspopup="menu"
+            aria-haspopup="dialog"
             title="Account"
           >
             <span className="header-avatar" aria-hidden="true">{initials(user?.userName)}</span>
@@ -180,7 +178,31 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subContent, actions }) =
             </span>
             <i className="pi pi-angle-down header-user-caret" aria-hidden="true" />
           </button>
-          <Menu model={userMenu} popup ref={userMenuRef} className="header-user-menu" />
+          {/* Account card: who is logged in, and Change password. Logging out is the button next to it. */}
+          <OverlayPanel ref={userMenuRef} className="header-user-menu" aria-label="Account">
+            <div className="hum-head">
+              <span className="header-avatar hum-avatar" aria-hidden="true">{initials(user?.userName)}</span>
+              <div className="hum-who">
+                <span className="hum-name">{user?.userName || user?.userId || ''}</span>
+                <span className="hum-meta">
+                  {user?.userId && <span className="hum-id"><i className="pi pi-user" aria-hidden="true" /> {user.userId}</span>}
+                  {user?.role && <span className="hum-role">{user.role}</span>}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="hum-item"
+              onClick={() => { userMenuRef.current?.hide(); setChangePasswordOpen(true); }}
+            >
+              <span className="hum-item-icon"><i className="pi pi-key" aria-hidden="true" /></span>
+              <span className="hum-item-text">
+                <span className="hum-item-label">Change password</span>
+                <span className="hum-item-desc">Update the password you log in with</span>
+              </span>
+              <i className="pi pi-angle-right hum-item-chev" aria-hidden="true" />
+            </button>
+          </OverlayPanel>
           <button
             type="button"
             className="header-logout"

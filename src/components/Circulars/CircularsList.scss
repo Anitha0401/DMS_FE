@@ -888,11 +888,159 @@
         .p-dropdown .p-dropdown-label { font-size: 1rem; }
     }
 
-    .custom-tree .p-treenode-label { font-size: 1rem; }
+    .custom-tree {
+        height: 100%;
+        padding: 0.35rem;
+        border: 0;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--text-primary);
+
+        .p-tree-container > .p-treenode {
+            margin: 0 0 0.25rem;
+        }
+
+        .p-treenode-content {
+            min-width: 0;
+            gap: 0.35rem;
+            padding: 0.4rem 0.55rem;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+
+            &:hover {
+                background: color-mix(in srgb, var(--primary-color) 6%, var(--bg-secondary));
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 28%, transparent);
+            }
+
+            &.p-highlight {
+                border-color: color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+                background: color-mix(in srgb, var(--primary-color) 12%, var(--bg-secondary));
+                color: var(--text-primary);
+            }
+        }
+
+        .p-treenode-children {
+            margin: 0.15rem 0 0.35rem 0.85rem;
+            padding-left: 0.45rem;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .p-tree-toggler {
+            flex: 0 0 1.65rem;
+            width: 1.65rem;
+            height: 1.65rem;
+            margin-right: 0.1rem;
+            color: var(--text-secondary);
+
+            &:hover { color: var(--primary-color); }
+        }
+
+        .p-treenode-label {
+            display: block;
+            flex: 1 1 auto;
+            min-width: 0;
+            font-size: 0.95rem;
+        }
+    }
 
     .circulars-grid .grid-item .meta-item { font-size: 0.95rem; }
 
     .p-paginator { font-size: 0.95rem; }
+}
+
+.tree-category-label,
+.tree-circular-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+    width: 100%;
+}
+
+.tree-category-label {
+    color: var(--text-primary);
+    font-weight: 650;
+
+    > .pi-folder {
+        color: var(--primary-color);
+        font-size: 0.9rem;
+    }
+}
+
+.tree-category-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4rem;
+    height: 1.4rem;
+    margin-left: auto;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary-color) 9%, var(--bg-secondary));
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.tree-circular-number {
+    flex: 0 0 auto;
+    padding: 0.2rem 0.45rem;
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--primary-color) 8%, var(--bg-secondary));
+    color: var(--primary-color);
+    font-size: 0.76rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+}
+
+.tree-circular-title {
+    overflow: hidden;
+    color: var(--text-primary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.circulars-split-container .custom-tree .p-treenode-content.p-highlight {
+    .tree-circular-number {
+        background: color-mix(in srgb, var(--primary-color) 17%, var(--bg-secondary));
+    }
+}
+
+.circular-context-menu {
+    min-width: 13rem;
+    padding: 0.35rem;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+
+    .p-menuitem-content {
+        border-radius: 7px;
+        transition: background-color 0.15s ease;
+
+        &:hover { background: color-mix(in srgb, var(--primary-color) 8%, var(--bg-secondary)); }
+    }
+
+    .p-menuitem-link {
+        gap: 0.65rem;
+        padding: 0.65rem 0.75rem;
+        color: var(--text-primary);
+        font-size: 0.88rem;
+    }
+
+    .p-menuitem-icon {
+        width: 1rem;
+        color: var(--primary-color);
+    }
+
+    .p-menuitem.p-disabled {
+        opacity: 0.45;
+    }
 }
 
 .circular-favorites-heading {

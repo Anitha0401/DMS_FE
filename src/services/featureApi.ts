@@ -5,7 +5,7 @@ import dmsLifecycleService from './DMSLifecycleService';
 
 /**
  * The new features (office API: FeatureControllers.cs): pending acknowledgements, inbox, circular extras,
- * suggestions, folders, certificates and search.
+ * suggestions, folders, and search.
  */
 
 // ---- Types (match DMS.Application/Interface/IFeatureServices.cs; JSON is camelCase) ----
@@ -150,7 +150,7 @@ export interface SuggestionDetail extends SuggestionListItem {
 }
 
 export interface FolderItem {
-    flD_FolderID: number;
+    otherDocument_FolderID: number;
     vesselID: number;
     vesselName?: string;
     parentID?: number | null;
@@ -179,7 +179,7 @@ export interface FolderDocument {
     /** Office-only document: the vessel it is about. */
     relatedVesselID?: number | null;
     vesselName?: string;
-    flD_FolderID?: number | null;
+    otherDocument_FolderID?: number | null;
     folderName?: string | null;
     /** Added at the office and kept there (never sent to a vessel). */
     isOfficeOnly: boolean;
@@ -195,37 +195,7 @@ export interface FolderDocument {
     origin?: string;
     fileCount: number;
     firstFileID?: number;
-    isCertificate: boolean;
     expiryDate?: string;
-}
-
-export interface CertificateItem {
-    otherDocumentMasterID: number;
-    vesselID: number;
-    vesselName?: string;
-    otherDocument_TypeID?: number;
-    documentType?: string;
-    documentNumber?: string;
-    documentTitle?: string;
-    certificateNo?: string;
-    issuedBy?: string;
-    issueDate?: string;
-    expiryDate?: string;
-    nextSurveyDate?: string;
-    replacesID?: number;
-    warningDays: number;
-    remarks?: string;
-    fileCount: number;
-    firstFileID?: number;
-    status: 'Valid' | 'Expiring' | 'Expired' | 'NoExpiry';
-}
-
-export interface CertificateType {
-    otherDocument_TypeID: number;
-    documentCode?: string;
-    documentType?: string;
-    isCertificate: boolean;
-    warningDays: number;
 }
 
 export interface SearchHit {
@@ -297,8 +267,6 @@ export const itemLink = (itemType: string, itemId: number): { pathname: string; 
             return { pathname: '/circulars', search: `?cirmode=allCirculars&id=${itemId}` };
         case 'Alert':
             return { pathname: '/circulars', search: `?cirmode=allAlerts&id=${itemId}` };
-        case 'Certificate':
-            return { pathname: '/certificates', search: `?id=${itemId}` };
         case 'Suggestion':
             return { pathname: '/suggestions', search: `?id=${itemId}` };
         default:
@@ -311,7 +279,6 @@ export const ITEM_ICONS: Record<string, string> = {
     Circular: 'pi pi-megaphone',
     Alert: 'pi pi-exclamation-triangle',
     Document: 'pi pi-file',
-    Certificate: 'pi pi-verified',
     Suggestion: 'pi pi-comments',
 };
 
@@ -392,16 +359,7 @@ const featureApi = {
         moveDocument: (documentId: number, folderId: number | null) => api.putApiCall(`OtherDocument/Documents/${documentId}/Folder`, { folderId }),
         documentFiles: (documentId: number): Promise<FileItem[]> => api.getApiCall(`OtherDocument/Documents/${documentId}/Files`),
         /** An Other Document file (OtherDocument_Blob). */
-        documentFileUrl: (blobId: number) => `Certificates/File/${blobId}`,
-    },
-
-    certificates: {
-        list: (vesselId?: number | null, status?: string | null, includeReplaced = false): Promise<CertificateItem[]> =>
-            api.getApiCall(`Certificates${q({ vesselId, status, includeReplaced })}`),
-        types: (): Promise<CertificateType[]> => api.getApiCall('Certificates/Types'),
-        saveType: (t: CertificateType) => api.putApiCall(`Certificates/Types/${t.otherDocument_TypeID}`, { isCertificate: t.isCertificate, warningDays: t.warningDays }),
-        create: (form: FormData): Promise<{ id: number }> => postForm('Certificates', form),
-        fileUrl: (blobId: number) => `Certificates/File/${blobId}`,
+        documentFileUrl: (blobId: number) => `OtherDocument/Files/${blobId}`,
     },
 
     search: (query: string, types?: string | null): Promise<SearchHit[]> => api.getApiCall(`Search${q({ q: query, types })}`),

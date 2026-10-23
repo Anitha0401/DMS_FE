@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import DocumentVesselList, { Vessel } from './DocumentVesselList';
 import VesselDocuments from './VesselDocuments';
+import { ReportPanel } from '../../Reports/ReportsPage';
+import '../../Reports/ReportsPage.scss';
 import './DashboardOtherDocument.scss';
 import '../../Features/Features.scss';
 
@@ -11,17 +13,26 @@ export interface DashboardProps {
 /**
  * Other Documents: pick a vessel on the left; its folders and documents open on the right, with
  * "New folder" and "New document". Documents added here stay at the office; documents added on board come up.
+ * "All vessels" at the top of the list opens the fleet-wide reports (documents register, certificate expiry).
  */
 const DashboardOtherDocuments: React.FC<DashboardProps> = () => {
     const [vessel, setVessel] = useState<Vessel | null>(null);
+    const [allVessels, setAllVessels] = useState(false);
 
     return (
         <div className="dashboard-wrapper other-documents-dashboard">
             <div className="od-layout">
-                <DocumentVesselList selectedVesselId={vessel?.vesselID ?? null} onSelectionChange={(list) => setVessel(list[0] ?? null)} />
+                <DocumentVesselList
+                    selectedVesselId={vessel?.vesselID ?? null}
+                    onSelectionChange={(list) => { setVessel(list[0] ?? null); setAllVessels(false); }}
+                    allSelected={allVessels}
+                    onAllVessels={() => { setAllVessels((on) => !on); setVessel(null); }}
+                />
 
-                <section className="od-panel">
-                    {vessel ? (
+                <section className={`od-panel${allVessels ? ' od-panel--reports' : ''}`}>
+                    {allVessels ? (
+                        <ReportPanel context="documents" layout="tabs" />
+                    ) : vessel ? (
                         <VesselDocuments
                             key={vessel.vesselID}
                             vesselId={vessel.vesselID}

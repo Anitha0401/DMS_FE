@@ -5,7 +5,7 @@
 
 /** GET api/Search?q=&types= (DMS.Application.DTO.Features.SearchHit). */
 export interface SearchHit {
-    /** Manual | Circular | Alert | Document | Certificate | Suggestion */
+    /** Manual | Circular | Alert | Document |  Suggestion */
     itemType: string;
     itemID: number;
     number?: string | null;
